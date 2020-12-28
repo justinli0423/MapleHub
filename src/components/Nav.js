@@ -3,41 +3,138 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  NavLink,
 } from "react-router-dom";
+import styled from "styled-components";
+
+const Container = styled.div`
+  position: sticky;
+  top: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f6f6f6;
+  border-bottom: 3px solid #e5e5e5;
+`;
+
+const OptionsContainer = styled.div`
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+
+  span {
+    height: 100%;
+    padding: 40px 0;
+  }
+`;
+
+const LogoContainer = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 40px 0 32px;
+
+  h1 {
+    font-weight: normal;
+  }
+`;
+
+const Icon = styled.div`
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  margin-top: -40px;
+  background: url("maple.png") no-repeat local center;
+  background-size: 50px 50px;
+`;
+
+const LogoBar = styled.div`
+  position: absolute;
+  width: 6px;
+  height: 50px;
+  left: 0px;
+  border-radius: 0 10px 10px 0;
+  background: #b60d0d;
+`;
+
+const ActiveBar = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  top: 0px;
+  background: #b60d0d;
+  border-radius: 0 0 10px 10px;
+`;
+
+const Item = styled.span`
+  position: relative;
+  ${ActiveBar} {
+    opacity: 0;
+  }
+`;
+
+const StyledLink = styled(NavLink)`
+  text-decoration: none;
+  color: black;
+
+  &.active {
+    ${ActiveBar} {
+      opacity: 1;
+    }
+  }
+`;
 
 export default function Nav() {
   return (
     <Router>
-      <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Updates</Link>
-            </li>
-            <li>
-              <Link to="/about">Reminders</Link>
-            </li>
-            <li>
-              <Link to="/users">Legion Board</Link>
-            </li>
-          </ul>
-        </nav>
+      <Container>
+        <LogoContainer>
+          <LogoBar />
+          <h1>MapleHub</h1>
+          <Icon />
+        </LogoContainer>
+        <OptionsContainer>
+          <StyledLink exact to="">
+            <Item>
+              <ActiveBar />
+              Updates
+            </Item>
+          </StyledLink>
+          <StyledLink to="/reminders">
+            <Item>
+              <ActiveBar />
+              Reminders
+            </Item>
+          </StyledLink>
+          <StyledLink to="/legion">
+            <Item>
+              <ActiveBar />
+              Legion Board
+            </Item>
+          </StyledLink>
+          <Item>
+            <ActiveBar />
+            Maple.gg
+          </Item>
+        </OptionsContainer>
+      </Container>
 
-        {/* A <Switch> looks through its children <Route>s and
+      {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
-        <Switch>
-          <Route path="/about">
-            <About />
-          </Route>
-          <Route path="/users">
-            <Users />
-          </Route>
-          <Route path="/">
-            <Home />
-          </Route>
-        </Switch>
-      </div>
+      <Switch>
+        <Route path="/legion">
+          <Legion />
+        </Route>
+        <Route path="/reminders">
+          <Reminders />
+        </Route>
+        <Route path="/">
+          <Home />
+        </Route>
+      </Switch>
     </Router>
   );
 }
@@ -46,10 +143,10 @@ function Home() {
   return <h2>Updates</h2>;
 }
 
-function About() {
-  return <h2>Reminders</h2>;
+function Legion() {
+  return <h2>Legion Board</h2>;
 }
 
-function Users() {
-  return <h2>Legion Board</h2>;
+function Reminders() {
+  return <h2>Reminders</h2>;
 }
