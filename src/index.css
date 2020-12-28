@@ -1,0 +1,24 @@
+@font-face {
+  font-family: 'mapleStory';
+  src: url('font/mapleLight.ttf');
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'mapleStory';
+  src: url('font/mapleBold.ttf');
+  font-weight: bold;
+}
+
+body {
+  margin: 0;
+  font-family: 'mapleStory';
+  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
