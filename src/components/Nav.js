@@ -6,6 +6,7 @@ import {
   NavLink,
 } from "react-router-dom";
 import styled from "styled-components";
+import Home from '../pages/Home';
 
 const Container = styled.div`
   position: sticky;
@@ -35,7 +36,7 @@ const LogoContainer = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  padding: 0 40px 0 32px;
+  padding: 0 40px 0 24px;
 
   h1 {
     font-weight: normal;
@@ -87,6 +88,12 @@ const StyledLink = styled(NavLink)`
   }
 `;
 
+const MainContainer = styled.div`
+  margin: 0 auto;
+  width: 1024px;
+  border: 1px solid grey;
+`;
+
 export default function Nav() {
   return (
     <Router>
@@ -124,23 +131,21 @@ export default function Nav() {
 
       {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
-      <Switch>
-        <Route path="/legion">
-          <Legion />
-        </Route>
-        <Route path="/reminders">
-          <Reminders />
-        </Route>
-        <Route path="/">
-          <Home />
-        </Route>
-      </Switch>
+      <MainContainer>
+        <Switch>
+          <Route path="/legion">
+            <Legion />
+          </Route>
+          <Route path="/reminders">
+            <Reminders />
+          </Route>
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
+      </MainContainer>
     </Router>
   );
-}
-
-function Home() {
-  return <h2>Updates</h2>;
 }
 
 function Legion() {
