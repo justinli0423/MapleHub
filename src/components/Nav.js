@@ -6,7 +6,7 @@ import {
   NavLink,
 } from "react-router-dom";
 import styled from "styled-components";
-import Home from '../pages/Home';
+import Home from "../pages/Home";
 
 const Container = styled.div`
   z-index: 100000;

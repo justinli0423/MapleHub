@@ -59,29 +59,75 @@ const ModalTextArea = styled.textarea`
 
 const NewsContainer = styled.div``;
 
+const findYearForEvent = (eventTimeStamp, patchNotesDate) => {
+  // all event dates are assumed to be in current year
+  const threeMonthsBeforePatch = patchNotesDate.setMonth(
+    patchNotesDate.getMonth() - 3
+  );
+  const threeMonthsAfterPatch = patchNotesDate.setMonth(
+    patchNotesDate.getMonth() + 6
+  );
+  const yearThreeMonthsBeforePatch = new Date(
+    threeMonthsBeforePatch
+  ).getFullYear();
+  const yearThreeMonthsAfterPatch = new Date(
+    threeMonthsAfterPatch
+  ).getFullYear();
+
+  if (yearThreeMonthsBeforePatch === yearThreeMonthsAfterPatch) {
+    // event period within the same year
+    if (eventTimeStamp < threeMonthsBeforePatch) {
+      // if event occurs before window: assume next year
+      return patchNotesDate.getFullYear() + 1;
+    }
+    if (eventTimeStamp > threeMonthsBeforePatch) {
+      // if event occurs during/after window: assume this year
+      return patchNotesDate.getFullYear();
+    }
+  } else {
+    // event period on different years (e.g. sept 2020 -> march 2021)
+
+    if (
+      eventTimeStamp > threeMonthsBeforePatch &&
+      eventTimeStamp < threeMonthsAfterPatch
+    ) {
+      // if event occurs during window and month < dec: assume this year
+      return yearThreeMonthsBeforePatch;
+    }
+    if (eventTimeStamp < threeMonthsBeforePatch) {
+      // if event occurs after event duration: assume next year
+      return yearThreeMonthsAfterPatch;
+    }
+  }
+};
+
 const cleanDateString = (dateString, patchNodesTimeStamp) => {
   const filteredDate = dateString
-    .replace("UTC: Available after", "")
-    .replace("at", ",")
-    .replace("(after maintenance)", "12:00 AM")
-    .concat(new Date().getFullYear());
+    .replace("UTC:", "")
+    .replace("Available after", "")
+    .replace(/part\s[0-9]*:\s/gi, "")
+    .replace("at", "")
+    .replaceAll(/\((before|after)\smaintenance\)/gi, "")
+    .replaceAll(/\s/gi, " ")
+    .concat(" " + new Date().getFullYear() + " ")
+    .concat("UTC");
   const filteredDateObject = new Date(filteredDate);
   const timeStamp = Date.parse(filteredDate);
-  // TODO: fix the time stamp stuff 
-  // if the event start date is 4 months before the patch notes, it must be referring to the following year
+  const patchNotesDate = new Date(patchNodesTimeStamp);
   const filteredDateWithYear = filteredDateObject.setYear(
-    timeStamp < patchNodesTimeStamp
-      ? new Date().getFullYear() + 1
-      : new Date().getFullYear()
+    findYearForEvent(timeStamp, patchNotesDate)
   );
-  // TODO: set date to UTC before returning
-  // console.log(new Date(filteredDateWithYear));
   return filteredDateWithYear;
 };
 
 const handleSingleEvent = (dateArray, patchNodesTimeStamp) => {
-  const [startTime, endTime] = [cleanDateString(dateArray[0], patchNodesTimeStamp), cleanDateString(dateArray[1], patchNodesTimeStamp)];
-  console.log(new Date(startTime), new Date(endTime));
+  const [startTime, endTime] = [
+    cleanDateString(dateArray[0], patchNodesTimeStamp),
+    cleanDateString(dateArray[1], patchNodesTimeStamp),
+  ];
+  // console.log(dateArray);
+  // console.log(new Date(startTime), " TO ", new Date(endTime));
+  return [startTime, endTime];
 };
 
 const handleMultipleEvents = (dateArray, patchNodesTimeStamp) => {};
@@ -148,7 +194,7 @@ export default class Home extends Component {
      * 2. grab all the following elements
      *
      */
-
+    console.log(`PATCH NOTES DATE: ${new Date(patchNodesTimeStamp)}`);
     nodeList.forEach((node, i) => {
       if (node.nodeName === NodeNames.H3) {
         sectionDetails.push({
@@ -159,25 +205,20 @@ export default class Home extends Component {
           requirements: "",
           details: "",
           rewards: "",
-          // pinned: false,
+          pinned: false,
           pinId: -1,
         });
       } else if (sectionDetails.length) {
         const lastSectionDetail = sectionDetails[sectionDetails.length - 1];
         let isRewardsIMG = node.childNodes[0].nodeName === NodeNames.IMG;
-        // console.log(node);
         if (node.nodeName === NodeNames.UL) {
           lastSectionDetail.details = node.innerHTML;
         }
         if (node.nodeName === NodeNames.P && !isRewardsIMG) {
-          // console.log(node.innerText);
           const text = node.innerText;
-
           if (text.includes(Keywords.DATES)) {
             const unfilteredDate = text.split(/-|–/g);
             const dateCount = unfilteredDate.length;
-            // console.log(dateCount)
-            // console.log(text);
             /**
              * 3 CASES:
              * 1. no end date [prio: 2]
@@ -186,28 +227,33 @@ export default class Home extends Component {
              */
 
             switch (dateCount) {
-              // no end date
               case 1:
+                // no end date
                 lastSectionDetail.startDate = cleanDateString(
                   unfilteredDate[0],
                   patchNodesTimeStamp
                 );
                 lastSectionDetail.endDate = null;
+                // console.log(
+                //   "CASE 1 (NO END DATE): ",
+                //   new Date(lastSectionDetail.startDate)
+                // );
                 break;
-              // single duration
               case 2:
-                // console.log(unfilteredDate);
-                handleSingleEvent(unfilteredDate, patchNodesTimeStamp);
+                // single duration
+                [
+                  lastSectionDetail.startDate,
+                  lastSectionDetail.endDate,
+                ] = handleSingleEvent(unfilteredDate, patchNodesTimeStamp);
                 break;
-              // multiple dates
               default:
+                // multiple dates
                 handleMultipleEvents(unfilteredDate, patchNodesTimeStamp);
                 break;
             }
           }
           if (text.includes(Keywords.REQUIREMENTS)) {
             lastSectionDetail.requirements = text.split(":")[1];
-            // console.log(lastSectionDetail.requirements);
           }
           if (text.includes(Keywords.REWARDS)) {
           }
@@ -243,10 +289,9 @@ export default class Home extends Component {
     const doc = new DOMParser().parseFromString(newsStringHTML, "text/html");
     const body = doc.querySelector("div.article-content");
     const patchNodesTimeStamp = Date.parse(
-      doc.querySelector(".timestamp").innerText
+      doc.querySelector(".timestamp").innerText + "UTC"
     );
     // const targetNode = this.newsRef.current;
-    // console.log(body);
     // targetNode.appendChild(body);
     this.handleNewsHTML(body, patchNodesTimeStamp);
   }
