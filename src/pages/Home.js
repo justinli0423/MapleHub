@@ -3,6 +3,7 @@ import Title from "../components/common/Title";
 import Button from "../components/common/Button";
 import styled from "styled-components";
 import { Modal } from "@material-ui/core";
+import EventTile from "../components/EventTile";
 
 const NodeNames = {
   H1: "H1",
@@ -31,9 +32,16 @@ Object.freeze(Keywords);
 Object.freeze(EventTypes);
 
 const Container = styled.div`
-  width: 1024px;
+  position: relative;
+  /* width: 1024px; */
+  width: 100%;
   margin: 0 auto;
   text-align: center;
+`;
+
+const HeaderContainer = styled.div`
+  width: 1024px;
+  margin: 0 auto;
 `;
 
 const Banner = styled.img`
@@ -64,7 +72,29 @@ const ModalTextArea = styled.textarea`
   height: 100%;
 `;
 
-const NewsContainer = styled.div``;
+const LastUpdatedHeader = styled.h2`
+  font-size: 18px;
+  font-weight: normal;
+`;
+
+const NewsContainer = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  margin: 32px auto;
+  width: 1024px;
+`;
+
+const TileContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  margin: 32px auto;
+  width: 100%;
+`;
 
 const findYearForEvent = (eventTimeStamp, patchNotesDate) => {
   // all event dates are assumed to be in current year
@@ -204,29 +234,8 @@ export default class Home extends Component {
   // ===== HTML UTILITY FUNCTIONS ===== //
 
   handleSubSectionNews(body, patchNodesTimeStamp) {
-    /** object format for this.state.newsDetails.sectionDetails
-     * [
-     *    {
-     *      orderId: 1,
-     *      eventName: '',
-     *      duration: Date(),
-     *      requirements: '',
-     *      eventType: typeOf(EventTypes),
-     *      eventTimes: [[start,end], [start,end]]
-     *      details: '',
-     *      pinned: boolean [different list for pinned using pinnedId],
-     *      pinId: 1
-     *    },
-     * ]
-     */
-
     const sectionDetails = [];
     const nodeList = Array.from(body.children);
-    /**
-     * 1. find h3 - boolean 'isNewSection' set as true
-     * 2.   grab all the following elements
-     *
-     */
     console.log(`PATCH NOTES DATE: ${new Date(patchNodesTimeStamp)}`);
     nodeList.forEach((node, i) => {
       if (node.nodeName === NodeNames.H3) {
@@ -252,13 +261,6 @@ export default class Home extends Component {
           if (text.includes(Keywords.DATES)) {
             const unfilteredDate = text.split(/-|–/g);
             const dateCount = unfilteredDate.length;
-            /**
-             * 3 CASES:
-             * 1. no end date [prio: 2]
-             * 2. end date [prio: 1]
-             * 3. multiple dates [prio: 1]
-             */
-
             switch (dateCount) {
               case 1:
                 // no end date
@@ -315,7 +317,6 @@ export default class Home extends Component {
     });
   }
 
-  // TODO: check dates of patch notes, and run this only when new patch notes are out
   // This function should only be ran when new patch notes are out
   // TODO: find count of subsections (count of h3s) and render placeholders?
   getNews() {
@@ -324,10 +325,8 @@ export default class Home extends Component {
     const doc = new DOMParser().parseFromString(newsStringHTML, "text/html");
     const body = doc.querySelector("div.article-content");
     const patchNodesTimeStamp = Date.parse(
-      doc.querySelector(".timestamp").innerText + "UTC"
+      doc.querySelector(".timestamp").innerText
     );
-    // const targetNode = this.newsRef.current;
-    // targetNode.appendChild(body);
     this.handleNewsHTML(body, patchNodesTimeStamp);
   }
 
@@ -346,28 +345,47 @@ export default class Home extends Component {
     return (
       <Container>
         <Banner src={newsDetails.bannerURL} />
-        <Title
-          title="All-In-One News Hub"
-          caption="Click the button below if the News Hub is not updated!"
-        />
-        <Button label="Update News Hub" callback={this.openModal.bind(this)} />
-        <Modal
-          open={this.state.isModalActive}
-          onClose={this.closeModal.bind(this)}
-          aria-labelledby="simple-modal-title"
-          aria-describedby="simple-modal-description"
-        >
-          {this.renderModalBody()}
-        </Modal>
+        <HeaderContainer>
+          <Title
+            title="All-In-One News Hub"
+            caption="Click the button below if the News Hub is not updated!"
+          />
+          <Button
+            label="Update News Hub"
+            callback={this.openModal.bind(this)}
+          />
+          <Modal
+            open={this.state.isModalActive}
+            onClose={this.closeModal.bind(this)}
+            aria-labelledby="simple-modal-title"
+            aria-describedby="simple-modal-description"
+          >
+            {this.renderModalBody()}
+          </Modal>
+        </HeaderContainer>
       </Container>
     );
   }
 
   render() {
+    const { patchNodesTimeStamp } = this.state.newsDetails;
     return (
       <>
         {this.renderHeader()}
-        <NewsContainer ref={this.newsRef} />
+        <NewsContainer>
+          <LastUpdatedHeader>
+            <b>Patch Notes Last Updated On: </b>
+            {"" + new Date(patchNodesTimeStamp).toDateString()}
+          </LastUpdatedHeader>
+          <TileContainer ref={this.newsRef}>
+            <EventTile />
+            <EventTile />
+            <EventTile />
+            <EventTile />
+            <EventTile />
+            <EventTile />
+          </TileContainer>
+        </NewsContainer>
       </>
     );
   }
