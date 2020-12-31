@@ -20,8 +20,15 @@ const Keywords = {
   PARTS: "Part",
 };
 
+const EventTypes = {
+  UPDATE: "UPDATE",
+  SINGLE_EVENT: "SINGLE_EVENT",
+  MULTIPLE_EVENTS: "MULTIPLE_EVENTS",
+};
+
 Object.freeze(NodeNames);
 Object.freeze(Keywords);
+Object.freeze(EventTypes);
 
 const Container = styled.div`
   width: 1024px;
@@ -102,13 +109,22 @@ const findYearForEvent = (eventTimeStamp, patchNotesDate) => {
 };
 
 const cleanDateString = (dateString, patchNodesTimeStamp) => {
-  const filteredDate = dateString
-    .replace("UTC:", "")
-    .replace("Available after", "")
-    .replace(/part\s[0-9]*:\s/gi, "")
-    .replace("at", "")
-    .replaceAll(/\((before|after)\smaintenance\)/gi, "")
-    .replaceAll(/\s/gi, " ")
+  if (!dateString.length) {
+    return;
+  }
+  let filteredDate = dateString
+    .replaceAll(/\s/g, " ")
+    .replaceAll(/part [0-9]+:*\s/gi, "")
+    .replaceAll("UTC:", "")
+    .replaceAll("Available after", "")
+    .replaceAll("during the times listed below.", "")
+    .replaceAll("at", "")
+    .replaceAll(/\((before|after) maintenance\)/gi, "");
+
+  if (!filteredDate.match(/[1-9]+/g) || !filteredDate.match(/[1-9]+/g).length) {
+    return;
+  }
+  filteredDate = filteredDate
     .concat(" " + new Date().getFullYear() + " ")
     .concat("UTC");
   const filteredDateObject = new Date(filteredDate);
@@ -125,12 +141,28 @@ const handleSingleEvent = (dateArray, patchNodesTimeStamp) => {
     cleanDateString(dateArray[0], patchNodesTimeStamp),
     cleanDateString(dateArray[1], patchNodesTimeStamp),
   ];
-  // console.log(dateArray);
-  // console.log(new Date(startTime), " TO ", new Date(endTime));
   return [startTime, endTime];
 };
 
-const handleMultipleEvents = (dateArray, patchNodesTimeStamp) => {};
+const handleMultipleEvents = (dateArray, patchNodesTimeStamp) => {
+  const splitDateArray = dateArray
+    .map((dateString) => dateString.split("UTC:"))
+    .flat();
+  const splitCleanedDateArray = splitDateArray
+    .map((date) => cleanDateString(date, patchNodesTimeStamp))
+    .filter((date) => date);
+  const eventTimes = [];
+  splitCleanedDateArray.forEach((event, i) => {
+    if (!(i % 2)) {
+      // event start timestamp
+      eventTimes.push([event]);
+    } else {
+      // event end timestamp
+      eventTimes[eventTimes.length - 1].push(event);
+    }
+  });
+  return eventTimes;
+};
 
 export default class Home extends Component {
   constructor() {
@@ -143,7 +175,7 @@ export default class Home extends Component {
       newsDetails: {
         backupBanner: process.env.PUBLIC_URL + "/testbanner.png",
         bannerURL: "",
-        patchNotesReleaseDate: null,
+        patchNodesTimeStamp: null,
         sectionDetails: [],
       },
     };
@@ -177,10 +209,11 @@ export default class Home extends Component {
      *    {
      *      orderId: 1,
      *      eventName: '',
-     *      startDate: Date(),
      *      duration: Date(),
      *      requirements: '',
-     *      details: ''
+     *      eventType: typeOf(EventTypes),
+     *      eventTimes: [[start,end], [start,end]]
+     *      details: '',
      *      pinned: boolean [different list for pinned using pinnedId],
      *      pinId: 1
      *    },
@@ -191,7 +224,7 @@ export default class Home extends Component {
     const nodeList = Array.from(body.children);
     /**
      * 1. find h3 - boolean 'isNewSection' set as true
-     * 2. grab all the following elements
+     * 2.   grab all the following elements
      *
      */
     console.log(`PATCH NOTES DATE: ${new Date(patchNodesTimeStamp)}`);
@@ -200,11 +233,11 @@ export default class Home extends Component {
         sectionDetails.push({
           orderId: i,
           eventName: node.textContent,
-          startDate: "",
-          endDate: "",
           requirements: "",
           details: "",
           rewards: "",
+          eventType: null,
+          eventTimes: [],
           pinned: false,
           pinId: -1,
         });
@@ -229,26 +262,27 @@ export default class Home extends Component {
             switch (dateCount) {
               case 1:
                 // no end date
-                lastSectionDetail.startDate = cleanDateString(
-                  unfilteredDate[0],
-                  patchNodesTimeStamp
-                );
-                lastSectionDetail.endDate = null;
-                // console.log(
-                //   "CASE 1 (NO END DATE): ",
-                //   new Date(lastSectionDetail.startDate)
-                // );
+                lastSectionDetail.eventType = EventTypes.UPDATE;
+                lastSectionDetail.eventTimes = [
+                  cleanDateString(unfilteredDate[0], patchNodesTimeStamp),
+                  (lastSectionDetail.endDate = null),
+                ];
                 break;
               case 2:
                 // single duration
-                [
-                  lastSectionDetail.startDate,
-                  lastSectionDetail.endDate,
-                ] = handleSingleEvent(unfilteredDate, patchNodesTimeStamp);
+                lastSectionDetail.eventType = EventTypes.SINGLE_EVENT;
+                lastSectionDetail.eventTimes = handleSingleEvent(
+                  unfilteredDate,
+                  patchNodesTimeStamp
+                );
                 break;
               default:
                 // multiple dates
-                handleMultipleEvents(unfilteredDate, patchNodesTimeStamp);
+                lastSectionDetail.eventType = EventTypes.MULTIPLE_EVENTS;
+                lastSectionDetail.eventTimes = handleMultipleEvents(
+                  unfilteredDate,
+                  patchNodesTimeStamp
+                );
                 break;
             }
           }
@@ -276,6 +310,7 @@ export default class Home extends Component {
       newsDetails: Object.assign(this.state.newsDetails, {
         bannerURL: banner.attributes.src.textContent,
         newsBySubsection,
+        patchNodesTimeStamp,
       }),
     });
   }
