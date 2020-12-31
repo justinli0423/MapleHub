@@ -9,6 +9,7 @@ import styled from "styled-components";
 import Home from '../pages/Home';
 
 const Container = styled.div`
+  z-index: 100000;
   position: sticky;
   top: 0;
   width: 100%;
@@ -89,9 +90,12 @@ const StyledLink = styled(NavLink)`
 `;
 
 const MainContainer = styled.div`
-  margin: 0 auto;
-  width: 1024px;
-  border: 1px solid grey;
+  position: relative;
+  width: 100%;
+  /* display: flex;
+  flex-direction: column;
+  align-items: center; */
+  /* border: 1px solid grey; */
 `;
 
 export default function Nav() {

@@ -4,6 +4,7 @@ const DefaultButton = styled.button`
   width: 250px;
   height: 40px;
   margin: 24px 0 80px;
+  color: white;
   background: transparent;
   border: 4px solid #b60d0d;
   border-radius: 22px;

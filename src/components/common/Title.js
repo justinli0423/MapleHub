@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 const Header = styled.h1`
-  margin: 72px 0 24px 0;
+  padding: 72px 0 24px 0;
   font-size: 32px;
   font-weight: normal;
 `;
@@ -9,7 +9,10 @@ const Header = styled.h1`
 const Caption = styled.p``;
 
 const Container = styled.div`
+  position: relative;
   text-align: center;
+  color: #D3D3D3;
+  text-shadow: 3px 3px 0px black;
 `;
 
 function Title({ title, caption }) {
