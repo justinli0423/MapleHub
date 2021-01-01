@@ -8,13 +8,17 @@ import ArrowUp from "../icons/chevron-up-solid.svg";
 const Container = styled.div`
   position: relative;
   flex: ${({ isDetailsExpanded }) =>
-    isDetailsExpanded ? "0 0 calc(90% + 52px)" : "0 0 45%"};
-  height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "500px" : "230px")};
+    isDetailsExpanded ? "0 0 calc(100% - 32px)" : "0 0 calc(50% - 32px)"};
+  height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "500px" : "300px")};
   margin: 16px;
   padding: 16px;
   border-radius: 5px;
   background: #ffffff;
   box-shadow: 4px 5px 3px rgba(0, 0, 0, 0.25);
+`;
+
+const ContentContainer = styled.div`
+  margin-left: 8px;
 `;
 
 const EventHeader = styled.h2`
@@ -25,13 +29,14 @@ const EventHeader = styled.h2`
 
 const EventSubheader = styled.h3`
   display: inline-block;
-  margin: 4px 4px 4px 8px;
+  margin: 4px 4px 4px 0;
   font-weight: bold;
   font-size: 16px;
 `;
 
 const EventDetails = styled.p`
   display: inline;
+  margin-left: 4px;
 `;
 
 const Footer = styled.div`
@@ -88,7 +93,7 @@ export default class EventTile extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ...this.props.eventDetails,
+      eventDetails: this.props.eventDetails,
       isDetailsExpanded: false,
     };
   }
@@ -100,36 +105,57 @@ export default class EventTile extends Component {
     });
   }
 
+  /**
+   * {
+  "sectionDetails": {
+    "orderId": 7,
+    "eventName": "Reboot World Revamp",
+    "requirements": "",
+    "details": "\n<li>Zero can now be created in Reboot world during the <a href=\"https://maplestory.nexon.net/news/63875/v-219-awake-flicker-of-light-patch-notes#zero\" target=\"_blank\">Zero Creation</a> event. <br>\n<ul>\n<li>Please note that you must have a character that is Lv. 100 or above in Reboot world in order to create a Zero character.</li>\n</ul>\n</li>\n<li>Increased the chance to obtain equipment from defeating the following bosses in Reboot world:<br>\n<ul>\n<li>Lotus (Hard)</li>\n<li>Papulatus (Chaos)</li>...",
+    "rewards": "",
+    "eventType": null,
+    "eventTimes": "[]",
+    "pinned": false,
+    "pinId": -1
+  }
+}
+   */
+
   render() {
-    const { isDetailsExpanded } = this.state;
+    const { isDetailsExpanded, eventDetails } = this.state;
     return (
       <Container isDetailsExpanded={isDetailsExpanded}>
-        <EventHeader>Event Title</EventHeader>
-        <EventSubheader>Available after:</EventSubheader>
-        <EventDetails>date and time</EventDetails>
-        <br />
-        <EventSubheader>Duration:</EventSubheader>
-        <EventDetails>date and time</EventDetails>
-        <br />
-        <EventSubheader>Requirements:</EventSubheader>
-        <EventDetails>date and time</EventDetails>
-        <br />
-        <DetailsContainer isDetailsExpanded={isDetailsExpanded}>
-          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+        <EventHeader>{eventDetails.eventName}</EventHeader>
+        <ContentContainer>
+          <EventSubheader>Available after:</EventSubheader>
+          <EventDetails>INSERT TIMES HERE</EventDetails>
           <br />
-          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <EventSubheader>Duration:</EventSubheader>
+          <EventDetails>INSERT TIMES HERE</EventDetails>
           <br />
-          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-          <br />
-          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-          <br />
-          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-          <br />
-          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-          <br />
-          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-          <br />
-        </DetailsContainer>
+          <EventSubheader>Requirements:</EventSubheader>
+          <EventDetails>
+            {eventDetails.requirements.length
+              ? eventDetails.requirements
+              : "None"}
+          </EventDetails>
+          <DetailsContainer isDetailsExpanded={isDetailsExpanded}>
+            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+            <br />
+            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+            <br />
+            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+            <br />
+            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+            <br />
+            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+            <br />
+            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+            <br />
+            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+            <br />
+          </DetailsContainer>
+        </ContentContainer>
         <Footer>
           <span>Show Details</span>
           <ArrowContainer onClick={this.handleDetailsToggle.bind(this)}>

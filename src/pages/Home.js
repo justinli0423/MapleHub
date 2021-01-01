@@ -89,7 +89,7 @@ const NewsContainer = styled.div`
 const TileContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: flex-start;
   flex-wrap: wrap;
   margin: 32px auto;
   width: 100%;
@@ -235,7 +235,6 @@ export default class Home extends Component {
   handleSubSectionNews(body, patchNodesTimeStamp) {
     const sectionDetails = [];
     const nodeList = Array.from(body.children);
-    console.log(`PATCH NOTES DATE: ${new Date(patchNodesTimeStamp)}`);
     nodeList.forEach((node, i) => {
       if (node.nodeName === NodeNames.H3) {
         sectionDetails.push({
@@ -295,24 +294,19 @@ export default class Home extends Component {
         }
       }
     });
-
-    this.setState({
-      newsDetails: Object.assign(this.state.newsDetails, sectionDetails),
-    });
+    return sectionDetails;
   }
 
   handleNewsHTML(body, patchNodesTimeStamp) {
     const banner = body.querySelector("img#__mcenew");
-    const newsBySubsection = this.handleSubSectionNews(
-      body,
-      patchNodesTimeStamp
-    );
+    const sectionDetails = this.handleSubSectionNews(body, patchNodesTimeStamp);
     this.setState({
-      newsDetails: Object.assign(this.state.newsDetails, {
+      newsDetails: {
+        ...this.state.newsDetails,
         bannerURL: banner.attributes.src.textContent,
-        newsBySubsection,
+        sectionDetails,
         patchNodesTimeStamp,
-      }),
+      },
     });
   }
 
@@ -367,7 +361,7 @@ export default class Home extends Component {
   }
 
   render() {
-    const { patchNodesTimeStamp } = this.state.newsDetails;
+    const { patchNodesTimeStamp, sectionDetails } = this.state.newsDetails;
     return (
       <>
         {this.renderHeader()}
@@ -377,12 +371,9 @@ export default class Home extends Component {
             {"" + new Date(patchNodesTimeStamp).toDateString()}
           </LastUpdatedHeader>
           <TileContainer ref={this.newsRef}>
-            <EventTile />
-            <EventTile />
-            <EventTile />
-            <EventTile />
-            <EventTile />
-            <EventTile />
+            {sectionDetails.map((section, i) => (
+              <EventTile key={i} eventDetails={section} />
+            ))}
           </TileContainer>
         </NewsContainer>
       </>
