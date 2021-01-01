@@ -7,14 +7,15 @@ import ArrowUp from "../icons/chevron-up-solid.svg";
 
 const Container = styled.div`
   position: relative;
-  width: 450px;
-  height: 230px;
+  transition: 0.3s all linear;
+  flex: ${({ isDetailsExpanded }) =>
+    isDetailsExpanded ? "0 0 93.3%" : "0 0 45%"};
+  height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "500px" : "230px")};
   margin: 16px;
   padding: 16px;
   border-radius: 5px;
   background: #ffffff;
   box-shadow: 4px 5px 3px rgba(0, 0, 0, 0.25);
-  flex: 0 0 45%;
 `;
 
 const EventHeader = styled.h2`
@@ -50,40 +51,55 @@ const Footer = styled.div`
 `;
 
 // TODO: do i need this?
-const ArrowContainer = styled.div`
-`;
+const ArrowContainer = styled.div``;
 
 const ArrowIcon = styled.img`
   width: 28px;
   height: 28px;
   padding: 3px;
   border-radius: 50%;
+  transition: 0.1s linear all;
 
   &:hover {
     transform: scale(1.15);
-    filter: drop-shadow( 2px 2px 1px #d3d3d3);
+    filter: drop-shadow(2px 2px 1px #d3d3d3);
   }
 `;
 
 const ArrowUpIcon = styled(ArrowIcon)`
-  display: none;
+  display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "block" : "none")};
 `;
 
 const ArrowDownIcon = styled(ArrowIcon)`
-  display: block;
+  display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "none" : "block")};
+`;
+
+const DetailsContainer = styled.div`
+  display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "block" : "none")};
+  margin: 16px 8px;
+  max-height: 280px;
 `;
 
 export default class EventTile extends Component {
   constructor(props) {
     super(props);
-    this.state = this.props.eventDetails;
-    this.arrowDownRef = React.createRef();
-    this.arrowUpRef = React.createRef();
+    this.state = {
+      ...this.props.eventDetails,
+      isDetailsExpanded: false,
+    };
+  }
+
+  handleDetailsToggle() {
+    this.setState({
+      ...this.state,
+      isDetailsExpanded: !this.state.isDetailsExpanded,
+    });
   }
 
   render() {
+    const { isDetailsExpanded } = this.state;
     return (
-      <Container>
+      <Container isDetailsExpanded={isDetailsExpanded}>
         <EventHeader>Event Title</EventHeader>
         <EventSubheader>Available after:</EventSubheader>
         <EventDetails>date and time</EventDetails>
@@ -94,11 +110,29 @@ export default class EventTile extends Component {
         <EventSubheader>Requirements:</EventSubheader>
         <EventDetails>date and time</EventDetails>
         <br />
+        <DetailsContainer isDetailsExpanded={isDetailsExpanded}>
+        DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br/>DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br/>DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br/>DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br/>DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br/>DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br/>DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br/>
+        </DetailsContainer>
         <Footer>
           <span>Show Details</span>
-          <ArrowContainer>
-            <ArrowDownIcon ref={this.arrowDownRef} src={ArrowDown} alt="" />
-            <ArrowUpIcon ref={this.arrowUpRef} src={ArrowUp} alt="" />
+          <ArrowContainer onClick={this.handleDetailsToggle.bind(this)}>
+            <ArrowDownIcon
+              isDetailsExpanded={isDetailsExpanded}
+              src={ArrowDown}
+              alt=""
+            />
+            <ArrowUpIcon
+              isDetailsExpanded={isDetailsExpanded}
+              src={ArrowUp}
+              alt=""
+            />
           </ArrowContainer>
         </Footer>
       </Container>

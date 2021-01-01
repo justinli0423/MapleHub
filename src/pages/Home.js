@@ -90,7 +90,7 @@ const NewsContainer = styled.div`
 const TileContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: flex-start;
   flex-wrap: wrap;
   margin: 32px auto;
   width: 100%;
