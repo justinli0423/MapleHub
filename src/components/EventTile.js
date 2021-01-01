@@ -1,4 +1,4 @@
-import { Component } from "react";
+import React, { Component } from "react";
 
 import styled from "styled-components";
 
@@ -49,16 +49,27 @@ const Footer = styled.div`
   border-top: 1px solid #d3d3d3;
 `;
 
+// TODO: do i need this?
 const ArrowContainer = styled.div`
-  width: 15px;
-  height: 15px;
 `;
 
-const ArrowUpIcon = styled.img`
+const ArrowIcon = styled.img`
+  width: 28px;
+  height: 28px;
+  padding: 3px;
+  border-radius: 50%;
+
+  &:hover {
+    transform: scale(1.15);
+    filter: drop-shadow( 2px 2px 1px #d3d3d3);
+  }
+`;
+
+const ArrowUpIcon = styled(ArrowIcon)`
   display: none;
 `;
 
-const ArrowDownIcon = styled.img`
+const ArrowDownIcon = styled(ArrowIcon)`
   display: block;
 `;
 
@@ -66,6 +77,8 @@ export default class EventTile extends Component {
   constructor(props) {
     super(props);
     this.state = this.props.eventDetails;
+    this.arrowDownRef = React.createRef();
+    this.arrowUpRef = React.createRef();
   }
 
   render() {
@@ -84,8 +97,8 @@ export default class EventTile extends Component {
         <Footer>
           <span>Show Details</span>
           <ArrowContainer>
-            <ArrowDownIcon id="expand" src={ArrowDown} alt="" />
-            <ArrowUpIcon id="expand" src={ArrowUp} alt="" />
+            <ArrowDownIcon ref={this.arrowDownRef} src={ArrowDown} alt="" />
+            <ArrowUpIcon ref={this.arrowUpRef} src={ArrowUp} alt="" />
           </ArrowContainer>
         </Footer>
       </Container>
