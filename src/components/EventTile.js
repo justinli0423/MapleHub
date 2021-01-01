@@ -9,7 +9,7 @@ const Container = styled.div`
   position: relative;
   flex: ${({ isDetailsExpanded }) =>
     isDetailsExpanded ? "0 0 calc(100% - 32px)" : "0 0 calc(50% - 32px)"};
-  height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "500px" : "300px")};
+  height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "500px" : "250px")};
   margin: 16px;
   padding: 16px;
   border-radius: 5px;
@@ -19,43 +19,39 @@ const Container = styled.div`
 
 const ContentContainer = styled.div`
   margin-left: 8px;
+  line-height: 30px;
 `;
 
 const EventHeader = styled.h2`
+  margin-bottom: 16px;
   font-weight: bold;
   font-size: 24px;
-  margin-bottom: 16px;
-`;
-
-const EventSubheader = styled.h3`
-  display: inline-block;
-  margin: 4px 4px 4px 0;
-  font-weight: bold;
-  font-size: 16px;
 `;
 
 const EventDetails = styled.p`
-  display: inline;
+  display: inline-block;
   margin-left: 4px;
+  line-height: 25px;
 `;
 
 const Footer = styled.div`
   position: absolute;
   left: 0;
   bottom: 0;
-  height: 45px;
-  width: 100%;
   display: flex;
   justify-content: space-between;
   flex-direction: row;
   align-items: center;
+  height: 45px;
+  width: 100%;
   padding: 0 16px;
   vertical-align: center;
   border-top: 1px solid #d3d3d3;
 `;
 
-// TODO: do i need this?
-const ArrowContainer = styled.div``;
+const Bold = styled.b`
+  margin-right: 8px;
+`;
 
 const ArrowIcon = styled.img`
   width: 28px;
@@ -105,6 +101,10 @@ export default class EventTile extends Component {
     });
   }
 
+  handleTruncateText(text) {
+    return text.length > 100 ? text.substring(0, 80) + "..." : text;
+  }
+
   /**
    * {
   "sectionDetails": {
@@ -127,38 +127,27 @@ export default class EventTile extends Component {
       <Container isDetailsExpanded={isDetailsExpanded}>
         <EventHeader>{eventDetails.eventName}</EventHeader>
         <ContentContainer>
-          <EventSubheader>Available after:</EventSubheader>
-          <EventDetails>INSERT TIMES HERE</EventDetails>
-          <br />
-          <EventSubheader>Duration:</EventSubheader>
-          <EventDetails>INSERT TIMES HERE</EventDetails>
-          <br />
-          <EventSubheader>Requirements:</EventSubheader>
           <EventDetails>
+            <Bold>Available After:</Bold>INSERT TIMES HERE
+          </EventDetails>
+          <br />
+          <EventDetails>
+            <Bold>Duration:</Bold>INSERT TIMES HERE
+          </EventDetails>
+          <br />
+          <EventDetails>
+            <Bold>Requirements:</Bold>
             {eventDetails.requirements.length
-              ? eventDetails.requirements
+              ? this.handleTruncateText(eventDetails.requirements)
               : "None"}
           </EventDetails>
-          <DetailsContainer isDetailsExpanded={isDetailsExpanded}>
-            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-            <br />
-            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-            <br />
-            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-            <br />
-            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-            <br />
-            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-            <br />
-            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-            <br />
-            DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-            <br />
-          </DetailsContainer>
+          <DetailsContainer
+            isDetailsExpanded={isDetailsExpanded}
+          ></DetailsContainer>
         </ContentContainer>
         <Footer>
           <span>Show Details</span>
-          <ArrowContainer onClick={this.handleDetailsToggle.bind(this)}>
+          <div onClick={this.handleDetailsToggle.bind(this)}>
             <ArrowDownIcon
               isDetailsExpanded={isDetailsExpanded}
               src={ArrowDown}
@@ -169,7 +158,7 @@ export default class EventTile extends Component {
               src={ArrowUp}
               alt=""
             />
-          </ArrowContainer>
+          </div>
         </Footer>
       </Container>
     );
