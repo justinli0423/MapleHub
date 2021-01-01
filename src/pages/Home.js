@@ -33,7 +33,6 @@ Object.freeze(EventTypes);
 
 const Container = styled.div`
   position: relative;
-  /* width: 1024px; */
   width: 100%;
   margin: 0 auto;
   text-align: center;
@@ -90,7 +89,7 @@ const NewsContainer = styled.div`
 const TileContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: space-around;
   flex-wrap: wrap;
   margin: 32px auto;
   width: 100%;

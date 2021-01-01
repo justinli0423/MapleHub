@@ -7,9 +7,8 @@ import ArrowUp from "../icons/chevron-up-solid.svg";
 
 const Container = styled.div`
   position: relative;
-  transition: 0.3s all linear;
   flex: ${({ isDetailsExpanded }) =>
-    isDetailsExpanded ? "0 0 93.3%" : "0 0 45%"};
+    isDetailsExpanded ? "0 0 calc(90% + 52px)" : "0 0 45%"};
   height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "500px" : "230px")};
   margin: 16px;
   padding: 16px;
@@ -74,9 +73,14 @@ const ArrowDownIcon = styled(ArrowIcon)`
   display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "none" : "block")};
 `;
 
+// TODO: Animation on show/hide?
 const DetailsContainer = styled.div`
-  display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "block" : "none")};
-  margin: 16px 8px;
+  opacity: ${({ isDetailsExpanded }) => (isDetailsExpanded ? 1 : 0)};
+  visibility: ${({ isDetailsExpanded }) =>
+    isDetailsExpanded ? "visible" : "hidden"};
+  width: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "auto" : 0)};
+  height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "auto" : 0)};
+  margin: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "16px 8px" : 0)};
   max-height: 280px;
 `;
 
@@ -111,14 +115,20 @@ export default class EventTile extends Component {
         <EventDetails>date and time</EventDetails>
         <br />
         <DetailsContainer isDetailsExpanded={isDetailsExpanded}>
-        DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-          <br/>DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-          <br/>DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-          <br/>DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-          <br/>DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-          <br/>DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-          <br/>DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
-          <br/>
+          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br />
+          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br />
+          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br />
+          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br />
+          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br />
+          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br />
+          DETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILSDETAILS
+          <br />
         </DetailsContainer>
         <Footer>
           <span>Show Details</span>
