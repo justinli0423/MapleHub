@@ -139,7 +139,6 @@ const cleanDateString = (dateString, patchNodesTimeStamp) => {
   const filteredDateWithYear = filteredDateObject.setYear(
     findYearForEvent(timeStamp, patchNodesTimeStamp)
   );
-  console.log(filteredDateWithYear);
   return filteredDateWithYear;
 };
 

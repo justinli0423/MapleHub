@@ -1,10 +1,16 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 
-import { EventTypes, Keywords, NodeNames } from "../common/Consts";
+import { EventTypes } from "../common/Consts";
 
-import ArrowDown from "../icons/chevron-down-solid.svg";
-import ArrowUp from "../icons/chevron-up-solid.svg";
+import ArrowDownIcon from "../icons/chevron-down-solid.svg";
+import ArrowUpIcon from "../icons/chevron-up-solid.svg";
+
+import MultiEventIcon from "../icons/tasks-solid.svg";
+import ActiveEventIcon from "../icons/hourglass-start-solid.svg";
+import FutureEventIcon from "../icons/fast-forward-solid.svg";
+import PastEventIcon from "../icons/history-solid.svg";
+import PermanentEventIcon from "../icons/infinity-solid.svg";
 
 const Container = styled.div`
   position: relative;
@@ -72,12 +78,19 @@ const ArrowIcon = styled.img`
   transition: 0.1s linear all;
 `;
 
-const ArrowUpIcon = styled(ArrowIcon)`
+const ArrowUpIconContainer = styled(ArrowIcon)`
   display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "block" : "none")};
 `;
 
-const ArrowDownIcon = styled(ArrowIcon)`
+const ArrowDownIconContainer = styled(ArrowIcon)`
   display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "none" : "block")};
+`;
+
+const EventIconContainer = styled.img`
+  margin: 0 8px 4px 0;
+  height: 20px;
+  width: 20px;
+  vertical-align: middle;
 `;
 
 // TODO: Animation on show/hide?
@@ -97,7 +110,24 @@ export default class EventTile extends Component {
     this.state = {
       eventDetails: this.props.eventDetails,
       isDetailsExpanded: false,
+      isEventActive: false,
+      eventDuration: 0,
+      eventIcon: null,
+      eventIconHash: Date.now()
     };
+  }
+
+  componentDidMount() {
+    const { eventDetails } = this.state;
+    const isEventActive = this.handleIsActiveEvent(eventDetails.eventTimes);
+    const eventDuration = this.handleDuration(eventDetails);
+    const eventIcon = this.handleEventTypeIcon();
+    this.setState({
+      ...this.state,
+      eventDuration,
+      isEventActive,
+      eventIcon,
+    });
   }
 
   handleDetailsToggle() {
@@ -119,6 +149,15 @@ export default class EventTile extends Component {
         0,
         lastSpaceIndex === -1 ? length : lastSpaceIndex
       ) + "..."
+    );
+  }
+
+  findFirstActiveDate(eventTimes) {
+    const currentTime = new Date();
+    return eventTimes.find(
+      (time) =>
+        time[0] > currentTime ||
+        (time[0] < currentTime && time[1] > currentTime)
     );
   }
 
@@ -147,7 +186,7 @@ export default class EventTile extends Component {
         );
       case EventTypes.MULTIPLE_EVENTS:
         // multiple durations
-        timeToConvert = new Date(eventTimes[0][0]);
+        timeToConvert = new Date(this.findFirstActiveDate(eventTimes)[0]);
         return (
           timeToConvert.toLocaleDateString() +
           " at " +
@@ -158,42 +197,93 @@ export default class EventTile extends Component {
     }
   }
 
-  componentDidMount() {
-    const { eventDetails } = this.state;
-    this.setState({
-      ...this.state,
-      eventDuration: this.handleDuration(eventDetails),
-    });
+  handleEventTypeIcon() {
+    const { eventTimes, eventType } = this.state.eventDetails;
+    let eventIcon = PermanentEventIcon;
+    const currentTime = new Date();
+    switch (eventType) {
+      case EventTypes.SINGLE_EVENT:
+        if (eventTimes[0] <= currentTime && eventTimes[1] >= currentTime) {
+          eventIcon = ActiveEventIcon;
+        }
+        if (eventTimes[0] > currentTime) {
+          eventIcon = FutureEventIcon;
+        }
+        if (eventTimes[1] < currentTime) {
+          eventIcon = PastEventIcon;
+        }
+        break;
+      case EventTypes.MULTIPLE_EVENTS:
+        eventIcon = eventTimes ? MultiEventIcon : PastEventIcon;
+        break;
+      default:
+        break;
+    }
+    return eventIcon;
+  }
+
+  handleIsActiveEvent(eventTimes) {
+    const { eventType } = this.state.eventDetails;
+    const currentTime = new Date();
+    switch (eventType) {
+      case EventTypes.PATCH:
+        this.handleEventTypeIcon(eventTimes, eventType);
+        return true;
+      case EventTypes.UPDATE:
+        this.handleEventTypeIcon(eventTimes, eventType);
+        return true;
+      case EventTypes.SINGLE_EVENT:
+        const isActive =
+          eventTimes[0] <= currentTime && eventTimes[1] >= currentTime;
+        this.handleEventTypeIcon(eventTimes, eventType);
+        return isActive;
+      case EventTypes.MULTIPLE_EVENTS:
+        // find first event that is either upcoming or active
+        const firstActiveTime = this.findFirstActiveDate(eventTimes);
+        if (!firstActiveTime) {
+          this.handleEventTypeIcon(eventTimes, eventType);
+          return false;
+        }
+        this.handleEventTypeIcon(eventTimes, eventType);
+        return (
+          firstActiveTime[0] <= currentTime && firstActiveTime[1] >= currentTime
+        );
+      default:
+        break;
+    }
+  }
+
+  findRemainingDuration(eventTimes) {
+    if (!eventTimes) {
+      return -1;
+    }
+    let timeToConvert = -1;
+    const currentTime = new Date();
+    if (eventTimes[0] > currentTime) {
+      timeToConvert = eventTimes[1] - eventTimes[0];
+    } else {
+      timeToConvert = eventTimes[1] - currentTime;
+      if (timeToConvert < 0) {
+        return -1;
+      }
+    }
+    const diffDays = Math.ceil(timeToConvert / (1000 * 60 * 60 * 24));
+    return diffDays;
   }
 
   handleDuration(details) {
     const { eventType, eventTimes } = details;
-    let timeToConvert;
-    let currentTime = new Date();
     switch (eventType) {
       case EventTypes.PATCH:
         return Infinity;
       case EventTypes.UPDATE:
         return Infinity;
       case EventTypes.SINGLE_EVENT:
-        if (eventTimes[0] > currentTime) {
-          timeToConvert = eventTimes[1] - eventTimes[0];
-        } else {
-          timeToConvert = eventTimes[1] - currentTime;
-          if (timeToConvert < 0) {
-            return -1;
-          }
-        }
-        const diffDays = Math.ceil(timeToConvert / (1000 * 60 * 60 * 24));
-        return diffDays;
+        return this.findRemainingDuration(eventTimes);
       case EventTypes.MULTIPLE_EVENTS:
-        // multiple durations
-        timeToConvert = new Date(eventTimes[0][0]);
-        return (
-          timeToConvert.toLocaleDateString() +
-          " at " +
-          timeToConvert.toLocaleTimeString()
-        );
+        // find first event that is either upcoming or active
+        const firstActiveTime = this.findFirstActiveDate(eventTimes);
+        return this.findRemainingDuration(firstActiveTime);
       default:
         break;
     }
@@ -207,18 +297,27 @@ export default class EventTile extends Component {
       case Infinity:
         return "Permanent";
       default:
-        return `${eventDuration} days`;
+        return eventDuration > 1
+          ? `${eventDuration} days`
+          : `${eventDuration} day`;
     }
   }
 
   render() {
-    const { isDetailsExpanded, eventDetails, eventDuration } = this.state;
+    const {
+      isDetailsExpanded,
+      eventDetails,
+      isEventActive,
+      eventIcon,
+      eventIconHash
+    } = this.state;
     return (
       <Container
         isDetailsExpanded={isDetailsExpanded}
-        isEventActive={eventDuration >= 0}
+        isEventActive={isEventActive}
       >
         <EventHeader>
+          <EventIconContainer src={`${eventIcon}?${eventIconHash}`} key={eventIconHash} />
           {this.handleTruncateText(eventDetails.eventName, 50)}
         </EventHeader>
         <ContentContainer>
@@ -228,7 +327,7 @@ export default class EventTile extends Component {
           </EventDetails>
           <br />
           <EventDetails>
-            <Bold>Remaining:</Bold>
+            <Bold>Duration:</Bold>
             {this.handleRenderDuration()}
           </EventDetails>
           <br />
@@ -245,14 +344,14 @@ export default class EventTile extends Component {
         <Footer onClick={this.handleDetailsToggle.bind(this)}>
           <span>Show Details</span>
           <div>
-            <ArrowDownIcon
+            <ArrowDownIconContainer
               isDetailsExpanded={isDetailsExpanded}
-              src={ArrowDown}
+              src={ArrowDownIcon}
               alt=''
             />
-            <ArrowUpIcon
+            <ArrowUpIconContainer
               isDetailsExpanded={isDetailsExpanded}
-              src={ArrowUp}
+              src={ArrowUpIcon}
               alt=''
             />
           </div>
