@@ -77,7 +77,7 @@ const findYearForEvent = (eventTimeStamp, patchNodesTimeStamp) => {
   // all event dates are assumed to be in current year
   const threeMonthsBeforePatch = patchNotesDate.setMonth(
     patchNotesDate.getMonth() - 3
-    );
+  );
   const threeMonthsAfterPatch = patchNotesDate.setMonth(
     patchNotesDate.getMonth() + 6
   );
@@ -128,7 +128,10 @@ const cleanDateString = (dateString, patchNodesTimeStamp) => {
     .replaceAll("at", "")
     .replaceAll(/\((before|after) maintenance\)/gi, "");
 
-  if (!filteredDate.match(/[1-9]{1,2}/g) || !filteredDate.match(/[1-9]{1,2}/g).length) {
+  if (
+    !filteredDate.match(/[1-9]{1,2}/g) ||
+    !filteredDate.match(/[1-9]{1,2}/g).length
+  ) {
     return;
   }
   filteredDate = filteredDate
@@ -170,6 +173,83 @@ const handleMultipleEvents = (dateArray, patchNodesTimeStamp) => {
   return eventTimes;
 };
 
+const handleSubSectionNews = (body, patchNodesTimeStamp) => {
+  const sectionDetails = [];
+  const nodeList = Array.from(body.children);
+  nodeList.forEach((node, i) => {
+    if (node.nodeName === NodeNames.H3) {
+      sectionDetails.push({
+        orderId: i,
+        eventName: node.textContent,
+        requirements: "",
+        details: "",
+        rewards: "",
+        eventType: null,
+        eventTimes: [],
+        pinned: false,
+        pinId: -1,
+      });
+      return;
+    }
+
+    if (sectionDetails.length) {
+      const lastSectionDetail = sectionDetails[sectionDetails.length - 1];
+      // TODO: forgot what isRewardsIMG is...
+      const isRewardsIMG = node.childNodes[0].nodeName === NodeNames.IMG;
+      if (node.nodeName === NodeNames.UL) {
+        lastSectionDetail.details = node.innerHTML;
+      }
+      if (node.nodeName === NodeNames.P && !isRewardsIMG) {
+        const text = node.innerText;
+        if (text.includes(Keywords.DATES)) {
+          const unfilteredDate = text.split(/-|–/g);
+          const dateCount = unfilteredDate.length;
+          switch (dateCount) {
+            case 1:
+              // no end date
+              lastSectionDetail.eventType = EventTypes.UPDATE;
+              lastSectionDetail.eventTimes = [
+                cleanDateString(unfilteredDate[0], patchNodesTimeStamp),
+                (lastSectionDetail.endDate = null),
+              ];
+              break;
+            case 2:
+              // single duration
+              lastSectionDetail.eventType = EventTypes.SINGLE_EVENT;
+              lastSectionDetail.eventTimes = handleSingleEvent(
+                unfilteredDate,
+                patchNodesTimeStamp
+              );
+              break;
+            default:
+              // multiple dates
+              lastSectionDetail.eventType = EventTypes.MULTIPLE_EVENTS;
+              lastSectionDetail.eventTimes = handleMultipleEvents(
+                unfilteredDate,
+                patchNodesTimeStamp
+              );
+              break;
+          }
+        }
+        if (text.includes(Keywords.REQUIREMENTS)) {
+          lastSectionDetail.requirements = text.split(":")[1];
+        }
+        if (text.includes(Keywords.REWARDS)) {
+          // TODO
+        }
+      }
+    }
+  });
+
+  // convert the leftover NULL event types to PATCH
+  return sectionDetails.map((section) => {
+    if (!section.eventTimes.length) {
+      section.eventType = EventTypes.PATCH;
+    }
+    return section;
+  });
+};
+
 export default class Home extends Component {
   constructor() {
     super();
@@ -207,88 +287,18 @@ export default class Home extends Component {
     window.localStorage.setItem("mapleHubNews", ev.target.value);
   }
 
-  // ===== HTML UTILITY FUNCTIONS ===== //
-
-  handleSubSectionNews(body, patchNodesTimeStamp) {
-    const sectionDetails = [];
-    const nodeList = Array.from(body.children);
-    nodeList.forEach((node, i) => {
-      if (node.nodeName === NodeNames.H3) {
-        sectionDetails.push({
-          orderId: i,
-          eventName: node.textContent,
-          requirements: "",
-          details: "",
-          rewards: "",
-          eventType: null,
-          eventTimes: [],
-          pinned: false,
-          pinId: -1,
-        });
-        return;
-      }
-      
-      if (sectionDetails.length) {
-        const lastSectionDetail = sectionDetails[sectionDetails.length - 1];
-        // TODO: forgot what isRewardsIMG is...
-        const isRewardsIMG = node.childNodes[0].nodeName === NodeNames.IMG;
-        if (node.nodeName === NodeNames.UL) {
-          lastSectionDetail.details = node.innerHTML;
-        }
-        if (node.nodeName === NodeNames.P && !isRewardsIMG) {
-          const text = node.innerText;
-          if (text.includes(Keywords.DATES)) {
-            const unfilteredDate = text.split(/-|–/g);
-            const dateCount = unfilteredDate.length;
-            switch (dateCount) {
-              case 1:
-                // no end date
-                lastSectionDetail.eventType = EventTypes.UPDATE;
-                lastSectionDetail.eventTimes = [
-                  cleanDateString(unfilteredDate[0], patchNodesTimeStamp),
-                  (lastSectionDetail.endDate = null),
-                ];
-                break;
-              case 2:
-                // single duration
-                lastSectionDetail.eventType = EventTypes.SINGLE_EVENT;
-                lastSectionDetail.eventTimes = handleSingleEvent(
-                  unfilteredDate,
-                  patchNodesTimeStamp
-                );
-                break;
-              default:
-                // multiple dates
-                lastSectionDetail.eventType = EventTypes.MULTIPLE_EVENTS;
-                lastSectionDetail.eventTimes = handleMultipleEvents(
-                  unfilteredDate,
-                  patchNodesTimeStamp
-                );
-                break;
-            }
-          }
-          if (text.includes(Keywords.REQUIREMENTS)) {
-            lastSectionDetail.requirements = text.split(":")[1];
-          }
-          if (text.includes(Keywords.REWARDS)) {
-            // TODO
-          }
-        }
-      }
-    });
-
-    // convert the leftover NULL event types to PATCH
-    return sectionDetails.map(section => {
-      if (!section.eventTimes.length) {
-        section.eventType = EventTypes.PATCH;
-      }
-      return section;
-    });
-  }
-
-  handleNewsHTML(body, patchNodesTimeStamp) {
+  // This function should only be ran when new patch notes are out
+  // TODO: find count of subsections (count of h3s) and render placeholders?
+  getNews() {
+    // convert to mobx? (loading state)
+    const newsStringHTML = this.state.modalInputText;
+    const doc = new DOMParser().parseFromString(newsStringHTML, "text/html");
+    const body = doc.querySelector("div.article-content");
     const banner = body.querySelector("img#__mcenew");
-    const sectionDetails = this.handleSubSectionNews(body, patchNodesTimeStamp);
+    const patchNodesTimeStamp = Date.parse(
+      doc.querySelector(".timestamp").innerText
+    );
+    const sectionDetails = handleSubSectionNews(body, patchNodesTimeStamp);
     this.setState({
       newsDetails: {
         ...this.state.newsDetails,
@@ -297,19 +307,6 @@ export default class Home extends Component {
         patchNodesTimeStamp,
       },
     });
-  }
-
-  // This function should only be ran when new patch notes are out
-  // TODO: find count of subsections (count of h3s) and render placeholders?
-  getNews() {
-    // convert to mobx? (loading state)
-    const newsStringHTML = this.state.modalInputText;
-    const doc = new DOMParser().parseFromString(newsStringHTML, "text/html");
-    const body = doc.querySelector("div.article-content");
-    const patchNodesTimeStamp = Date.parse(
-      doc.querySelector(".timestamp").innerText
-    );
-    this.handleNewsHTML(body, patchNodesTimeStamp);
   }
 
   // ===================================== //

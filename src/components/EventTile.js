@@ -30,9 +30,13 @@ const ContentContainer = styled.div`
 `;
 
 const EventHeader = styled.h2`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   margin-bottom: 16px;
   font-weight: bold;
   font-size: 24px;
+  width: 410px;
 `;
 
 const EventDetails = styled.p`
@@ -104,6 +108,110 @@ const DetailsContainer = styled.div`
   max-height: 280px;
 `;
 
+const handleTruncateText = (text, length = 50) => {
+  if (text.length <= length) {
+    return text;
+  }
+  const truncatedText = text.length > length ? text.substring(0, length) : text;
+  const lastSpaceIndex = truncatedText.lastIndexOf(" ");
+  return (
+    truncatedText.substring(
+      0,
+      lastSpaceIndex === -1 ? length : lastSpaceIndex
+    ) + "..."
+  );
+};
+
+const findFirstActiveDate = (eventTimes) => {
+  const currentTime = Date.now();
+  return eventTimes.find(
+    (time) =>
+      time[0] > currentTime || (time[0] < currentTime && time[1] > currentTime)
+  );
+};
+
+const handleEventProps = (details) => {
+  const { eventType, eventTimes } = details;
+  const currentTime = Date.now();
+  let startDate, eventIcon, isActive, eventDuration, timeToConvert;
+  switch (eventType) {
+    case EventTypes.PATCH:
+      // no times
+      eventIcon = PermanentEventIcon;
+      startDate = "Now";
+      isActive = true;
+      eventDuration = Infinity;
+      break;
+    case EventTypes.UPDATE:
+      // 1 time
+      timeToConvert = new Date(eventTimes[0]);
+      eventIcon = PermanentEventIcon;
+      startDate =
+        timeToConvert.toLocaleDateString() +
+        " at " +
+        timeToConvert.toLocaleTimeString();
+      isActive = true;
+      eventDuration = Infinity;
+      break;
+    case EventTypes.SINGLE_EVENT:
+      // duration
+      timeToConvert = new Date(eventTimes[0]);
+      startDate =
+        timeToConvert.toLocaleDateString() +
+        " at " +
+        timeToConvert.toLocaleTimeString();
+      isActive = eventTimes[0] <= currentTime && eventTimes[1] >= currentTime;
+      eventDuration = findRemainingDuration(eventTimes);
+      if (eventTimes[0] <= currentTime && eventTimes[1] >= currentTime) {
+        eventIcon = ActiveEventIcon;
+      }
+      if (eventTimes[0] > currentTime) {
+        eventIcon = FutureEventIcon;
+      }
+      if (eventTimes[1] < currentTime) {
+        eventIcon = PastEventIcon;
+      }
+      break;
+    case EventTypes.MULTIPLE_EVENTS:
+      // multiple durationsd
+      const firstActiveTime = findFirstActiveDate(eventTimes);
+      eventDuration = findRemainingDuration(firstActiveTime);
+      timeToConvert = new Date(findFirstActiveDate(eventTimes)[0]);
+      startDate =
+        timeToConvert.toLocaleDateString() +
+        " at " +
+        timeToConvert.toLocaleTimeString();
+      eventIcon = eventTimes ? MultiEventIcon : PastEventIcon;
+      if (!firstActiveTime) {
+        isActive = false;
+      }
+      isActive =
+        firstActiveTime[0] <= currentTime && firstActiveTime[1] >= currentTime;
+      break;
+    default:
+      break;
+  }
+  return { startDate, isActive, eventIcon, eventDuration };
+};
+
+const findRemainingDuration = (eventTimes) => {
+  if (!eventTimes) {
+    return -1;
+  }
+  let timeToConvert = -1;
+  const currentTime = Date.now();
+  if (eventTimes[0] > currentTime) {
+    timeToConvert = eventTimes[1] - eventTimes[0];
+  } else {
+    timeToConvert = eventTimes[1] - currentTime;
+    if (timeToConvert < 0) {
+      return -1;
+    }
+  }
+  const diffDays = Math.ceil(timeToConvert / (1000 * 60 * 60 * 24));
+  return diffDays;
+};
+
 export default class EventTile extends Component {
   constructor(props) {
     super(props);
@@ -113,20 +221,15 @@ export default class EventTile extends Component {
       isEventActive: false,
       eventDuration: 0,
       eventIcon: null,
-      eventIconHash: Date.now()
+      eventIconHash: Date.now(),
+      startdate: ''
     };
   }
 
   componentDidMount() {
-    const { eventDetails } = this.state;
-    const isEventActive = this.handleIsActiveEvent(eventDetails.eventTimes);
-    const eventDuration = this.handleDuration(eventDetails);
-    const eventIcon = this.handleEventTypeIcon();
     this.setState({
       ...this.state,
-      eventDuration,
-      isEventActive,
-      eventIcon,
+      ...handleEventProps(this.state.eventDetails),
     });
   }
 
@@ -135,158 +238,6 @@ export default class EventTile extends Component {
       ...this.state,
       isDetailsExpanded: !this.state.isDetailsExpanded,
     });
-  }
-
-  handleTruncateText(text, length = 50) {
-    if (text.length <= length) {
-      return text;
-    }
-    const truncatedText =
-      text.length > length ? text.substring(0, length) : text;
-    const lastSpaceIndex = truncatedText.lastIndexOf(" ");
-    return (
-      truncatedText.substring(
-        0,
-        lastSpaceIndex === -1 ? length : lastSpaceIndex
-      ) + "..."
-    );
-  }
-
-  findFirstActiveDate(eventTimes) {
-    const currentTime = new Date();
-    return eventTimes.find(
-      (time) =>
-        time[0] > currentTime ||
-        (time[0] < currentTime && time[1] > currentTime)
-    );
-  }
-
-  handleStartDates(details) {
-    const { eventType, eventTimes } = details;
-    let timeToConvert;
-    switch (eventType) {
-      case EventTypes.PATCH:
-        // no times
-        return "Now";
-      case EventTypes.UPDATE:
-        // 1 time
-        timeToConvert = new Date(eventTimes[0]);
-        return (
-          timeToConvert.toLocaleDateString() +
-          " at " +
-          timeToConvert.toLocaleTimeString()
-        );
-      case EventTypes.SINGLE_EVENT:
-        // duration
-        timeToConvert = new Date(eventTimes[0]);
-        return (
-          timeToConvert.toLocaleDateString() +
-          " at " +
-          timeToConvert.toLocaleTimeString()
-        );
-      case EventTypes.MULTIPLE_EVENTS:
-        // multiple durations
-        timeToConvert = new Date(this.findFirstActiveDate(eventTimes)[0]);
-        return (
-          timeToConvert.toLocaleDateString() +
-          " at " +
-          timeToConvert.toLocaleTimeString()
-        );
-      default:
-        break;
-    }
-  }
-
-  handleEventTypeIcon() {
-    const { eventTimes, eventType } = this.state.eventDetails;
-    let eventIcon = PermanentEventIcon;
-    const currentTime = new Date();
-    switch (eventType) {
-      case EventTypes.SINGLE_EVENT:
-        if (eventTimes[0] <= currentTime && eventTimes[1] >= currentTime) {
-          eventIcon = ActiveEventIcon;
-        }
-        if (eventTimes[0] > currentTime) {
-          eventIcon = FutureEventIcon;
-        }
-        if (eventTimes[1] < currentTime) {
-          eventIcon = PastEventIcon;
-        }
-        break;
-      case EventTypes.MULTIPLE_EVENTS:
-        eventIcon = eventTimes ? MultiEventIcon : PastEventIcon;
-        break;
-      default:
-        break;
-    }
-    return eventIcon;
-  }
-
-  handleIsActiveEvent(eventTimes) {
-    const { eventType } = this.state.eventDetails;
-    const currentTime = new Date();
-    switch (eventType) {
-      case EventTypes.PATCH:
-        this.handleEventTypeIcon(eventTimes, eventType);
-        return true;
-      case EventTypes.UPDATE:
-        this.handleEventTypeIcon(eventTimes, eventType);
-        return true;
-      case EventTypes.SINGLE_EVENT:
-        const isActive =
-          eventTimes[0] <= currentTime && eventTimes[1] >= currentTime;
-        this.handleEventTypeIcon(eventTimes, eventType);
-        return isActive;
-      case EventTypes.MULTIPLE_EVENTS:
-        // find first event that is either upcoming or active
-        const firstActiveTime = this.findFirstActiveDate(eventTimes);
-        if (!firstActiveTime) {
-          this.handleEventTypeIcon(eventTimes, eventType);
-          return false;
-        }
-        this.handleEventTypeIcon(eventTimes, eventType);
-        return (
-          firstActiveTime[0] <= currentTime && firstActiveTime[1] >= currentTime
-        );
-      default:
-        break;
-    }
-  }
-
-  findRemainingDuration(eventTimes) {
-    if (!eventTimes) {
-      return -1;
-    }
-    let timeToConvert = -1;
-    const currentTime = new Date();
-    if (eventTimes[0] > currentTime) {
-      timeToConvert = eventTimes[1] - eventTimes[0];
-    } else {
-      timeToConvert = eventTimes[1] - currentTime;
-      if (timeToConvert < 0) {
-        return -1;
-      }
-    }
-    const diffDays = Math.ceil(timeToConvert / (1000 * 60 * 60 * 24));
-    return diffDays;
-  }
-
-  handleDuration(details) {
-    const { eventType, eventTimes } = details;
-    switch (eventType) {
-      case EventTypes.PATCH:
-        return Infinity;
-      case EventTypes.UPDATE:
-        return Infinity;
-      case EventTypes.SINGLE_EVENT:
-        return this.findRemainingDuration(eventTimes);
-      case EventTypes.MULTIPLE_EVENTS:
-        // find first event that is either upcoming or active
-        const firstActiveTime = this.findFirstActiveDate(eventTimes);
-        return this.findRemainingDuration(firstActiveTime);
-      default:
-        break;
-    }
   }
 
   handleRenderDuration() {
@@ -309,7 +260,8 @@ export default class EventTile extends Component {
       eventDetails,
       isEventActive,
       eventIcon,
-      eventIconHash
+      eventIconHash,
+      startDate
     } = this.state;
     return (
       <Container
@@ -317,13 +269,15 @@ export default class EventTile extends Component {
         isEventActive={isEventActive}
       >
         <EventHeader>
-          <EventIconContainer src={`${eventIcon}?${eventIconHash}`} key={eventIconHash} />
-          {this.handleTruncateText(eventDetails.eventName, 50)}
+          <EventIconContainer
+            src={`${eventIcon}?${eventIconHash}`}
+          />
+          {eventDetails.eventName}
         </EventHeader>
         <ContentContainer>
           <EventDetails>
             <Bold>Available Starting:</Bold>
-            {this.handleStartDates(eventDetails)}
+            {startDate}
           </EventDetails>
           <br />
           <EventDetails>
@@ -334,7 +288,7 @@ export default class EventTile extends Component {
           <EventDetails>
             <Bold>Requirements:</Bold>
             {eventDetails.requirements.length
-              ? this.handleTruncateText(eventDetails.requirements, 80)
+              ? handleTruncateText(eventDetails.requirements, 80)
               : "None"}
           </EventDetails>
           <DetailsContainer
