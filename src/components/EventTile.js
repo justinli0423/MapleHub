@@ -46,7 +46,7 @@ const EventHeader = styled.h2`
   margin-bottom: 16px;
   font-weight: bold;
   font-size: 24px;
-  width: 410px;
+  width: ${({isDetailsExpanded}) => isDetailsExpanded ? '900px' : '410px'};
 `;
 
 const EventDetails = styled.p`
@@ -120,7 +120,7 @@ const DetailsContainer = styled.div`
   width: ${({ isDetailsExpanded }) =>
     isDetailsExpanded ? "calc(100% - 32px)" : 0};
   height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "auto" : 0)};
-  margin: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "16px 8px" : 0)};
+  padding: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "16px 8px" : 0)};
   opacity: ${({ isDetailsExpanded }) => (isDetailsExpanded ? 1 : 0)};
   visibility: ${({ isDetailsExpanded }) =>
     isDetailsExpanded ? "visible" : "hidden"};
@@ -137,8 +137,8 @@ const DetailsContainer = styled.div`
     }
   }
 
-  & li::marker {
-    content: "";
+  & img {
+    max-width: 600px;
   }
 
   & br {
@@ -152,14 +152,10 @@ const DetailsContainer = styled.div`
   & > span {
     padding-right: 4px;
   }
-
-  & strong {
-    display: block;
-  }
 `;
 
-const handleTruncateText = (text, length = 50) => {
-  if (text.length <= length) {
+const handleTruncateText = (text, isExpanded, length) => {
+  if (text.length <= length || isExpanded) {
     return text;
   }
   const truncatedText = text.length > length ? text.substring(0, length) : text;
@@ -353,7 +349,7 @@ export default class EventTile extends Component {
         isDetailsExpanded={isDetailsExpanded}
         isEventActive={isEventActive}
       >
-        <EventHeader>
+        <EventHeader isDetailsExpanded={isDetailsExpanded}>
           <EventIconContainer
             isActiveTimedEvent={
               isEventActive &&
@@ -377,7 +373,11 @@ export default class EventTile extends Component {
           <EventDetails>
             <Bold>Requirements:</Bold>
             {eventDetails.requirements.length
-              ? handleTruncateText(eventDetails.requirements, 80)
+              ? handleTruncateText(
+                  eventDetails.requirements,
+                  isDetailsExpanded,
+                  80
+                )
               : "None"}
           </EventDetails>
           <DetailsContainer
