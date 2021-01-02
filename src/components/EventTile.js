@@ -122,6 +122,14 @@ const handleTruncateText = (text, length = 50) => {
   );
 };
 
+/**
+ *
+ * @param integer eventTimes
+ * returns the first event cycle
+ * either:
+ * - first upcoming
+ * - currently happening
+ */
 const findFirstActiveDate = (eventTimes) => {
   const currentTime = Date.now();
   return eventTimes.find(
@@ -133,13 +141,18 @@ const findFirstActiveDate = (eventTimes) => {
 const handleEventProps = (details) => {
   const { eventType, eventTimes } = details;
   const currentTime = Date.now();
-  let startDate, eventIcon, isActive, eventDuration, timeToConvert;
+  let startDate,
+    eventIcon,
+    isEventActive,
+    eventDuration,
+    timeToConvert,
+    firstActiveTime;
   switch (eventType) {
     case EventTypes.PATCH:
       // no times
       eventIcon = PermanentEventIcon;
       startDate = "Now";
-      isActive = true;
+      isEventActive = true;
       eventDuration = Infinity;
       break;
     case EventTypes.UPDATE:
@@ -150,7 +163,7 @@ const handleEventProps = (details) => {
         timeToConvert.toLocaleDateString() +
         " at " +
         timeToConvert.toLocaleTimeString();
-      isActive = true;
+      isEventActive = true;
       eventDuration = Infinity;
       break;
     case EventTypes.SINGLE_EVENT:
@@ -160,7 +173,8 @@ const handleEventProps = (details) => {
         timeToConvert.toLocaleDateString() +
         " at " +
         timeToConvert.toLocaleTimeString();
-      isActive = eventTimes[0] <= currentTime && eventTimes[1] >= currentTime;
+      isEventActive =
+        eventTimes[0] <= currentTime && eventTimes[1] >= currentTime;
       eventDuration = findRemainingDuration(eventTimes);
       if (eventTimes[0] <= currentTime && eventTimes[1] >= currentTime) {
         eventIcon = ActiveEventIcon;
@@ -173,25 +187,38 @@ const handleEventProps = (details) => {
       }
       break;
     case EventTypes.MULTIPLE_EVENTS:
-      // multiple durationsd
-      const firstActiveTime = findFirstActiveDate(eventTimes);
-      eventDuration = findRemainingDuration(firstActiveTime);
+      const totalActiveTime = [
+        eventTimes[0][0],
+        eventTimes[eventTimes.length - 1][1],
+      ];
+      firstActiveTime = findFirstActiveDate(eventTimes);
+      eventDuration = findRemainingDuration(totalActiveTime);
       timeToConvert = new Date(findFirstActiveDate(eventTimes)[0]);
       startDate =
         timeToConvert.toLocaleDateString() +
         " at " +
         timeToConvert.toLocaleTimeString();
       eventIcon = eventTimes ? MultiEventIcon : PastEventIcon;
-      if (!firstActiveTime) {
-        isActive = false;
+      if (
+        totalActiveTime[0] <= currentTime &&
+        totalActiveTime[1] >= currentTime
+      ) {
+        isEventActive = true;
+      } else {
+        isEventActive = false;
       }
-      isActive =
-        firstActiveTime[0] <= currentTime && firstActiveTime[1] >= currentTime;
       break;
     default:
       break;
   }
-  return { startDate, isActive, eventIcon, eventDuration };
+  return {
+    startDate,
+    isEventActive,
+    eventIcon,
+    eventDuration,
+    // TODO: show in details when expanded as "next event period"
+    firstActiveTime,
+  };
 };
 
 const findRemainingDuration = (eventTimes) => {
@@ -218,11 +245,11 @@ export default class EventTile extends Component {
     this.state = {
       eventDetails: this.props.eventDetails,
       isDetailsExpanded: false,
-      isEventActive: false,
+      isEventActive: true,
       eventDuration: 0,
       eventIcon: null,
       eventIconHash: Date.now(),
-      startdate: ''
+      startdate: "",
     };
   }
 
@@ -244,7 +271,7 @@ export default class EventTile extends Component {
     const { eventDuration } = this.state;
     switch (eventDuration) {
       case -1:
-        return "Ended";
+        return "Event Ended";
       case Infinity:
         return "Permanent";
       default:
@@ -254,6 +281,14 @@ export default class EventTile extends Component {
     }
   }
 
+  handleRenderStartPeriodHeader() {
+    const { eventDetails } = this.state;
+    if (eventDetails.eventType === EventTypes.MULTIPLE_EVENTS) {
+      return "Next Period Starting:";
+    }
+    return "Available Starting:";
+  }
+
   render() {
     const {
       isDetailsExpanded,
@@ -261,7 +296,7 @@ export default class EventTile extends Component {
       isEventActive,
       eventIcon,
       eventIconHash,
-      startDate
+      startDate,
     } = this.state;
     return (
       <Container
@@ -269,19 +304,17 @@ export default class EventTile extends Component {
         isEventActive={isEventActive}
       >
         <EventHeader>
-          <EventIconContainer
-            src={`${eventIcon}?${eventIconHash}`}
-          />
+          <EventIconContainer src={`${eventIcon}?${eventIconHash}`} />
           {eventDetails.eventName}
         </EventHeader>
         <ContentContainer>
           <EventDetails>
-            <Bold>Available Starting:</Bold>
+            <Bold>{this.handleRenderStartPeriodHeader()}</Bold>
             {startDate}
           </EventDetails>
           <br />
           <EventDetails>
-            <Bold>Duration:</Bold>
+            <Bold>Duration Remaining:</Bold>
             {this.handleRenderDuration()}
           </EventDetails>
           <br />
