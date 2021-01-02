@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-
 import styled from "styled-components";
+
+import { EventTypes, Keywords, NodeNames } from "../common/Consts";
 
 import ArrowDown from "../icons/chevron-down-solid.svg";
 import ArrowUp from "../icons/chevron-up-solid.svg";
@@ -34,6 +35,7 @@ const EventDetails = styled.p`
   line-height: 25px;
 `;
 
+// TODO: shrink footer when out of focus (clicking outside the box)
 const Footer = styled.div`
   position: absolute;
   left: 0;
@@ -47,6 +49,15 @@ const Footer = styled.div`
   padding: 0 16px;
   vertical-align: center;
   border-top: 1px solid #d3d3d3;
+
+  &:hover {
+    cursor: pointer;
+
+    img {
+      transform: scale(1.15);
+      filter: drop-shadow(2px 2px 1px #d3d3d3);
+    }
+  }
 `;
 
 const Bold = styled.b`
@@ -59,11 +70,6 @@ const ArrowIcon = styled.img`
   padding: 3px;
   border-radius: 50%;
   transition: 0.1s linear all;
-
-  &:hover {
-    transform: scale(1.15);
-    filter: drop-shadow(2px 2px 1px #d3d3d3);
-  }
 `;
 
 const ArrowUpIcon = styled(ArrowIcon)`
@@ -101,8 +107,39 @@ export default class EventTile extends Component {
     });
   }
 
-  handleTruncateText(text) {
-    return text.length > 100 ? text.substring(0, 80) + "..." : text;
+  handleTruncateText(text, length = 50) {
+    if (text.length <= length) {
+      return text;
+    }
+    const truncatedText =
+      text.length > length ? text.substring(0, length) : text;
+    const lastSpaceIndex = truncatedText.lastIndexOf(" ");
+    return (
+      truncatedText.substring(
+        0,
+        lastSpaceIndex === -1 ? length : lastSpaceIndex
+      ) + "..."
+    );
+  }
+
+  handleStartDates(details) {
+    const { eventType, eventTimes } = details;
+    switch (eventType) {
+      case EventTypes.PATCH:
+        // no times
+        return 'Now';
+      case EventTypes.UPDATE:
+        // 1 time
+        return new Date(eventTimes[0]).toDateString();
+      case EventTypes.SINGLE_EVENT:
+        // duration
+        return new Date(eventTimes[0]).toDateString();
+      case EventTypes.MULTIPLE_EVENTS:
+        // multiple durations
+        return new Date(eventTimes[0][0]).toDateString();
+      default:
+        break;
+    }
   }
 
   /**
@@ -114,7 +151,7 @@ export default class EventTile extends Component {
     "details": "\n<li>Zero can now be created in Reboot world during the <a href=\"https://maplestory.nexon.net/news/63875/v-219-awake-flicker-of-light-patch-notes#zero\" target=\"_blank\">Zero Creation</a> event. <br>\n<ul>\n<li>Please note that you must have a character that is Lv. 100 or above in Reboot world in order to create a Zero character.</li>\n</ul>\n</li>\n<li>Increased the chance to obtain equipment from defeating the following bosses in Reboot world:<br>\n<ul>\n<li>Lotus (Hard)</li>\n<li>Papulatus (Chaos)</li>...",
     "rewards": "",
     "eventType": null,
-    "eventTimes": "[]",
+    "eventTimes": "[[]]",
     "pinned": false,
     "pinId": -1
   }
@@ -125,10 +162,13 @@ export default class EventTile extends Component {
     const { isDetailsExpanded, eventDetails } = this.state;
     return (
       <Container isDetailsExpanded={isDetailsExpanded}>
-        <EventHeader>{eventDetails.eventName}</EventHeader>
+        <EventHeader>
+          {this.handleTruncateText(eventDetails.eventName, 50)}
+        </EventHeader>
         <ContentContainer>
           <EventDetails>
-            <Bold>Available After:</Bold>INSERT TIMES HERE
+            <Bold>Available Starting:</Bold>
+            {this.handleStartDates(eventDetails)}
           </EventDetails>
           <br />
           <EventDetails>
@@ -138,25 +178,25 @@ export default class EventTile extends Component {
           <EventDetails>
             <Bold>Requirements:</Bold>
             {eventDetails.requirements.length
-              ? this.handleTruncateText(eventDetails.requirements)
+              ? this.handleTruncateText(eventDetails.requirements, 80)
               : "None"}
           </EventDetails>
           <DetailsContainer
             isDetailsExpanded={isDetailsExpanded}
           ></DetailsContainer>
         </ContentContainer>
-        <Footer>
+        <Footer onClick={this.handleDetailsToggle.bind(this)}>
           <span>Show Details</span>
-          <div onClick={this.handleDetailsToggle.bind(this)}>
+          <div>
             <ArrowDownIcon
               isDetailsExpanded={isDetailsExpanded}
               src={ArrowDown}
-              alt=""
+              alt=''
             />
             <ArrowUpIcon
               isDetailsExpanded={isDetailsExpanded}
               src={ArrowUp}
-              alt=""
+              alt=''
             />
           </div>
         </Footer>

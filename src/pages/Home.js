@@ -1,35 +1,12 @@
 import React, { Component } from "react";
-import Title from "../components/common/Title";
-import Button from "../components/common/Button";
 import styled from "styled-components";
 import { Modal } from "@material-ui/core";
+
+import { EventTypes, Keywords, NodeNames } from "../common/Consts";
+
+import Button from "../components/common/Button";
 import EventTile from "../components/EventTile";
-
-const NodeNames = {
-  H1: "H1",
-  H3: "H3",
-  TEXT: "#text",
-  UL: "UL",
-  P: "P",
-  IMG: "IMG",
-};
-
-const Keywords = {
-  DATES: "UTC: ",
-  REQUIREMENTS: "Requirement:",
-  REWARDS: "Reward:",
-  PARTS: "Part",
-};
-
-const EventTypes = {
-  UPDATE: "UPDATE",
-  SINGLE_EVENT: "SINGLE_EVENT",
-  MULTIPLE_EVENTS: "MULTIPLE_EVENTS",
-};
-
-Object.freeze(NodeNames);
-Object.freeze(Keywords);
-Object.freeze(EventTypes);
+import Title from "../components/common/Title";
 
 const Container = styled.div`
   position: relative;
@@ -95,11 +72,12 @@ const TileContainer = styled.div`
   width: 100%;
 `;
 
-const findYearForEvent = (eventTimeStamp, patchNotesDate) => {
+const findYearForEvent = (eventTimeStamp, patchNodesTimeStamp) => {
+  const patchNotesDate = new Date(patchNodesTimeStamp);
   // all event dates are assumed to be in current year
   const threeMonthsBeforePatch = patchNotesDate.setMonth(
     patchNotesDate.getMonth() - 3
-  );
+    );
   const threeMonthsAfterPatch = patchNotesDate.setMonth(
     patchNotesDate.getMonth() + 6
   );
@@ -150,18 +128,18 @@ const cleanDateString = (dateString, patchNodesTimeStamp) => {
     .replaceAll("at", "")
     .replaceAll(/\((before|after) maintenance\)/gi, "");
 
-  if (!filteredDate.match(/[1-9]+/g) || !filteredDate.match(/[1-9]+/g).length) {
+  if (!filteredDate.match(/[1-9]{1,2}/g) || !filteredDate.match(/[1-9]{1,2}/g).length) {
     return;
   }
   filteredDate = filteredDate
-    .concat(" " + new Date().getFullYear() + " ")
+    .concat(" " + new Date(patchNodesTimeStamp).getFullYear() + " ")
     .concat("UTC");
   const filteredDateObject = new Date(filteredDate);
   const timeStamp = Date.parse(filteredDate);
-  const patchNotesDate = new Date(patchNodesTimeStamp);
   const filteredDateWithYear = filteredDateObject.setYear(
-    findYearForEvent(timeStamp, patchNotesDate)
+    findYearForEvent(timeStamp, patchNodesTimeStamp)
   );
+  console.log(filteredDateWithYear);
   return filteredDateWithYear;
 };
 
@@ -248,9 +226,13 @@ export default class Home extends Component {
           pinned: false,
           pinId: -1,
         });
-      } else if (sectionDetails.length) {
+        return;
+      }
+      
+      if (sectionDetails.length) {
         const lastSectionDetail = sectionDetails[sectionDetails.length - 1];
-        let isRewardsIMG = node.childNodes[0].nodeName === NodeNames.IMG;
+        // TODO: forgot what isRewardsIMG is...
+        const isRewardsIMG = node.childNodes[0].nodeName === NodeNames.IMG;
         if (node.nodeName === NodeNames.UL) {
           lastSectionDetail.details = node.innerHTML;
         }
@@ -290,11 +272,19 @@ export default class Home extends Component {
             lastSectionDetail.requirements = text.split(":")[1];
           }
           if (text.includes(Keywords.REWARDS)) {
+            // TODO
           }
         }
       }
     });
-    return sectionDetails;
+
+    // convert the leftover NULL event types to PATCH
+    return sectionDetails.map(section => {
+      if (!section.eventTimes.length) {
+        section.eventType = EventTypes.PATCH;
+      }
+      return section;
+    });
   }
 
   handleNewsHTML(body, patchNodesTimeStamp) {
@@ -340,18 +330,18 @@ export default class Home extends Component {
         <Banner src={newsDetails.bannerURL} />
         <HeaderContainer>
           <Title
-            title="All-In-One News Hub"
-            caption="Click the button below if the News Hub is not updated!"
+            title='All-In-One News Hub'
+            caption='Click the button below if the News Hub is not updated!'
           />
           <Button
-            label="Update News Hub"
+            label='Update News Hub'
             callback={this.openModal.bind(this)}
           />
           <Modal
             open={this.state.isModalActive}
             onClose={this.closeModal.bind(this)}
-            aria-labelledby="simple-modal-title"
-            aria-describedby="simple-modal-description"
+            aria-labelledby='simple-modal-title'
+            aria-describedby='simple-modal-description'
           >
             {this.renderModalBody()}
           </Modal>
