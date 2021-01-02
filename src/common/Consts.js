@@ -11,7 +11,8 @@ const Keywords = {
   DATES: 'UTC: ',
   REQUIREMENTS: 'Requirement:',
   REWARDS: 'Reward:',
-  PARTS: 'Part'
+  PARTS: 'Part',
+  END: 'Join the discussion'
 }
 
 const EventTypes = {

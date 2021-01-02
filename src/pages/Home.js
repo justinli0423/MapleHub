@@ -176,8 +176,10 @@ const handleMultipleEvents = (dateArray, patchNodesTimeStamp) => {
 const handleSubSectionNews = (body, patchNodesTimeStamp) => {
   const sectionDetails = [];
   const nodeList = Array.from(body.children);
+  let hasReward = false;
   nodeList.forEach((node, i) => {
     if (node.nodeName === NodeNames.H3) {
+      hasReward = false;
       sectionDetails.push({
         orderId: i,
         eventName: node.textContent,
@@ -193,14 +195,20 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
     }
 
     if (sectionDetails.length) {
+      const text = node.innerText;
       const lastSectionDetail = sectionDetails[sectionDetails.length - 1];
       // TODO: forgot what isRewardsIMG is...
       const isRewardsIMG = node.childNodes[0].nodeName === NodeNames.IMG;
-      if (node.nodeName === NodeNames.UL) {
-        lastSectionDetail.details = node.innerHTML;
+      if (
+        (node.nodeName === NodeNames.UL) ||
+        !text.includes(Keywords.DATES) &&
+        !text.includes(Keywords.REQUIREMENTS) &&
+        !text.includes(Keywords.REWARDS) &&
+        !text.includes(Keywords.END)
+      ) {
+        lastSectionDetail.details += node.innerHTML;
       }
       if (node.nodeName === NodeNames.P && !isRewardsIMG) {
-        const text = node.innerText;
         if (text.includes(Keywords.DATES)) {
           const unfilteredDate = text.split(/-|–/g);
           const dateCount = unfilteredDate.length;

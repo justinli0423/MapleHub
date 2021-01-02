@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import styled from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 
 import { EventTypes } from "../common/Consts";
 
@@ -11,6 +11,16 @@ import ActiveEventIcon from "../icons/hourglass-start-solid.svg";
 import FutureEventIcon from "../icons/fast-forward-solid.svg";
 import PastEventIcon from "../icons/history-solid.svg";
 import PermanentEventIcon from "../icons/infinity-solid.svg";
+
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+`;
 
 const Container = styled.div`
   position: relative;
@@ -95,17 +105,57 @@ const EventIconContainer = styled.img`
   height: 20px;
   width: 20px;
   vertical-align: middle;
+  animation: ${({ isActiveTimedEvent }) =>
+    isActiveTimedEvent
+      ? css`
+          ${rotate} 4s linear infinite
+        `
+      : "none"};
 `;
 
 // TODO: Animation on show/hide?
 const DetailsContainer = styled.div`
+  overflow-y: auto;
+  max-height: 280px;
+  width: ${({ isDetailsExpanded }) =>
+    isDetailsExpanded ? "calc(100% - 32px)" : 0};
+  height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "auto" : 0)};
+  margin: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "16px 8px" : 0)};
   opacity: ${({ isDetailsExpanded }) => (isDetailsExpanded ? 1 : 0)};
   visibility: ${({ isDetailsExpanded }) =>
     isDetailsExpanded ? "visible" : "hidden"};
-  width: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "auto" : 0)};
-  height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "auto" : 0)};
-  margin: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "16px 8px" : 0)};
-  max-height: 280px;
+
+  & > li {
+    /* direct children: headers */
+    font-size: 14px;
+    font-weight: bold;
+
+    & ul {
+      font-size: 12px;
+      font-weight: normal;
+      text-indent: 16px;
+    }
+  }
+
+  & li::marker {
+    content: "";
+  }
+
+  & br {
+    display: none;
+  }
+
+  & em {
+    display: inline;
+  }
+
+  & > span {
+    padding-right: 4px;
+  }
+
+  & strong {
+    display: block;
+  }
 `;
 
 const handleTruncateText = (text, length = 50) => {
@@ -304,7 +354,13 @@ export default class EventTile extends Component {
         isEventActive={isEventActive}
       >
         <EventHeader>
-          <EventIconContainer src={`${eventIcon}?${eventIconHash}`} />
+          <EventIconContainer
+            isActiveTimedEvent={
+              isEventActive &&
+              eventDetails.eventType === EventTypes.SINGLE_EVENT
+            }
+            src={`${eventIcon}?${eventIconHash}`}
+          />
           {eventDetails.eventName}
         </EventHeader>
         <ContentContainer>
@@ -326,6 +382,7 @@ export default class EventTile extends Component {
           </EventDetails>
           <DetailsContainer
             isDetailsExpanded={isDetailsExpanded}
+            dangerouslySetInnerHTML={{ __html: eventDetails.details }}
           ></DetailsContainer>
         </ContentContainer>
         <Footer onClick={this.handleDetailsToggle.bind(this)}>
