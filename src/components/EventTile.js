@@ -14,7 +14,7 @@ const Container = styled.div`
   margin: 16px;
   padding: 16px;
   border-radius: 5px;
-  background: #ffffff;
+  background: ${({ isEventActive }) => (isEventActive ? "#ffffff" : "#e6e6e6")};
   box-shadow: 4px 5px 3px rgba(0, 0, 0, 0.25);
 `;
 
@@ -124,44 +124,100 @@ export default class EventTile extends Component {
 
   handleStartDates(details) {
     const { eventType, eventTimes } = details;
+    let timeToConvert;
     switch (eventType) {
       case EventTypes.PATCH:
         // no times
-        return 'Now';
+        return "Now";
       case EventTypes.UPDATE:
         // 1 time
-        return new Date(eventTimes[0]).toDateString();
+        timeToConvert = new Date(eventTimes[0]);
+        return (
+          timeToConvert.toLocaleDateString() +
+          " at " +
+          timeToConvert.toLocaleTimeString()
+        );
       case EventTypes.SINGLE_EVENT:
         // duration
-        return new Date(eventTimes[0]).toDateString();
+        timeToConvert = new Date(eventTimes[0]);
+        return (
+          timeToConvert.toLocaleDateString() +
+          " at " +
+          timeToConvert.toLocaleTimeString()
+        );
       case EventTypes.MULTIPLE_EVENTS:
         // multiple durations
-        return new Date(eventTimes[0][0]).toDateString();
+        timeToConvert = new Date(eventTimes[0][0]);
+        return (
+          timeToConvert.toLocaleDateString() +
+          " at " +
+          timeToConvert.toLocaleTimeString()
+        );
       default:
         break;
     }
   }
 
-  /**
-   * {
-  "sectionDetails": {
-    "orderId": 7,
-    "eventName": "Reboot World Revamp",
-    "requirements": "",
-    "details": "\n<li>Zero can now be created in Reboot world during the <a href=\"https://maplestory.nexon.net/news/63875/v-219-awake-flicker-of-light-patch-notes#zero\" target=\"_blank\">Zero Creation</a> event. <br>\n<ul>\n<li>Please note that you must have a character that is Lv. 100 or above in Reboot world in order to create a Zero character.</li>\n</ul>\n</li>\n<li>Increased the chance to obtain equipment from defeating the following bosses in Reboot world:<br>\n<ul>\n<li>Lotus (Hard)</li>\n<li>Papulatus (Chaos)</li>...",
-    "rewards": "",
-    "eventType": null,
-    "eventTimes": "[[]]",
-    "pinned": false,
-    "pinId": -1
+  componentDidMount() {
+    const { eventDetails } = this.state;
+    this.setState({
+      ...this.state,
+      eventDuration: this.handleDuration(eventDetails),
+    });
   }
-}
-   */
+
+  handleDuration(details) {
+    const { eventType, eventTimes } = details;
+    let timeToConvert;
+    let currentTime = new Date();
+    switch (eventType) {
+      case EventTypes.PATCH:
+        return Infinity;
+      case EventTypes.UPDATE:
+        return Infinity;
+      case EventTypes.SINGLE_EVENT:
+        if (eventTimes[0] > currentTime) {
+          timeToConvert = eventTimes[1] - eventTimes[0];
+        } else {
+          timeToConvert = eventTimes[1] - currentTime;
+          if (timeToConvert < 0) {
+            return -1;
+          }
+        }
+        const diffDays = Math.ceil(timeToConvert / (1000 * 60 * 60 * 24));
+        return diffDays;
+      case EventTypes.MULTIPLE_EVENTS:
+        // multiple durations
+        timeToConvert = new Date(eventTimes[0][0]);
+        return (
+          timeToConvert.toLocaleDateString() +
+          " at " +
+          timeToConvert.toLocaleTimeString()
+        );
+      default:
+        break;
+    }
+  }
+
+  handleRenderDuration() {
+    const { eventDuration } = this.state;
+    switch (eventDuration) {
+      case -1:
+        return "Ended";
+      case Infinity:
+        return "Permanent";
+      default:
+        return `${eventDuration} days`;
+    }
+  }
 
   render() {
-    const { isDetailsExpanded, eventDetails } = this.state;
+    const { isDetailsExpanded, eventDetails, eventDuration } = this.state;
     return (
-      <Container isDetailsExpanded={isDetailsExpanded}>
+      <Container
+        isDetailsExpanded={isDetailsExpanded}
+        isEventActive={eventDuration >= 0}
+      >
         <EventHeader>
           {this.handleTruncateText(eventDetails.eventName, 50)}
         </EventHeader>
@@ -172,7 +228,8 @@ export default class EventTile extends Component {
           </EventDetails>
           <br />
           <EventDetails>
-            <Bold>Duration:</Bold>INSERT TIMES HERE
+            <Bold>Remaining:</Bold>
+            {this.handleRenderDuration()}
           </EventDetails>
           <br />
           <EventDetails>
