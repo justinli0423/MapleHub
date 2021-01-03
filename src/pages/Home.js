@@ -173,6 +173,24 @@ const handleMultipleEvents = (dateArray, patchNodesTimeStamp) => {
   return eventTimes;
 };
 
+/**
+ * 
+ * @param {HTML} body 
+ * @param {Date} patchNodesTimeStamp 
+ * 
+ * Types of events:
+ * 1. title, no requirement, no time, no reward, only description
+ *  - h3 as title and ul as description
+ * 2. title, available after x, requirement, description, rewards, rewardsIMG
+ *  - h3 as title, p for requirement and availability, ul for description, p for reward title, ul for reward list, p for reward img
+ *  - could have multiple P tags for details
+ * 3. title, available after x, requirement, description, rewards, no rewards img
+ *  - h3 as title, p for requirement and availability, ul for description, p for reward title, ul for reward list
+ *  - could have multiple reward titles and desciprtions (should find sibling until next H3)
+ * 4. title, multipele event periods...
+ *  - multiple event periods nested under 1 p tag
+ */
+
 const handleSubSectionNews = (body, patchNodesTimeStamp) => {
   const sectionDetails = [];
   const nodeList = Array.from(body.children);
@@ -316,8 +334,6 @@ export default class Home extends Component {
       },
     });
   }
-
-  // ===================================== //
 
   renderModalBody() {
     return (
