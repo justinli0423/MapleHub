@@ -174,10 +174,10 @@ const handleMultipleEvents = (dateArray, patchNodesTimeStamp) => {
 };
 
 /**
- * 
- * @param {HTML} body 
- * @param {Date} patchNodesTimeStamp 
- * 
+ *
+ * @param {HTML} body
+ * @param {Date} patchNodesTimeStamp
+ *
  * Types of events:
  * 1. title, no requirement, no time, no reward, only description
  *  - h3 as title and ul as description
@@ -193,42 +193,39 @@ const handleMultipleEvents = (dateArray, patchNodesTimeStamp) => {
 
 const handleSubSectionNews = (body, patchNodesTimeStamp) => {
   const sectionDetails = [];
-  const nodeList = Array.from(body.children);
-  let hasReward = false;
-  nodeList.forEach((node, i) => {
-    if (node.nodeName === NodeNames.H3) {
-      hasReward = false;
-      sectionDetails.push({
-        orderId: i,
-        eventName: node.textContent,
-        requirements: "",
-        details: "",
-        rewards: "",
-        eventType: null,
-        eventTimes: [],
-        pinned: false,
-        pinId: -1,
-      });
-      return;
-    }
+  const eventHeadersList = Array.from(body.querySelectorAll("h3"));
 
-    if (sectionDetails.length) {
-      const text = node.innerText;
-      const lastSectionDetail = sectionDetails[sectionDetails.length - 1];
-      // TODO: forgot what isRewardsIMG is...
-      const isRewardsIMG = node.childNodes[0].nodeName === NodeNames.IMG;
-      if (
-        node.nodeName === NodeNames.UL ||
-        (!text.includes(Keywords.DATES) &&
-          !text.includes(Keywords.REQUIREMENTS) &&
-          !text.includes(Keywords.REWARDS) &&
-          !text.includes(Keywords.END))
-      ) {
-        lastSectionDetail.details += node.innerHTML;
-      }
-      if (node.nodeName === NodeNames.P && !isRewardsIMG) {
-        if (text.includes(Keywords.DATES)) {
-          const unfilteredDate = text.split(/-|–/g);
+  eventHeadersList.forEach((eventHeader, i) => {
+    sectionDetails.push({
+      orderId: i,
+      eventName: eventHeader.textContent,
+      requirements: [],
+      details: "",
+      rewards: "",
+      rewardIMG: "",
+      eventType: null,
+      eventTimes: [],
+      pinned: false,
+      pinId: -1,
+    });
+
+    let hasReward = false;
+    let element = eventHeader;
+    const lastSectionDetail = sectionDetails[sectionDetails.length - 1];
+    while (
+      element.nextElementSibling &&
+      element.nextElementSibling.nodeName !== NodeNames.H1 &&
+      element.nextElementSibling.nodeName !== NodeNames.H3
+    ) {
+      element = element.nextElementSibling;
+      // details inbetween
+      const innerText = element.innerText;
+      if (element.nodeName === NodeNames.P) {
+        const isRewardsIMG = element.childNodes[0].nodeName === NodeNames.IMG;
+        // either event duration or requirements
+        if (innerText.includes(Keywords.DATES)) {
+          // event duration
+          const unfilteredDate = innerText.split(/-|–/g);
           const dateCount = unfilteredDate.length;
           switch (dateCount) {
             case 1:
@@ -257,14 +254,28 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
               break;
           }
         }
-        if (text.includes(Keywords.REQUIREMENTS)) {
-          lastSectionDetail.requirements = text.split(":")[1];
+        if (innerText.includes(Keywords.REQUIREMENTS)) {
+          lastSectionDetail.requirements += innerText.split(":")[1];
         }
-        if (text.includes(Keywords.REWARDS)) {
-          // TODO
+        if (innerText.includes(Keywords.REWARDS)) {
+          hasReward = true;
+        }
+        if (isRewardsIMG && hasReward) {
+          lastSectionDetail.rewardIMG += element.childNodes[0];
         }
       }
+
+      if (element.nodeName === NodeNames.UL) {
+        // reward details
+        if (hasReward) {
+          lastSectionDetail.rewards += element.innerHTML;
+        } else {
+          lastSectionDetail.details += element.innerHTML;
+        }
+      }
+
     }
+    console.log("END OF EVENT DETAILS");
   });
 
   // convert the leftover NULL event types to PATCH
