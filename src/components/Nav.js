@@ -109,19 +109,19 @@ export default function Nav() {
           <Icon />
         </LogoContainer>
         <OptionsContainer>
-          <StyledLink exact to="">
+          <StyledLink exact to=''>
             <Item>
               <ActiveBar />
               Updates
             </Item>
           </StyledLink>
-          <StyledLink to="/reminders">
+          <StyledLink to='/reminders'>
             <Item>
               <ActiveBar />
               Reminders
             </Item>
           </StyledLink>
-          <StyledLink to="/legion">
+          <StyledLink to='/legion'>
             <Item>
               <ActiveBar />
               Legion Board
@@ -138,13 +138,13 @@ export default function Nav() {
             renders the first one that matches the current URL. */}
       <MainContainer>
         <Switch>
-          <Route path="/legion">
+          <Route path='/legion'>
             <Legion />
           </Route>
-          <Route path="/reminders">
+          <Route path='/reminders'>
             <Reminders />
           </Route>
-          <Route path="/">
+          <Route path='/'>
             <Home />
           </Route>
         </Switch>

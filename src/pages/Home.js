@@ -200,11 +200,11 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
       // TODO: forgot what isRewardsIMG is...
       const isRewardsIMG = node.childNodes[0].nodeName === NodeNames.IMG;
       if (
-        (node.nodeName === NodeNames.UL) ||
-        !text.includes(Keywords.DATES) &&
-        !text.includes(Keywords.REQUIREMENTS) &&
-        !text.includes(Keywords.REWARDS) &&
-        !text.includes(Keywords.END)
+        node.nodeName === NodeNames.UL ||
+        (!text.includes(Keywords.DATES) &&
+          !text.includes(Keywords.REQUIREMENTS) &&
+          !text.includes(Keywords.REWARDS) &&
+          !text.includes(Keywords.END))
       ) {
         lastSectionDetail.details += node.innerHTML;
       }

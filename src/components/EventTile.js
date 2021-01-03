@@ -23,6 +23,7 @@ const rotate = keyframes`
 `;
 
 const Container = styled.div`
+  z-index: ${({ isDetailsExpanded }) => (isDetailsExpanded ? 100 : "unset")};
   position: relative;
   flex: ${({ isDetailsExpanded }) =>
     isDetailsExpanded ? "0 0 calc(100% - 32px)" : "0 0 calc(50% - 32px)"};
@@ -46,7 +47,7 @@ const EventHeader = styled.h2`
   margin-bottom: 16px;
   font-weight: bold;
   font-size: 24px;
-  width: ${({isDetailsExpanded}) => isDetailsExpanded ? '900px' : '410px'};
+  width: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "900px" : "410px")};
 `;
 
 const EventDetails = styled.p`
@@ -152,6 +153,17 @@ const DetailsContainer = styled.div`
   & > span {
     padding-right: 4px;
   }
+`;
+
+const OverlayContainer = styled.div`
+  z-index: 10;
+  display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "block" : "none")};
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
 `;
 
 const handleTruncateText = (text, isExpanded, length) => {
@@ -345,62 +357,68 @@ export default class EventTile extends Component {
       startDate,
     } = this.state;
     return (
-      <Container
-        isDetailsExpanded={isDetailsExpanded}
-        isEventActive={isEventActive}
-      >
-        <EventHeader isDetailsExpanded={isDetailsExpanded}>
-          <EventIconContainer
-            isActiveTimedEvent={
-              isEventActive &&
-              eventDetails.eventType === EventTypes.SINGLE_EVENT
-            }
-            src={`${eventIcon}?${eventIconHash}`}
-          />
-          {eventDetails.eventName}
-        </EventHeader>
-        <ContentContainer>
-          <EventDetails>
-            <Bold>{this.handleRenderStartPeriodHeader()}</Bold>
-            {startDate}
-          </EventDetails>
-          <br />
-          <EventDetails>
-            <Bold>Duration Remaining:</Bold>
-            {this.handleRenderDuration()}
-          </EventDetails>
-          <br />
-          <EventDetails>
-            <Bold>Requirements:</Bold>
-            {eventDetails.requirements.length
-              ? handleTruncateText(
-                  eventDetails.requirements,
-                  isDetailsExpanded,
-                  80
-                )
-              : "None"}
-          </EventDetails>
-          <DetailsContainer
-            isDetailsExpanded={isDetailsExpanded}
-            dangerouslySetInnerHTML={{ __html: eventDetails.details }}
-          ></DetailsContainer>
-        </ContentContainer>
-        <Footer onClick={this.handleDetailsToggle.bind(this)}>
-          <span>Show Details</span>
-          <div>
-            <ArrowDownIconContainer
-              isDetailsExpanded={isDetailsExpanded}
-              src={ArrowDownIcon}
-              alt=''
+      <>
+        <OverlayContainer
+          onClick={this.handleDetailsToggle.bind(this)}
+          isDetailsExpanded={isDetailsExpanded}
+        />
+        <Container
+          isDetailsExpanded={isDetailsExpanded}
+          isEventActive={isEventActive}
+        >
+          <EventHeader isDetailsExpanded={isDetailsExpanded}>
+            <EventIconContainer
+              isActiveTimedEvent={
+                isEventActive &&
+                eventDetails.eventType === EventTypes.SINGLE_EVENT
+              }
+              src={`${eventIcon}?${eventIconHash}`}
             />
-            <ArrowUpIconContainer
+            {eventDetails.eventName}
+          </EventHeader>
+          <ContentContainer>
+            <EventDetails>
+              <Bold>{this.handleRenderStartPeriodHeader()}</Bold>
+              {startDate}
+            </EventDetails>
+            <br />
+            <EventDetails>
+              <Bold>Duration Remaining:</Bold>
+              {this.handleRenderDuration()}
+            </EventDetails>
+            <br />
+            <EventDetails>
+              <Bold>Requirements:</Bold>
+              {eventDetails.requirements.length
+                ? handleTruncateText(
+                    eventDetails.requirements,
+                    isDetailsExpanded,
+                    80
+                  )
+                : "None"}
+            </EventDetails>
+            <DetailsContainer
               isDetailsExpanded={isDetailsExpanded}
-              src={ArrowUpIcon}
-              alt=''
-            />
-          </div>
-        </Footer>
-      </Container>
+              dangerouslySetInnerHTML={{ __html: eventDetails.details }}
+            ></DetailsContainer>
+          </ContentContainer>
+          <Footer onClick={this.handleDetailsToggle.bind(this)}>
+            <span>Show Details</span>
+            <div>
+              <ArrowDownIconContainer
+                isDetailsExpanded={isDetailsExpanded}
+                src={ArrowDownIcon}
+                alt=''
+              />
+              <ArrowUpIconContainer
+                isDetailsExpanded={isDetailsExpanded}
+                src={ArrowUpIcon}
+                alt=''
+              />
+            </div>
+          </Footer>
+        </Container>
+      </>
     );
   }
 }
