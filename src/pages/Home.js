@@ -5,8 +5,9 @@ import { Modal } from "@material-ui/core";
 import { EventTypes, Keywords, NodeNames } from "../common/Consts";
 
 import Button from "../components/common/Button";
-import EventTile from "../components/EventTile";
 import Title from "../components/common/Title";
+import EventTile from "../components/EventTile";
+import SearchBar from "../components/SearchBar";
 
 const Container = styled.div`
   position: relative;
@@ -68,7 +69,7 @@ const TileContainer = styled.div`
   flex-direction: row;
   justify-content: flex-start;
   flex-wrap: wrap;
-  margin: 32px auto;
+  margin: 0 auto;
   width: 100%;
 `;
 
@@ -273,7 +274,6 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
           lastSectionDetail.details += element.innerHTML;
         }
       }
-
     }
     console.log("END OF EVENT DETAILS");
   });
@@ -292,6 +292,7 @@ export default class Home extends Component {
     super();
     this.state = {
       isModalActive: false,
+      filterValue: "",
       // TODO: convert to mobx later?
       modalInputText: window.localStorage.getItem("mapleHubNews"),
       // TODO: break HTML apart -> store the object into localStorage instead
@@ -381,7 +382,15 @@ export default class Home extends Component {
     );
   }
 
+  handleSearchResults(filterValue) {
+    this.setState({
+      ...this.state,
+      filterValue,
+    });
+  }
+
   render() {
+    const { filterValue } = this.state;
     const { patchNodesTimeStamp, sectionDetails } = this.state.newsDetails;
     return (
       <>
@@ -389,12 +398,23 @@ export default class Home extends Component {
         <NewsContainer>
           <LastUpdatedHeader>
             <b>Patch Notes Last Updated On: </b>
-            {"" + new Date(patchNodesTimeStamp).toDateString()}
+            {new Date(patchNodesTimeStamp).toDateString()}
           </LastUpdatedHeader>
+          <SearchBar
+            sectionDetails={sectionDetails}
+            callback={this.handleSearchResults.bind(this)}
+          />
           <TileContainer ref={this.newsRef}>
-            {sectionDetails.map((section, i) => (
-              <EventTile key={i} eventDetails={section} />
-            ))}
+            {sectionDetails
+              .filter((section) => {
+                if (!filterValue.length) {
+                  return true;
+                }
+                return section.eventName === filterValue;
+              })
+              .map((section, i) => (
+                <EventTile key={`${i}$${Date.now()}`} eventDetails={section} />
+              ))}
           </TileContainer>
         </NewsContainer>
       </>
