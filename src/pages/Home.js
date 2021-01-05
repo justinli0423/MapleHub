@@ -9,6 +9,12 @@ import Title from "../components/common/Title";
 import EventTile from "../components/EventTile";
 import SearchBar from "../components/SearchBar";
 
+import MultiEventIcon from "../icons/tasks-solid.svg";
+import ActiveEventIcon from "../icons/hourglass-start-solid.svg";
+import FutureEventIcon from "../icons/fast-forward-solid.svg";
+import PastEventIcon from "../icons/history-solid.svg";
+import PermanentEventIcon from "../icons/infinity-solid.svg";
+
 const Container = styled.div`
   position: relative;
   width: 100%;
@@ -178,18 +184,6 @@ const handleMultipleEvents = (dateArray, patchNodesTimeStamp) => {
  *
  * @param {HTML} body
  * @param {Date} patchNodesTimeStamp
- *
- * Types of events:
- * 1. title, no requirement, no time, no reward, only description
- *  - h3 as title and ul as description
- * 2. title, available after x, requirement, description, rewards, rewardsIMG
- *  - h3 as title, p for requirement and availability, ul for description, p for reward title, ul for reward list, p for reward img
- *  - could have multiple P tags for details
- * 3. title, available after x, requirement, description, rewards, no rewards img
- *  - h3 as title, p for requirement and availability, ul for description, p for reward title, ul for reward list
- *  - could have multiple reward titles and desciprtions (should find sibling until next H3)
- * 4. title, multipele event periods...
- *  - multiple event periods nested under 1 p tag
  */
 
 const handleSubSectionNews = (body, patchNodesTimeStamp) => {
@@ -302,12 +296,66 @@ export default class Home extends Component {
         patchNodesTimeStamp: null,
         sectionDetails: [],
       },
+      filters: {
+        [EventTypes.MULTIPLE_EVENTS]: false,
+        UPDATES_PATCHES: false,
+        ACTIVE_EVENTS: false,
+        PAST_EVENTS: false,
+        FUTURE_EVENTS: false,
+      },
+      filterPills: [
+        {
+          name: "multiEvents",
+          tooltip: "Multiple Events",
+          icon: MultiEventIcon,
+          filterType: EventTypes.MULTIPLE_EVENTS,
+          callback: this.handleFilterToggle.bind(this),
+        },
+        {
+          name: "updatesAndPatches",
+          tooltip: "Updates and Patches",
+          icon: PermanentEventIcon,
+          filterType: "UPDATE_PATCHES",
+          callback: this.handleFilterToggle.bind(this),
+        },
+        {
+          name: "activeEvents",
+          tooltip: "Active Events",
+          icon: ActiveEventIcon,
+          filterType: "ACTIVE_EVENTS",
+          callback: this.handleFilterToggle.bind(this),
+        },
+        {
+          name: "futureEvents",
+          tooltip: "Future Events",
+          icon: FutureEventIcon,
+          filterType: "FUTURE_EVENTS",
+          callback: this.handleFilterToggle.bind(this),
+        },
+        {
+          name: "pastEvents",
+          tooltip: "Past Events",
+          icon: PastEventIcon,
+          filterType: "PAST_EVENTS",
+          callback: this.handleFilterToggle.bind(this),
+        },
+      ],
     };
     this.newsRef = React.createRef();
   }
 
   componentDidMount() {
     this.getNews();
+  }
+
+  handleFilterToggle(filter) {
+    this.setState({
+      ...this.state,
+      filters: {
+        ...this.state.filters,
+        filter: !filter,
+      },
+    });
   }
 
   openModal() {
@@ -325,7 +373,22 @@ export default class Home extends Component {
     window.localStorage.setItem("mapleHubNews", ev.target.value);
   }
 
-  // This function should only be ran when new patch notes are out
+  handleEventFilters() {
+    const { filterValue } = this.state;
+    const { sectionDetails } = this.state.newsDetails;
+
+    return sectionDetails
+      .filter((section) => {
+        if (!filterValue.length) {
+          return true;
+        }
+        return section.eventName === filterValue;
+      })
+      .map((section, i) => (
+        <EventTile key={`${i}$${Date.now()}`} eventDetails={section} />
+      ));
+  }
+
   // TODO: find count of subsections (count of h3s) and render placeholders?
   getNews() {
     // convert to mobx? (loading state)
@@ -390,7 +453,6 @@ export default class Home extends Component {
   }
 
   render() {
-    const { filterValue } = this.state;
     const { patchNodesTimeStamp, sectionDetails } = this.state.newsDetails;
     return (
       <>
@@ -401,20 +463,12 @@ export default class Home extends Component {
             {new Date(patchNodesTimeStamp).toDateString()}
           </LastUpdatedHeader>
           <SearchBar
-            sectionDetails={sectionDetails}
+            searchObject={sectionDetails}
             callback={this.handleSearchResults.bind(this)}
+            filterPills={this.state.filterPills}
           />
           <TileContainer ref={this.newsRef}>
-            {sectionDetails
-              .filter((section) => {
-                if (!filterValue.length) {
-                  return true;
-                }
-                return section.eventName === filterValue;
-              })
-              .map((section, i) => (
-                <EventTile key={`${i}$${Date.now()}`} eventDetails={section} />
-              ))}
+            {this.handleEventFilters()}
           </TileContainer>
         </NewsContainer>
       </>

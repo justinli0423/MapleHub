@@ -7,8 +7,10 @@ import { StylesProvider } from "@material-ui/core/styles";
 
 const Container = styled.div`
   position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   width: calc(1024px - 32px);
-  background: #fff;
   height: auto;
   margin: 16px auto 0;
 `;
@@ -17,18 +19,29 @@ const StyledTextField = styled(TextField)`
   width: 300px;
 `;
 
+const FilterPillsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  flex: 1 0 50%;
+`;
+
+const FilterPill = styled.img`
+  width: 20px;
+`;
+
 export default class SearchBar extends React.Component {
   handleAutocompleteInputChange(ev, val) {
     // default search to empty string
-    this.props.callback(val ?? '');
+    this.props.callback(val ?? "");
   }
 
   render() {
     return (
       <Container>
         <Autocomplete
-          id='free-solo-demo'
-          options={this.props.sectionDetails.map((event) => event.eventName)}
+          options={this.props.searchObject.map((event) => event.eventName)}
           onChange={this.handleAutocompleteInputChange.bind(this)}
           renderInput={(params) => (
             <StylesProvider injectFirst>
@@ -40,6 +53,11 @@ export default class SearchBar extends React.Component {
             </StylesProvider>
           )}
         />
+        <FilterPillsContainer>
+          {this.props.filterPills.map((filter, i) => (
+            <FilterPill key={i} src={filter.icon} alt={filter.tooltip}/>
+          ))}
+        </FilterPillsContainer>
       </Container>
     );
   }
