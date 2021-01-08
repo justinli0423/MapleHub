@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import styled, { keyframes, css } from "styled-components";
 
-import { EventTypes } from "../common/Consts";
+import { EventTypes, FilterTypes } from "../common/Consts";
 
 import ArrowDownIcon from "../icons/chevron-down-solid.svg";
 import ArrowUpIcon from "../icons/chevron-up-solid.svg";
@@ -25,6 +25,7 @@ const rotate = keyframes`
 const Container = styled.div`
   z-index: ${({ isDetailsExpanded }) => (isDetailsExpanded ? 100 : "unset")};
   position: relative;
+  display: ${({ isFiltered }) => (isFiltered ? "block" : "none")};
   flex: ${({ isDetailsExpanded }) =>
     isDetailsExpanded ? "0 0 calc(100% - 32px)" : "0 0 calc(50% - 32px)"};
   height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "500px" : "250px")};
@@ -283,8 +284,8 @@ const findRemainingDuration = (eventTimes) => {
   if (!eventTimes) {
     return -1;
   }
-  let timeToConvert = -1;
   const currentTime = Date.now();
+  let timeToConvert = -1;
   if (eventTimes[0] > currentTime) {
     timeToConvert = eventTimes[1] - eventTimes[0];
   } else {
@@ -306,8 +307,7 @@ export default class EventTile extends Component {
       isEventActive: true,
       eventDuration: 0,
       eventIcon: null,
-      eventIconHash: Date.now(),
-      startdate: "",
+      startDate: "",
     };
   }
 
@@ -347,13 +347,69 @@ export default class EventTile extends Component {
     return "Available Starting:";
   }
 
+  handleFilteredState() {
+    const { eventDetails } = this.state;
+    const { isFilterActive, filters } = this.props;
+    const filterKeys = Object.keys(filters);
+    let shouldTileBeDisplayed = false;
+
+    if (!isFilterActive) {
+      return true;
+    }
+
+    // check for type of event and event times
+    filterKeys.forEach((key) => {
+      const filterState = filters[key];
+      if (!filterState) {
+        return;
+      }
+      if (key === FilterTypes.UPDATES_PATCHES) {
+        if (
+          eventDetails.eventType === EventTypes.PATCH ||
+          eventDetails.eventType === EventTypes.UPDATE
+        ) {
+          shouldTileBeDisplayed = true;
+          return;
+        }
+      } else if (key === FilterTypes.MULTIPLE_EVENTS) {
+        if (eventDetails.eventType === EventTypes.MULTIPLE_EVENTS) {
+          shouldTileBeDisplayed = true;
+          return;
+        }
+      } else if (key === FilterTypes.ACTIVE_EVENTS) {
+        if (
+          this.state.isEventActive &&
+          this.state.eventDetails.eventType === EventTypes.SINGLE_EVENT
+        ) {
+          shouldTileBeDisplayed = true;
+          return;
+        }
+      } else if (key === FilterTypes.PAST_EVENTS) {
+        if (!this.state.isEventActive && this.state.eventDuration < 0) {
+          shouldTileBeDisplayed = true;
+          return;
+        }
+      } else if (key === FilterTypes.FUTURE_EVENTS) {
+        if (
+          !this.state.isEventActive &&
+          this.state.eventDetails.eventTimes &&
+          this.state.eventDetails.eventTimes[0] > Date.now()
+        ) {
+          shouldTileBeDisplayed = true;
+          return;
+        }
+      }
+    });
+
+    return shouldTileBeDisplayed;
+  }
+
   render() {
     const {
       isDetailsExpanded,
       eventDetails,
       isEventActive,
       eventIcon,
-      eventIconHash,
       startDate,
     } = this.state;
     return (
@@ -365,6 +421,7 @@ export default class EventTile extends Component {
         <Container
           isDetailsExpanded={isDetailsExpanded}
           isEventActive={isEventActive}
+          isFiltered={this.handleFilteredState()}
         >
           <EventHeader isDetailsExpanded={isDetailsExpanded}>
             <EventIconContainer
@@ -372,7 +429,7 @@ export default class EventTile extends Component {
                 isEventActive &&
                 eventDetails.eventType === EventTypes.SINGLE_EVENT
               }
-              src={`${eventIcon}?${eventIconHash}`}
+              src={`${eventIcon}`}
             />
             {eventDetails.eventName}
           </EventHeader>

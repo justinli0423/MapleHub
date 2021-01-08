@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import { Modal } from "@material-ui/core";
 
-import { EventTypes, Keywords, NodeNames } from "../common/Consts";
+import { EventTypes, Keywords, NodeNames, FilterTypes } from "../common/Consts";
 
 import Button from "../components/common/Button";
 import Title from "../components/common/Title";
@@ -269,7 +269,6 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
         }
       }
     }
-    console.log("END OF EVENT DETAILS");
   });
 
   // convert the leftover NULL event types to PATCH
@@ -297,46 +296,51 @@ export default class Home extends Component {
         sectionDetails: [],
       },
       filters: {
-        [EventTypes.MULTIPLE_EVENTS]: false,
-        UPDATES_PATCHES: false,
-        ACTIVE_EVENTS: false,
-        PAST_EVENTS: false,
-        FUTURE_EVENTS: false,
+        [FilterTypes.MULTIPLE_EVENTS]: false,
+        [FilterTypes.UPDATES_PATCHES]: false,
+        [FilterTypes.ACTIVE_EVENTS]: false,
+        [FilterTypes.PAST_EVENTS]: false,
+        [FilterTypes.FUTURE_EVENTS]: false,
       },
       filterPills: [
-        {
-          name: "multiEvents",
-          tooltip: "Multiple Events",
-          icon: MultiEventIcon,
-          filterType: EventTypes.MULTIPLE_EVENTS,
-          callback: this.handleFilterToggle.bind(this),
-        },
         {
           name: "updatesAndPatches",
           tooltip: "Updates and Patches",
           icon: PermanentEventIcon,
-          filterType: "UPDATE_PATCHES",
+          filterType: FilterTypes.UPDATES_PATCHES,
+          isActive: false,
           callback: this.handleFilterToggle.bind(this),
         },
         {
           name: "activeEvents",
           tooltip: "Active Events",
           icon: ActiveEventIcon,
-          filterType: "ACTIVE_EVENTS",
+          filterType: FilterTypes.ACTIVE_EVENTS,
+          isActive: false,
+          callback: this.handleFilterToggle.bind(this),
+        },
+        {
+          name: "multiEvents",
+          tooltip: "Multiple Events",
+          icon: MultiEventIcon,
+          filterType: FilterTypes.MULTIPLE_EVENTS,
+          isActive: false,
           callback: this.handleFilterToggle.bind(this),
         },
         {
           name: "futureEvents",
           tooltip: "Future Events",
           icon: FutureEventIcon,
-          filterType: "FUTURE_EVENTS",
+          filterType: FilterTypes.FUTURE_EVENTS,
+          isActive: false,
           callback: this.handleFilterToggle.bind(this),
         },
         {
           name: "pastEvents",
           tooltip: "Past Events",
           icon: PastEventIcon,
-          filterType: "PAST_EVENTS",
+          filterType: FilterTypes.PAST_EVENTS,
+          isActive: false,
           callback: this.handleFilterToggle.bind(this),
         },
       ],
@@ -348,14 +352,15 @@ export default class Home extends Component {
     this.getNews();
   }
 
-  handleFilterToggle(filter) {
+  handleFilterToggle(filterType) {
     this.setState({
       ...this.state,
       filters: {
         ...this.state.filters,
-        filter: !filter,
+        [filterType]: !this.state.filters[filterType],
       },
     });
+    this.handleEventFilters();
   }
 
   openModal() {
@@ -374,8 +379,10 @@ export default class Home extends Component {
   }
 
   handleEventFilters() {
-    const { filterValue } = this.state;
+    const { filterValue, filters } = this.state;
     const { sectionDetails } = this.state.newsDetails;
+    const filterKeys = Object.keys(filters);
+    const isFilterActive = filterKeys.filter((key) => filters[key]).length;
 
     return sectionDetails
       .filter((section) => {
@@ -385,7 +392,12 @@ export default class Home extends Component {
         return section.eventName === filterValue;
       })
       .map((section, i) => (
-        <EventTile key={`${i}$${Date.now()}`} eventDetails={section} />
+        <EventTile
+          key={i}
+          eventDetails={section}
+          isFilterActive={isFilterActive}
+          filters={filters}
+        />
       ));
   }
 
