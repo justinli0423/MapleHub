@@ -71,9 +71,10 @@ const PillContainer = styled.div`
 
 export default class SearchBar extends React.Component {
   handleAutocompleteInputChange(ev, val) {
-    // default search to empty string
-    this.props.callback(val ?? "");
+    this.props.callback(val);
   }
+
+  // TODO: design better filter pills (hover and active state) as well as the tooltip
 
   render() {
     return (

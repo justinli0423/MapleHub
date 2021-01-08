@@ -349,12 +349,20 @@ export default class EventTile extends Component {
 
   handleFilteredState() {
     const { eventDetails } = this.state;
-    const { isFilterActive, filters } = this.props;
+    const { isFilterActive, filters, filterValue } = this.props;
     const filterKeys = Object.keys(filters);
     let shouldTileBeDisplayed = false;
 
-    if (!isFilterActive) {
+    if (!isFilterActive && !filterValue) {
       return true;
+    }
+
+    // search bar takes precedence - ignore filter pills if event name is entered
+    if (filterValue) {
+      if (eventDetails.eventName === filterValue) {
+        return true;
+      }
+      return false;
     }
 
     // check for type of event and event times
@@ -363,6 +371,7 @@ export default class EventTile extends Component {
       if (!filterState) {
         return;
       }
+
       if (key === FilterTypes.UPDATES_PATCHES) {
         if (
           eventDetails.eventType === EventTypes.PATCH ||
@@ -454,6 +463,7 @@ export default class EventTile extends Component {
                   )
                 : "None"}
             </EventDetails>
+            {/* TODO: set Rewards */}
             <DetailsContainer
               isDetailsExpanded={isDetailsExpanded}
               dangerouslySetInnerHTML={{ __html: eventDetails.details }}

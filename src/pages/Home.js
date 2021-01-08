@@ -385,16 +385,11 @@ export default class Home extends Component {
     const isFilterActive = filterKeys.filter((key) => filters[key]).length;
 
     return sectionDetails
-      .filter((section) => {
-        if (!filterValue.length) {
-          return true;
-        }
-        return section.eventName === filterValue;
-      })
       .map((section, i) => (
         <EventTile
           key={i}
           eventDetails={section}
+          filterValue={filterValue}
           isFilterActive={isFilterActive}
           filters={filters}
         />
