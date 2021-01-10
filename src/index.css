@@ -10,7 +10,7 @@
   font-weight: bold;
 }
 
-* {
+div, span, h1, h2, h3, p, body{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -18,7 +18,6 @@
 
 body {
   overflow-x: hidden;
-  margin: 0;
   background: #F6F6F6;
   font-family: 'mapleStory';
   font-weight: normal;

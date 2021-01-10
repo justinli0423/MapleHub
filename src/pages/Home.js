@@ -213,6 +213,7 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
       element.nodeName !== NodeNames.H3
     ) {
       // details inbetween
+      // TODO: not all details are working properly (i.e. maplehood watch)
       const innerText = element.innerText;
       if (element.nodeName === NodeNames.P) {
         const isRewardsIMG = element.childNodes[0].nodeName === NodeNames.IMG;

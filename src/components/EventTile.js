@@ -128,7 +128,8 @@ const DetailsContainer = styled.div`
     isDetailsExpanded ? "visible" : "hidden"};
 `;
 
-const Details = styled.div`
+const Details = styled.ul`
+  list-style-position: outside;
   & > li {
     font-size: 14px;
     font-weight: bold;
@@ -161,11 +162,11 @@ const Rewards = styled.div`
   display: ${({ isRewardsActive }) => (isRewardsActive ? "block" : "none")};
 `;
 
-const RewardHeader = styled.h2`
+const DetailsHeader = styled.h2`
   margin: 8px 4px;
 `;
 
-const RewardDetails = styled.div``;
+const RewardDetails = styled.ul``;
 
 const OverlayContainer = styled.div`
   z-index: 10;
@@ -476,11 +477,12 @@ export default class EventTile extends Component {
             </EventDetails>
             {/* TODO: set Rewards */}
             <DetailsContainer isDetailsExpanded={isDetailsExpanded}>
+              <DetailsHeader>Details: </DetailsHeader>
               <Details
                 dangerouslySetInnerHTML={{ __html: eventDetails.details }}
               />
               <Rewards isRewardsActive={!!eventDetails.rewards.length}>
-                <RewardHeader>Rewards: </RewardHeader>
+                <DetailsHeader>Rewards: </DetailsHeader>
                 <RewardDetails
                   dangerouslySetInnerHTML={{ __html: eventDetails.rewards }}
                 />
