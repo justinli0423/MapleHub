@@ -5,6 +5,8 @@ import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { StylesProvider } from "@material-ui/core/styles";
 
+import Colors from "../common/Colors";
+
 const Container = styled.div`
   position: relative;
   display: flex;
@@ -47,7 +49,7 @@ const Tooltip = styled.div`
   height: 30px;
   padding: 4px;
   border-radius: 5px;
-  background: #d3d3d3;
+  background: ${Colors.BackgroundGrey};
   transition: visibility 0s, opacity 0.5s linear;
 `;
 
@@ -75,6 +77,7 @@ export default class SearchBar extends React.Component {
   }
 
   // TODO: design better filter pills (hover and active state) as well as the tooltip
+  // currently the filter pills shift on hover... probably don't want zoom effect
 
   render() {
     return (

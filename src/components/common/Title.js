@@ -1,5 +1,7 @@
 import styled from "styled-components";
 
+import Colors from "../../common/Colors";
+
 const Header = styled.h1`
   padding: 72px 0 24px 0;
   font-size: 32px;
@@ -10,8 +12,9 @@ const Caption = styled.p``;
 
 const Container = styled.div`
   position: relative;
+  color: #d3d3d3;
+  color: ${Colors.BackgroundGrey};
   text-align: center;
-  color: #D3D3D3;
   text-shadow: 3px 3px 0px black;
 `;
 

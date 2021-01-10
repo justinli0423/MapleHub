@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import styled, { keyframes, css } from "styled-components";
 
 import { EventTypes, FilterTypes } from "../common/Consts";
+import Colors from "../common/Colors";
 
 import ArrowDownIcon from "../icons/chevron-down-solid.svg";
 import ArrowUpIcon from "../icons/chevron-up-solid.svg";
@@ -70,14 +71,14 @@ const Footer = styled.div`
   width: 100%;
   padding: 0 16px;
   vertical-align: center;
-  border-top: 1px solid #d3d3d3;
+  border-top: 1px solid ${Colors.BackgroundGrey};
 
   &:hover {
     cursor: pointer;
 
     img {
       transform: scale(1.15);
-      filter: drop-shadow(2px 2px 1px #d3d3d3);
+      filter: drop-shadow(2px 2px 1px ${Colors.BackgroundGrey});
     }
   }
 `;

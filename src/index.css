@@ -1,16 +1,23 @@
 @font-face {
-  font-family: 'mapleStory';
-  src: url('font/mapleLight.ttf');
+  font-family: "mapleStory";
+  src: url("font/mapleLight.ttf");
   font-weight: normal;
 }
 
 @font-face {
-  font-family: 'mapleStory';
-  src: url('font/mapleBold.ttf');
+  font-family: "mapleStory";
+  src: url("font/mapleBold.ttf");
   font-weight: bold;
 }
 
-div, span, h1, h2, h3, p, body{
+div,
+span,
+h1,
+h2,
+h3,
+p,
+body,
+textarea {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -18,14 +25,14 @@ div, span, h1, h2, h3, p, body{
 
 body {
   overflow-x: hidden;
-  background: #F6F6F6;
-  font-family: 'mapleStory';
+  background: #f6f6f6;
+  font-family: "mapleStory";
   font-weight: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }

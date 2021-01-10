@@ -3,8 +3,9 @@ import styled from "styled-components";
 import { Modal } from "@material-ui/core";
 
 import { EventTypes, Keywords, NodeNames, FilterTypes } from "../common/Consts";
+import Colors from "../common/Colors";
 
-import Button from "../components/common/Button";
+import Button from "../components/common/DefaultButton";
 import Title from "../components/common/Title";
 import EventTile from "../components/EventTile";
 import SearchBar from "../components/SearchBar";
@@ -43,16 +44,26 @@ const ModalContainer = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 1024px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 600px;
   height: 300px;
+  padding: 8px 0;
   outline: none;
-  background: #d3d3d3;
+  background: ${Colors.White};
   border-radius: 5px;
+
+  li {
+    margin: 4px 0;
+  }
 `;
 
 const ModalTextArea = styled.textarea`
-  width: 100%;
-  height: 100%;
+  width: 400px;
+  height: 300px;
+  background: ${Colors.BackgroundGrey};
 `;
 
 const LastUpdatedHeader = styled.h2`
@@ -78,6 +89,8 @@ const TileContainer = styled.div`
   margin: 0 auto;
   width: 100%;
 `;
+
+const ModalInstructionsContainer = styled.div``;
 
 const findYearForEvent = (eventTimeStamp, patchNodesTimeStamp) => {
   const patchNotesDate = new Date(patchNodesTimeStamp);
@@ -421,6 +434,17 @@ export default class Home extends Component {
   renderModalBody() {
     return (
       <ModalContainer>
+        <ModalInstructionsContainer>
+          <h2>Steps:</h2>
+          <ol>
+            <li>Open patch notes</li>
+            <li>
+              Right click anywhere on the page and select 'View Page Source'
+            </li>
+            <li>Copy the entire file (Ctrl + A) and paste below!</li>
+          </ol>
+        </ModalInstructionsContainer>
+
         <ModalTextArea onChange={this.handleModalInputChange.bind(this)} />
       </ModalContainer>
     );
