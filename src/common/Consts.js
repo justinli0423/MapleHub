@@ -10,7 +10,7 @@ const NodeNames = {
 const Keywords = {
   DATES: "UTC: ",
   REQUIREMENTS: "Requirement:",
-  REWARDS: "Reward:",
+  REWARDS: "Reward",
   PARTS: "Part",
   END: "Join the discussion",
 };

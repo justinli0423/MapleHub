@@ -94,10 +94,9 @@ export default class SearchBar extends React.Component {
         />
         <FilterPillsContainer>
           {this.props.filterPills.map((filter, i) => (
-            <PillContainer>
+            <PillContainer key={i}>
               <Tooltip>{filter.tooltip}</Tooltip>
               <FilterPill
-                key={i}
                 src={filter.icon}
                 isActive={filter.isActive}
                 onClick={() => {

@@ -197,7 +197,7 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
       requirements: [],
       details: "",
       rewards: "",
-      rewardIMG: "",
+      rewardImages: [],
       eventType: null,
       eventTimes: [],
       pinned: false,
@@ -205,14 +205,13 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
     });
 
     let hasReward = false;
-    let element = eventHeader;
+    let element = eventHeader.nextElementSibling;
     const lastSectionDetail = sectionDetails[sectionDetails.length - 1];
     while (
-      element.nextElementSibling &&
-      element.nextElementSibling.nodeName !== NodeNames.H1 &&
-      element.nextElementSibling.nodeName !== NodeNames.H3
+      element &&
+      element.nodeName !== NodeNames.H1 &&
+      element.nodeName !== NodeNames.H3
     ) {
-      element = element.nextElementSibling;
       // details inbetween
       const innerText = element.innerText;
       if (element.nodeName === NodeNames.P) {
@@ -256,7 +255,7 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
           hasReward = true;
         }
         if (isRewardsIMG && hasReward) {
-          lastSectionDetail.rewardIMG += element.childNodes[0];
+          lastSectionDetail.rewardImages.push(element.childNodes[0].src);
         }
       }
 
@@ -268,6 +267,8 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
           lastSectionDetail.details += element.innerHTML;
         }
       }
+
+      element = element.nextElementSibling;
     }
   });
 
@@ -384,16 +385,15 @@ export default class Home extends Component {
     const filterKeys = Object.keys(filters);
     const isFilterActive = filterKeys.filter((key) => filters[key]).length;
 
-    return sectionDetails
-      .map((section, i) => (
-        <EventTile
-          key={i}
-          eventDetails={section}
-          filterValue={filterValue}
-          isFilterActive={isFilterActive}
-          filters={filters}
-        />
-      ));
+    return sectionDetails.map((section, i) => (
+      <EventTile
+        key={i}
+        eventDetails={section}
+        filterValue={filterValue}
+        isFilterActive={isFilterActive}
+        filters={filters}
+      />
+    ));
   }
 
   // TODO: find count of subsections (count of h3s) and render placeholders?

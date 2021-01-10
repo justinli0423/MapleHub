@@ -126,9 +126,10 @@ const DetailsContainer = styled.div`
   opacity: ${({ isDetailsExpanded }) => (isDetailsExpanded ? 1 : 0)};
   visibility: ${({ isDetailsExpanded }) =>
     isDetailsExpanded ? "visible" : "hidden"};
+`;
 
+const Details = styled.div`
   & > li {
-    /* direct children: headers */
     font-size: 14px;
     font-weight: bold;
 
@@ -155,6 +156,16 @@ const DetailsContainer = styled.div`
     padding-right: 4px;
   }
 `;
+
+const Rewards = styled.div`
+  display: ${({ isRewardsActive }) => (isRewardsActive ? "block" : "none")};
+`;
+
+const RewardHeader = styled.h2`
+  margin: 8px 4px;
+`;
+
+const RewardDetails = styled.div``;
 
 const OverlayContainer = styled.div`
   z-index: 10;
@@ -464,10 +475,20 @@ export default class EventTile extends Component {
                 : "None"}
             </EventDetails>
             {/* TODO: set Rewards */}
-            <DetailsContainer
-              isDetailsExpanded={isDetailsExpanded}
-              dangerouslySetInnerHTML={{ __html: eventDetails.details }}
-            ></DetailsContainer>
+            <DetailsContainer isDetailsExpanded={isDetailsExpanded}>
+              <Details
+                dangerouslySetInnerHTML={{ __html: eventDetails.details }}
+              />
+              <Rewards isRewardsActive={!!eventDetails.rewards.length}>
+                <RewardHeader>Rewards: </RewardHeader>
+                <RewardDetails
+                  dangerouslySetInnerHTML={{ __html: eventDetails.rewards }}
+                />
+                {eventDetails.rewardImages.map((imgSrc, i) => (
+                  <img key={i} src={imgSrc} />
+                ))}
+              </Rewards>
+            </DetailsContainer>
           </ContentContainer>
           <Footer onClick={this.handleDetailsToggle.bind(this)}>
             <span>Show Details</span>
