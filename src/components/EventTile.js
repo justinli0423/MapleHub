@@ -204,9 +204,12 @@ const handleTruncateText = (text, isExpanded, length) => {
  */
 const findFirstActiveDate = (eventTimes) => {
   const currentTime = Date.now();
-  return eventTimes.find(
-    (time) =>
-      time[0] > currentTime || (time[0] < currentTime && time[1] > currentTime)
+  return (
+    eventTimes.find(
+      (time) =>
+        time[0] > currentTime ||
+        (time[0] < currentTime && time[1] > currentTime)
+    ) ?? eventTimes[eventTimes.length - 1]
   );
 };
 

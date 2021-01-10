@@ -35,7 +35,7 @@ const Banner = styled.img`
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: fill;
+  object-fit: cover;
   filter: blur(1.5px) grayscale(1) brightness(0.35);
 `;
 
@@ -90,7 +90,14 @@ const TileContainer = styled.div`
   width: 100%;
 `;
 
-const ModalInstructionsContainer = styled.div``;
+const EventEmptyIntro = styled.p`
+  margin: 32px 16px;
+`;
+
+const HTMLQuickValidate = (str) => {
+  let doc = new DOMParser().parseFromString(str, "text/html");
+  return Array.from(doc.body.childNodes).some((node) => node.nodeType === 1);
+};
 
 const findYearForEvent = (eventTimeStamp, patchNodesTimeStamp) => {
   const patchNotesDate = new Date(patchNodesTimeStamp);
@@ -301,12 +308,11 @@ export default class Home extends Component {
     this.state = {
       isModalActive: false,
       filterValue: "",
-      // TODO: convert to mobx later?
-      modalInputText: window.localStorage.getItem("mapleHubNews"),
+      modalInputText: null,
       // TODO: break HTML apart -> store the object into localStorage instead
       newsDetails: {
         backupBanner: process.env.PUBLIC_URL + "/testbanner.png",
-        bannerURL: "",
+        bannerURL: null,
         patchNodesTimeStamp: null,
         sectionDetails: [],
       },
@@ -364,7 +370,13 @@ export default class Home extends Component {
   }
 
   componentDidMount() {
-    this.getNews();
+    const newsDetails = JSON.parse(localStorage.getItem("mapleHubNews"));
+    if (newsDetails) {
+      this.setState({
+        ...this.state,
+        newsDetails,
+      });
+    }
   }
 
   handleFilterToggle(filterType) {
@@ -386,18 +398,34 @@ export default class Home extends Component {
     this.setState({ isModalActive: false });
   }
 
+  // TODO: think about loading state?
   handleModalInputChange(ev) {
-    this.setState({
-      modalInputText: ev.target.value,
-    });
-    window.localStorage.setItem("mapleHubNews", ev.target.value);
+    if (HTMLQuickValidate(ev.target.value)) {
+      this.getNews(ev.target.value);
+      this.setState({
+        isModalActive: false,
+      });
+    } else {
+      alert(
+        "The source code is not valid and cannot be parsed.\nPlease try again."
+      );
+      ev.target.value = "";
+    }
   }
 
-  handleEventFilters() {
+  handleEventTileRender() {
     const { filterValue, filters } = this.state;
-    const { sectionDetails } = this.state.newsDetails;
+    const { sectionDetails } = this.state.newsDetails ?? [];
     const filterKeys = Object.keys(filters);
-    const isFilterActive = filterKeys.filter((key) => filters[key]).length;
+    const isFilterActive = !!filterKeys.filter((key) => filters[key]).length;
+
+    if (!sectionDetails || !sectionDetails.length) {
+      return (
+        <EventEmptyIntro>
+          No Events found, click the button above to get started!
+        </EventEmptyIntro>
+      );
+    }
 
     return sectionDetails.map((section, i) => (
       <EventTile
@@ -411,30 +439,37 @@ export default class Home extends Component {
   }
 
   // TODO: find count of subsections (count of h3s) and render placeholders?
-  getNews() {
+  getNews(patchNotesSrc = "") {
     // convert to mobx? (loading state)
-    const newsStringHTML = this.state.modalInputText;
-    const doc = new DOMParser().parseFromString(newsStringHTML, "text/html");
+    const doc = new DOMParser().parseFromString(patchNotesSrc, "text/html");
     const body = doc.querySelector("div.article-content");
     const banner = body.querySelector("img#__mcenew");
     const patchNodesTimeStamp = Date.parse(
       doc.querySelector(".timestamp").innerText
     );
     const sectionDetails = handleSubSectionNews(body, patchNodesTimeStamp);
-    this.setState({
-      newsDetails: {
-        ...this.state.newsDetails,
-        bannerURL: banner.attributes.src.textContent,
-        sectionDetails,
-        patchNodesTimeStamp,
+    this.setState(
+      {
+        newsDetails: {
+          ...this.state.newsDetails,
+          bannerURL: banner.attributes.src.textContent,
+          sectionDetails,
+          patchNodesTimeStamp,
+        },
       },
-    });
+      () => {
+        window.localStorage.setItem(
+          "mapleHubNews",
+          JSON.stringify(this.state.newsDetails)
+        );
+      }
+    );
   }
 
   renderModalBody() {
     return (
       <ModalContainer>
-        <ModalInstructionsContainer>
+        <div>
           <h2>Steps:</h2>
           <ol>
             <li>Open patch notes</li>
@@ -443,7 +478,7 @@ export default class Home extends Component {
             </li>
             <li>Copy the entire file (Ctrl + A) and paste below!</li>
           </ol>
-        </ModalInstructionsContainer>
+        </div>
 
         <ModalTextArea onChange={this.handleModalInputChange.bind(this)} />
       </ModalContainer>
@@ -454,7 +489,7 @@ export default class Home extends Component {
     const { newsDetails } = this.state;
     return (
       <Container>
-        <Banner src={newsDetails.bannerURL} />
+        <Banner src={newsDetails.bannerURL ?? newsDetails.backupBanner} />
         <HeaderContainer>
           <Title
             title='All-In-One News Hub'
@@ -500,7 +535,7 @@ export default class Home extends Component {
             filterPills={this.state.filterPills}
           />
           <TileContainer ref={this.newsRef}>
-            {this.handleEventFilters()}
+            {this.handleEventTileRender()}
           </TileContainer>
         </NewsContainer>
       </>
