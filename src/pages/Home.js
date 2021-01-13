@@ -387,7 +387,7 @@ export default class Home extends Component {
         [filterType]: !this.state.filters[filterType],
       },
     });
-    this.handleEventFilters();
+    this.handleEventTileRender();
   }
 
   openModal() {
@@ -476,7 +476,7 @@ export default class Home extends Component {
             <li>
               Right click anywhere on the page and select 'View Page Source'
             </li>
-            <li>Copy the entire file (Ctrl + A) and paste below!</li>
+            <li>Copy the entire page (Ctrl + A) and paste below!</li>
           </ol>
         </div>
 
