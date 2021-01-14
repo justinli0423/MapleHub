@@ -14,6 +14,7 @@ const StyledButton = styled(Button)`
 `;
 
 function DefaultButton({
+  className,
   label = "Button",
   callback = () => {
     console.log("callback");
@@ -21,7 +22,11 @@ function DefaultButton({
 }) {
   return (
     <StylesProvider injectFirst>
-      <StyledButton variant='contained' onClick={callback}>
+      <StyledButton
+        variant='contained'
+        onClick={callback}
+        className={className}
+      >
         {label}
       </StyledButton>
     </StylesProvider>

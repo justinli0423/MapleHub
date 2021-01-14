@@ -8,6 +8,65 @@ import {
 import styled from "styled-components";
 
 import Home from "../pages/Home";
+import ServerStatus from "../pages/ServerStatus";
+
+export default function Nav() {
+  return (
+    <Router>
+      <Container>
+        <LogoContainer>
+          <LogoBar />
+          <h1>MapleHub</h1>
+          <Icon />
+        </LogoContainer>
+        <OptionsContainer>
+          <StyledLink exact to=''>
+            <Item>
+              <ActiveBar />
+              Updates
+            </Item>
+          </StyledLink>
+          <StyledLink to='/status'>
+            <Item>
+              <ActiveBar />
+              Status
+            </Item>
+          </StyledLink>
+          <StyledLink exact to='/legion'>
+            <Item>
+              <ActiveBar />
+              Legion Board
+            </Item>
+          </StyledLink>
+          <Item>
+            <ActiveBar />
+            Maple.gg
+          </Item>
+        </OptionsContainer>
+      </Container>
+
+      {/* A <Switch> looks through its children <Route>s and
+            renders the first one that matches the current URL. */}
+      <MainContainer>
+        <Switch>
+          <Route path='/legion'>
+            <Legion />
+          </Route>
+          <Route path='/status'>
+            <ServerStatus />
+          </Route>
+          <Route path='/'>
+            <Home />
+          </Route>
+        </Switch>
+      </MainContainer>
+    </Router>
+  );
+}
+
+function Legion() {
+  return <h2>Legion Board</h2>;
+}
 
 const Container = styled.div`
   z-index: 100000;
@@ -93,70 +152,8 @@ const StyledLink = styled(NavLink)`
 const MainContainer = styled.div`
   position: relative;
   width: 100%;
-  /* display: flex;
+  display: flex;
   flex-direction: column;
-  align-items: center; */
+  align-items: center;
   /* border: 1px solid grey; */
 `;
-
-export default function Nav() {
-  return (
-    <Router>
-      <Container>
-        <LogoContainer>
-          <LogoBar />
-          <h1>MapleHub</h1>
-          <Icon />
-        </LogoContainer>
-        <OptionsContainer>
-          <StyledLink exact to=''>
-            <Item>
-              <ActiveBar />
-              Updates
-            </Item>
-          </StyledLink>
-          <StyledLink to='/reminders'>
-            <Item>
-              <ActiveBar />
-              Reminders
-            </Item>
-          </StyledLink>
-          <StyledLink to='/legion'>
-            <Item>
-              <ActiveBar />
-              Legion Board
-            </Item>
-          </StyledLink>
-          <Item>
-            <ActiveBar />
-            Maple.gg
-          </Item>
-        </OptionsContainer>
-      </Container>
-
-      {/* A <Switch> looks through its children <Route>s and
-            renders the first one that matches the current URL. */}
-      <MainContainer>
-        <Switch>
-          <Route path='/legion'>
-            <Legion />
-          </Route>
-          <Route path='/reminders'>
-            <Reminders />
-          </Route>
-          <Route path='/'>
-            <Home />
-          </Route>
-        </Switch>
-      </MainContainer>
-    </Router>
-  );
-}
-
-function Legion() {
-  return <h2>Legion Board</h2>;
-}
-
-function Reminders() {
-  return <h2>Reminders</h2>;
-}

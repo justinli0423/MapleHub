@@ -16,84 +16,6 @@ import FutureEventIcon from "../icons/fast-forward-solid.svg";
 import PastEventIcon from "../icons/history-solid.svg";
 import PermanentEventIcon from "../icons/infinity-solid.svg";
 
-const Container = styled.div`
-  position: relative;
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
-`;
-
-const HeaderContainer = styled.div`
-  width: 1024px;
-  margin: 0 auto;
-`;
-
-const Banner = styled.img`
-  z-index: -1;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: blur(1.5px) grayscale(1) brightness(0.35);
-`;
-
-const ModalContainer = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  width: 600px;
-  height: 300px;
-  padding: 8px 0;
-  outline: none;
-  background: ${Colors.White};
-  border-radius: 5px;
-
-  li {
-    margin: 4px 0;
-  }
-`;
-
-const ModalTextArea = styled.textarea`
-  width: 400px;
-  height: 300px;
-  background: ${Colors.BackgroundGrey};
-`;
-
-const LastUpdatedHeader = styled.h2`
-  font-size: 18px;
-  font-weight: normal;
-`;
-
-const NewsContainer = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
-  margin: 32px auto;
-  width: 1024px;
-`;
-
-const TileContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  margin: 0 auto;
-  width: 100%;
-`;
-
-const EventEmptyIntro = styled.p`
-  margin: 32px 16px;
-`;
-
 const HTMLQuickValidate = (str) => {
   let doc = new DOMParser().parseFromString(str, "text/html");
   return Array.from(doc.body.childNodes).some((node) => node.nodeType === 1);
@@ -542,3 +464,81 @@ export default class Home extends Component {
     );
   }
 }
+
+const Container = styled.div`
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+`;
+
+const HeaderContainer = styled.div`
+  width: 1024px;
+  margin: 0 auto;
+`;
+
+const Banner = styled.img`
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(1.5px) grayscale(1) brightness(0.35);
+`;
+
+const ModalContainer = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 600px;
+  height: 300px;
+  padding: 8px 0;
+  outline: none;
+  background: ${Colors.White};
+  border-radius: 5px;
+
+  li {
+    margin: 4px 0;
+  }
+`;
+
+const ModalTextArea = styled.textarea`
+  width: 400px;
+  height: 300px;
+  background: ${Colors.BackgroundGrey};
+`;
+
+const LastUpdatedHeader = styled.h2`
+  font-size: 18px;
+  font-weight: normal;
+`;
+
+const NewsContainer = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  margin: 32px auto;
+  width: 1024px;
+`;
+
+const TileContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  width: 100%;
+`;
+
+const EventEmptyIntro = styled.p`
+  margin: 32px 16px;
+`;

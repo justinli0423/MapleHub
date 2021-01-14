@@ -13,173 +13,6 @@ import FutureEventIcon from "../icons/fast-forward-solid.svg";
 import PastEventIcon from "../icons/history-solid.svg";
 import PermanentEventIcon from "../icons/infinity-solid.svg";
 
-const rotate = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-`;
-
-const Container = styled.div`
-  z-index: ${({ isDetailsExpanded }) => (isDetailsExpanded ? 100 : "unset")};
-  position: relative;
-  display: ${({ isFiltered }) => (isFiltered ? "block" : "none")};
-  flex: ${({ isDetailsExpanded }) =>
-    isDetailsExpanded ? "0 0 calc(100% - 32px)" : "0 0 calc(50% - 32px)"};
-  height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "500px" : "250px")};
-  margin: 16px;
-  padding: 16px;
-  border-radius: 5px;
-  background: ${({ isEventActive }) => (isEventActive ? "#ffffff" : "#e6e6e6")};
-  box-shadow: 4px 5px 3px rgba(0, 0, 0, 0.25);
-`;
-
-const ContentContainer = styled.div`
-  margin-left: 8px;
-  line-height: 30px;
-`;
-
-const EventHeader = styled.h2`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-bottom: 16px;
-  font-weight: bold;
-  font-size: 24px;
-  width: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "900px" : "410px")};
-`;
-
-const EventDetails = styled.p`
-  display: inline-block;
-  margin-left: 4px;
-  line-height: 25px;
-`;
-
-// TODO: shrink footer when out of focus (clicking outside the box)
-const Footer = styled.div`
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  align-items: center;
-  height: 45px;
-  width: 100%;
-  padding: 0 16px;
-  vertical-align: center;
-  border-top: 1px solid ${Colors.BackgroundGrey};
-
-  &:hover {
-    cursor: pointer;
-
-    img {
-      transform: scale(1.15);
-      filter: drop-shadow(2px 2px 1px ${Colors.BackgroundGrey});
-    }
-  }
-`;
-
-const Bold = styled.b`
-  margin-right: 8px;
-`;
-
-const ArrowIcon = styled.img`
-  width: 28px;
-  height: 28px;
-  padding: 3px;
-  border-radius: 50%;
-  transition: 0.1s linear all;
-`;
-
-const ArrowUpIconContainer = styled(ArrowIcon)`
-  display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "block" : "none")};
-`;
-
-const ArrowDownIconContainer = styled(ArrowIcon)`
-  display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "none" : "block")};
-`;
-
-const EventIconContainer = styled.img`
-  margin: 0 8px 4px 0;
-  height: 20px;
-  width: 20px;
-  vertical-align: middle;
-  animation: ${({ isActiveTimedEvent }) =>
-    isActiveTimedEvent
-      ? css`
-          ${rotate} 4s linear infinite
-        `
-      : "none"};
-`;
-
-// TODO: Animation on show/hide?
-const DetailsContainer = styled.div`
-  overflow-y: auto;
-  max-height: 280px;
-  width: ${({ isDetailsExpanded }) =>
-    isDetailsExpanded ? "calc(100% - 32px)" : 0};
-  height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "auto" : 0)};
-  padding: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "16px 8px" : 0)};
-  opacity: ${({ isDetailsExpanded }) => (isDetailsExpanded ? 1 : 0)};
-  visibility: ${({ isDetailsExpanded }) =>
-    isDetailsExpanded ? "visible" : "hidden"};
-`;
-
-const Details = styled.ul`
-  list-style-position: outside;
-  & > li {
-    font-size: 14px;
-    font-weight: bold;
-
-    & ul {
-      font-size: 12px;
-      font-weight: normal;
-      text-indent: 16px;
-    }
-  }
-
-  & img {
-    max-width: 600px;
-  }
-
-  & br {
-    display: none;
-  }
-
-  & em {
-    display: inline;
-  }
-
-  & > span {
-    padding-right: 4px;
-  }
-`;
-
-const Rewards = styled.div`
-  display: ${({ isRewardsActive }) => (isRewardsActive ? "block" : "none")};
-`;
-
-const DetailsHeader = styled.h2`
-  margin: 8px 4px;
-`;
-
-const RewardDetails = styled.ul``;
-
-const OverlayContainer = styled.div`
-  z-index: 10;
-  display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "block" : "none")};
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-`;
-
 const handleTruncateText = (text, isExpanded, length) => {
   if (text.length <= length || isExpanded) {
     return text;
@@ -516,3 +349,170 @@ export default class EventTile extends Component {
     );
   }
 }
+
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+const Container = styled.div`
+  z-index: ${({ isDetailsExpanded }) => (isDetailsExpanded ? 100 : "unset")};
+  position: relative;
+  display: ${({ isFiltered }) => (isFiltered ? "block" : "none")};
+  flex: ${({ isDetailsExpanded }) =>
+    isDetailsExpanded ? "0 0 calc(100% - 32px)" : "0 0 calc(50% - 32px)"};
+  height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "500px" : "250px")};
+  margin: 16px;
+  padding: 16px;
+  border-radius: 5px;
+  background: ${({ isEventActive }) => (isEventActive ? "#ffffff" : "#e6e6e6")};
+  box-shadow: 4px 5px 3px rgba(0, 0, 0, 0.25);
+`;
+
+const ContentContainer = styled.div`
+  margin-left: 8px;
+  line-height: 30px;
+`;
+
+const EventHeader = styled.h2`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 16px;
+  font-weight: bold;
+  font-size: 24px;
+  width: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "900px" : "410px")};
+`;
+
+const EventDetails = styled.p`
+  display: inline-block;
+  margin-left: 4px;
+  line-height: 25px;
+`;
+
+// TODO: shrink footer when out of focus (clicking outside the box)
+const Footer = styled.div`
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+  height: 45px;
+  width: 100%;
+  padding: 0 16px;
+  vertical-align: center;
+  border-top: 1px solid ${Colors.BackgroundGrey};
+
+  &:hover {
+    cursor: pointer;
+
+    img {
+      transform: scale(1.15);
+      filter: drop-shadow(2px 2px 1px ${Colors.BackgroundGrey});
+    }
+  }
+`;
+
+const Bold = styled.b`
+  margin-right: 8px;
+`;
+
+const ArrowIcon = styled.img`
+  width: 28px;
+  height: 28px;
+  padding: 3px;
+  border-radius: 50%;
+  transition: 0.1s linear all;
+`;
+
+const ArrowUpIconContainer = styled(ArrowIcon)`
+  display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "block" : "none")};
+`;
+
+const ArrowDownIconContainer = styled(ArrowIcon)`
+  display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "none" : "block")};
+`;
+
+const EventIconContainer = styled.img`
+  margin: 0 8px 4px 0;
+  height: 20px;
+  width: 20px;
+  vertical-align: middle;
+  animation: ${({ isActiveTimedEvent }) =>
+    isActiveTimedEvent
+      ? css`
+          ${rotate} 4s linear infinite
+        `
+      : "none"};
+`;
+
+// TODO: Animation on show/hide?
+const DetailsContainer = styled.div`
+  overflow-y: auto;
+  max-height: 280px;
+  width: ${({ isDetailsExpanded }) =>
+    isDetailsExpanded ? "calc(100% - 32px)" : 0};
+  height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "auto" : 0)};
+  padding: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "16px 8px" : 0)};
+  opacity: ${({ isDetailsExpanded }) => (isDetailsExpanded ? 1 : 0)};
+  visibility: ${({ isDetailsExpanded }) =>
+    isDetailsExpanded ? "visible" : "hidden"};
+`;
+
+const Details = styled.ul`
+  list-style-position: outside;
+  & > li {
+    font-size: 14px;
+    font-weight: bold;
+
+    & ul {
+      font-size: 12px;
+      font-weight: normal;
+      text-indent: 16px;
+    }
+  }
+
+  & img {
+    max-width: 600px;
+  }
+
+  & br {
+    display: none;
+  }
+
+  & em {
+    display: inline;
+  }
+
+  & > span {
+    padding-right: 4px;
+  }
+`;
+
+const Rewards = styled.div`
+  display: ${({ isRewardsActive }) => (isRewardsActive ? "block" : "none")};
+`;
+
+const DetailsHeader = styled.h2`
+  margin: 8px 4px;
+`;
+
+const RewardDetails = styled.ul``;
+
+const OverlayContainer = styled.div`
+  z-index: 10;
+  display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "block" : "none")};
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+`;
