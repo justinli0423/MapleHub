@@ -7,6 +7,7 @@ import Colors from "../common/Colors";
 
 import Button from "../components/common/DefaultButton";
 import Title from "../components/common/Title";
+import Header from "../components/common/Header";
 import EventTile from "../components/EventTile";
 import SearchBar from "../components/SearchBar";
 
@@ -17,7 +18,7 @@ import PastEventIcon from "../icons/history-solid.svg";
 import PermanentEventIcon from "../icons/infinity-solid.svg";
 
 const HTMLQuickValidate = (str) => {
-  let doc = new DOMParser().parseFromString(str, "text/html");
+  const doc = new DOMParser().parseFromString(str, "text/html");
   return Array.from(doc.body.childNodes).some((node) => node.nodeType === 1);
 };
 
@@ -409,28 +410,23 @@ export default class Home extends Component {
 
   renderHeader() {
     const { newsDetails } = this.state;
+    const src = newsDetails.bannerURL ?? newsDetails.backupBanner;
     return (
-      <Container>
-        <Banner src={newsDetails.bannerURL ?? newsDetails.backupBanner} />
-        <HeaderContainer>
-          <Title
-            title='All-In-One News Hub'
-            caption='Click the button below if the News Hub is not updated!'
-          />
-          <Button
-            label='Update News Hub'
-            callback={this.openModal.bind(this)}
-          />
-          <Modal
-            open={this.state.isModalActive}
-            onClose={this.closeModal.bind(this)}
-            aria-labelledby='simple-modal-title'
-            aria-describedby='simple-modal-description'
-          >
-            {this.renderModalBody()}
-          </Modal>
-        </HeaderContainer>
-      </Container>
+      <Header src={src}>
+        <Title
+          title='All-In-One News Hub'
+          caption='Click the button below if the News Hub is not updated!'
+        />
+        <Button label='Update News Hub' callback={this.openModal.bind(this)} />
+        <Modal
+          open={this.state.isModalActive}
+          onClose={this.closeModal.bind(this)}
+          aria-labelledby='simple-modal-title'
+          aria-describedby='simple-modal-description'
+        >
+          {this.renderModalBody()}
+        </Modal>
+      </Header>
     );
   }
 
@@ -464,29 +460,6 @@ export default class Home extends Component {
     );
   }
 }
-
-const Container = styled.div`
-  position: relative;
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
-`;
-
-const HeaderContainer = styled.div`
-  width: 1024px;
-  margin: 0 auto;
-`;
-
-const Banner = styled.img`
-  z-index: -1;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: blur(1.5px) grayscale(1) brightness(0.35);
-`;
 
 const ModalContainer = styled.div`
   position: absolute;

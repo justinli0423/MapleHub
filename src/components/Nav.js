@@ -32,16 +32,16 @@ export default function Nav() {
               Status
             </Item>
           </StyledLink>
-          <StyledLink exact to='/legion'>
+          {/* <StyledLink exact to='/legion'>
             <Item>
               <ActiveBar />
               Legion Board
             </Item>
-          </StyledLink>
-          <Item>
+          </StyledLink> */}
+          {/* <Item>
             <ActiveBar />
             Maple.gg
-          </Item>
+          </Item> */}
         </OptionsContainer>
       </Container>
 
@@ -72,6 +72,7 @@ const Container = styled.div`
   z-index: 100000;
   position: sticky;
   top: 0;
+  /* height: 100px; */
   width: 100%;
   display: flex;
   align-items: center;
@@ -82,15 +83,11 @@ const Container = styled.div`
 
 const OptionsContainer = styled.div`
   display: flex;
-  justify-content: space-evenly;
+  justify-content: flex-end;
   align-items: center;
   height: 100%;
   width: 100%;
-
-  span {
-    height: 100%;
-    padding: 40px 0;
-  }
+  margin-right: 24px;
 `;
 
 const LogoContainer = styled.div`
@@ -132,7 +129,12 @@ const ActiveBar = styled.div`
 `;
 
 const Item = styled.span`
+  display: inline-block;
   position: relative;
+  height: 100%;
+  padding: 20px 0;
+  margin: 0 48px;
+
   ${ActiveBar} {
     opacity: 0;
   }

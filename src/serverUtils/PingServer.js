@@ -4,17 +4,16 @@ export default class PingServer {
   startTime = null;
   timer = null;
 
-  constructor(id, ip, port, threshold, callback) {
+  constructor(id, ip, port, callback) {
     this.id = id;
     this.ip = ip;
     this.port = port;
-    this.threshold = threshold;
     this.callback = callback;
   }
 
-  updateResponseTime(isFailedConnection = false) {
+  updateResponseTime() {
     const { startTime, averageTenLatencies } = this;
-    this.latency = isFailedConnection ? Infinity : Date.now() - startTime;
+    this.latency = Date.now() - startTime;
 
     if (averageTenLatencies.length >= 10) {
       averageTenLatencies.shift();
@@ -31,7 +30,7 @@ export default class PingServer {
   }
 
   pingChannel() {
-    const { ip, port, threshold } = this;
+    const { ip, port } = this;
     const stubImage = new Image();
 
     if (this.timer) {
@@ -52,10 +51,5 @@ export default class PingServer {
 
     this.startTime = Date.now();
     stubImage.src = `http://${ip}:${port}/?cachebreaker=${Date.now()}`;
-    this.timer = setTimeout(() => {
-      // give a max wait time of 2x threshold
-      // pass latency as infinity
-      this.updateResponseTime(true);
-    }, threshold * 2);
   }
 }

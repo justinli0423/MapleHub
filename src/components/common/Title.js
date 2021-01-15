@@ -8,7 +8,11 @@ const Header = styled.h1`
   font-weight: normal;
 `;
 
-const Caption = styled.p``;
+const Caption = styled.p`
+  margin: 0 auto;
+  max-width: 700px;
+  line-height: 25px;
+`;
 
 const Container = styled.div`
   position: relative;
