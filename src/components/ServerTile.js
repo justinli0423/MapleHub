@@ -64,7 +64,13 @@ export default class ServerTile extends Component {
       <Container>
         <ServerName>Ch. {channelId}</ServerName>
         <Latency isActive>{displayLatency}</Latency>
-        <Latency isActive={showStat}>{displayAverageLatency}</Latency>
+        <Latency
+          isActive={showStat}
+          latency={averageLatency}
+          threshold={latencyThreshold}
+        >
+          {displayAverageLatency}
+        </Latency>
         <StatusBar isActive={!showStat}>
           <ActiveStatus threshold={latencyThreshold} latency={latency} />
         </StatusBar>
@@ -106,7 +112,12 @@ const StatusBar = styled.div`
   width: ${statusWidth}px;
   height: ${statusHeight}px;
   margin: 0 auto;
-  background: linear-gradient(90deg, #75d965 0%, #ffb930 50%, #e81515 100%);
+  background: linear-gradient(
+    90deg,
+    ${Colors.StatusBar.Green} 0%,
+    ${Colors.StatusBar.Yellow} 50%,
+    ${Colors.StatusBar.Red} 100%
+  );
   box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
 `;
@@ -119,4 +130,14 @@ const ServerName = styled.h2`
 const Latency = styled.p`
   display: ${({ isActive }) => (isActive ? "block" : "none")};
   margin: 0 0 4px 8px;
+  color: ${({ latency, threshold }) => {
+    if (!latency) {
+      return "unset";
+    }
+    return latency <= threshold * 0.33
+      ? Colors.StatusBar.Green
+      : latency <= threshold * 0.66
+      ? Colors.StatusBar.Yellow
+      : Colors.StatusBar.Red;
+  }};
 `;
