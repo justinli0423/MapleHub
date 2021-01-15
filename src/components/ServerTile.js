@@ -24,14 +24,14 @@ export default class ServerTile extends Component {
   }
 
   componentDidMount() {
-    // this.state.server.pingChannel();
+    this.state.server.pingChannel();
     // refresh ping every 10 seconds
-    // const intervalHandler = setInterval(() => {
-    //   this.state.server.pingChannel();
-    // }, 10000);
-    // this.setState({
-    //   intervalHandler,
-    // });
+    const intervalHandler = setInterval(() => {
+      this.state.server.pingChannel();
+    }, 10000);
+    this.setState({
+      intervalHandler,
+    });
   }
 
   componentWillUnmount() {
