@@ -3,7 +3,6 @@ import styled from "styled-components";
 import * as React from "react";
 
 const Header = ({ src, children }) => {
-  console.log(children);
   return (
     <Container>
       <Banner src={src} />

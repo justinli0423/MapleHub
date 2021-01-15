@@ -17,10 +17,6 @@ const Container = styled.div`
   margin: 16px auto 0;
 `;
 
-const StyledTextField = styled(TextField)`
-  width: 300px;
-`;
-
 const FilterPillsContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -87,10 +83,13 @@ export default class SearchBar extends React.Component {
           onChange={this.handleAutocompleteInputChange.bind(this)}
           renderInput={(params) => (
             <StylesProvider injectFirst>
-              <StyledTextField
-                {...params}
+              <TextField
+                style={{
+                  width: "300px",
+                }}
                 label='Event Name'
                 variant='outlined'
+                {...params}
               />
             </StylesProvider>
           )}
