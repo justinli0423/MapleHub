@@ -14,6 +14,8 @@ export default class ServerTile extends Component {
       ip,
       port,
       latencyThreshold,
+      latency: 0,
+      intervalHandler: null,
       server: new PingServer(
         channelId,
         ip,
@@ -26,10 +28,18 @@ export default class ServerTile extends Component {
 
   componentDidMount() {
     this.state.server.pingChannel();
+    // refresh ping every 10 seconds
+    const intervalHandler = setInterval(() => {
+      this.state.server.pingChannel();
+    }, 10000);
+    this.setState({
+      intervalHandler,
+    });
   }
 
   componentWillUnmount() {
     this.state.server.unmount();
+    clearInterval(this.state.intervalHandler);
   }
 
   forceRender = (latency, averageTenLatencies) => {
@@ -47,10 +57,17 @@ export default class ServerTile extends Component {
       averageTenLatencies,
       latency,
     } = this.state;
+
+    const displayLatency = !latency
+      ? "Waiting..."
+      : latency > latencyThreshold
+      ? "Unplayable"
+      : `Latency: ${latency}ms`;
+
     return (
       <Container>
         <ServerName>Ch. {channelId}</ServerName>
-        Latency: {latency}
+        <Latency>{displayLatency}</Latency>
         <StatusBar>
           <ActiveStatus threshold={latencyThreshold} latency={latency} />
         </StatusBar>
@@ -94,30 +111,13 @@ const StatusBar = styled.div`
   background: linear-gradient(90deg, #75d965 0%, #ffb930 50%, #e81515 100%);
   box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
-
-  /* &::before {
-    content: "";
-    z-index: 1;
-    position: absolute;
-    left: 0;
-    height: 100%;
-    width: calc(80px + 10px);
-    background: linear-gradient(90deg, #75d965 0%, #ffb930 50%, #e81515 100%);
-    border-radius: 10px;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    height: 100%;
-    width: calc(160px - 80px);
-
-    border-radius: 0 10px 10px 0;
-  } */
 `;
 
 const ServerName = styled.h2`
-  margin: 8px;
+  margin: 4px 8px 0;
   font-weight: normal;
+`;
+
+const Latency = styled.p`
+  margin: 0 0 4px 8px;
 `;

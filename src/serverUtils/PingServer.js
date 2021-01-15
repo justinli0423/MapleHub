@@ -17,13 +17,12 @@ export default class PingServer {
     this.latency = isFailedConnection ? Infinity : Date.now() - startTime;
 
     if (averageTenLatencies.length >= 10) {
-      averageTenLatencies.pop();
+      averageTenLatencies.shift();
       averageTenLatencies.push(this.latency);
     } else {
       averageTenLatencies.push(this.latency);
     }
 
-    // TODO: how to trigger render form object fields
     this.callback(this.latency, averageTenLatencies);
   }
 
@@ -45,14 +44,18 @@ export default class PingServer {
     };
     stubImage.onerror = () => {
       this.updateResponseTime();
+      // the image will always throw cross origin error
+      // hacky way to remove it
+      console.clear();
       clearTimeout(this.timer);
     };
 
     this.startTime = Date.now();
     stubImage.src = `http://${ip}:${port}/?cachebreaker=${Date.now()}`;
     this.timer = setTimeout(() => {
-      // failed to connect, try again
+      // give a max wait time of 2x threshold
+      // pass latency as infinity
       this.updateResponseTime(true);
-    }, threshold);
+    }, threshold * 2);
   }
 }
