@@ -1,44 +1,120 @@
 import React, { Component } from "react";
 import styled from "styled-components";
+import { TextField } from "@material-ui/core";
 
 import Title from "../components/common/Title";
+import Header from "../components/common/Header";
 import Button from "../components/common/DefaultButton";
 
 import ServerTile from "../components/ServerTile";
-
 import RebootPng from "../icons/reboot.png";
 
 import ServerDetails from "../serverUtils/ServerDetails";
 
 export default class ServerStatus extends Component {
-  render() {
+  constructor() {
+    super();
+    this.state = {
+      showStat: false,
+      latencyThreshold: 1200,
+      timer: null,
+    };
+  }
+
+  toggleShowStat = () => {
+    this.setState({
+      showStat: !this.state.showStat,
+    });
+  };
+
+  handleLatencyThreshold = (latencyThreshold) => {
+    if (
+      !latencyThreshold ||
+      isNaN(parseInt(latencyThreshold)) ||
+      latencyThreshold < 700
+    ) {
+      alert("Values should ideally be > 700");
+      return;
+    }
+    this.setState({
+      ...this.state,
+      latencyThreshold,
+    });
+  };
+
+  deboundInput = (ev) => {
+    const value = ev.target.value;
+
+    const { timer } = this.state;
+    let newTimer;
+
+    if (timer) {
+      clearTimeout(timer);
+    }
+
+    newTimer = setTimeout(() => {
+      this.handleLatencyThreshold(parseInt(value));
+    }, 600);
+
+    this.setState({
+      timer: newTimer,
+    });
+  };
+
+  renderHeader() {
     return (
-      <Container>
+      <Header src={process.env.PUBLIC_URL + "/serverstatusbanner.jpg"}>
         <Title
           title='Server Status'
-          caption='The response times below will show both the average of the last 10 pings as well  as the last ping. Pings will trigger itself every 10 seconds against each channel asynchronously'
+          caption='The response times below will show both the average of the last 10 pings as well as the last ping. Pings will trigger itself every 10 seconds against each channel asynchronously.'
         />
-        <StatusContainer>
-          <HeaderContainer>
-            <ServerName>
-              <Icon src={RebootPng} />
-              <Header>Reboot</Header>
-            </ServerName>
-            <StyledButton label='Refresh Pings' />
-          </HeaderContainer>
-          <ServerContainer>
-            {ServerDetails.map((server, i) => (
-              <ServerTile
-                channelId={server.channelId}
-                ip={server.ip}
-                port={server.port}
-                key={i}
-                latencyThreshold={1200}
-              />
-            ))}
-          </ServerContainer>
-        </StatusContainer>
-      </Container>
+      </Header>
+    );
+  }
+
+  render() {
+    const { latencyThreshold, showStat } = this.state;
+    return (
+      <>
+        {this.renderHeader()}
+        <Container>
+          <StatusContainer>
+            <HeaderContainer>
+              <ServerName>
+                <Icon src={RebootPng} />
+                <IconLabel>Reboot</IconLabel>
+              </ServerName>
+              <ControlsContainer>
+                <TextField
+                  label='Latency Threshold'
+                  style={{
+                    marginRight: "24px",
+                    height: "56px",
+                  }}
+                  defaultValue={latencyThreshold}
+                  onChange={this.deboundInput}
+                />
+                <StyledButton
+                  label='Toggle Average'
+                  callback={this.toggleShowStat}
+                />
+              </ControlsContainer>
+            </HeaderContainer>
+            <ServerContainer>
+              {ServerDetails.map((server, i) => (
+                <ServerTile
+                  channelId={server.channelId}
+                  ip={server.ip}
+                  port={server.port}
+                  key={i}
+                  latencyThreshold={latencyThreshold}
+                  showStat={showStat}
+                />
+              ))}
+            </ServerContainer>
+          </StatusContainer>
+        </Container>
+      </>
     );
   }
 }
@@ -56,26 +132,31 @@ const HeaderContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  margin: 0 54px;
 `;
 
 const ServerName = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: space-around;
   align-items: center;
 `;
 
-const Header = styled.h2`
-  margin: 0 8px;
+const ControlsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `;
 
-const Icon = styled.img`
-  margin: 0 8px;
+const IconLabel = styled.h2`
+  margin: 0 16px;
 `;
 
 const StyledButton = styled(Button)`
-  margin: 0 16px;
+  margin: 0;
 `;
+
+const Icon = styled.img``;
 
 const ServerContainer = styled.div`
   display: flex;
