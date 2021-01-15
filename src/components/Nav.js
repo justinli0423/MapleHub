@@ -9,6 +9,7 @@ import styled from "styled-components";
 
 import Home from "../pages/Home";
 import ServerStatus from "../pages/ServerStatus";
+import Legion from "../pages/Legion";
 
 export default function Nav() {
   return (
@@ -32,12 +33,12 @@ export default function Nav() {
               Status
             </Item>
           </StyledLink>
-          {/* <StyledLink exact to='/legion'>
+          <StyledLink exact to='/legion'>
             <Item>
               <ActiveBar />
               Legion Board
             </Item>
-          </StyledLink> */}
+          </StyledLink>
           {/* <Item>
             <ActiveBar />
             Maple.gg
@@ -62,10 +63,6 @@ export default function Nav() {
       </MainContainer>
     </Router>
   );
-}
-
-function Legion() {
-  return <h2>Legion Board</h2>;
 }
 
 const Container = styled.div`

@@ -61,22 +61,16 @@ export default class ServerStatus extends Component {
     });
   };
 
-  renderHeader() {
-    return (
-      <Header src={process.env.PUBLIC_URL + "/serverstatusbanner.jpg"}>
-        <Title
-          title='Server Status'
-          caption='The response times below will show both the average of the last 10 pings as well as the last ping. Pings will trigger itself every 10 seconds against each channel asynchronously.'
-        />
-      </Header>
-    );
-  }
-
   render() {
     const { latencyThreshold, showStat } = this.state;
     return (
       <>
-        {this.renderHeader()}
+        <Header src={process.env.PUBLIC_URL + "/serverstatusbanner.jpg"}>
+          <Title
+            title='Server Status'
+            caption='The response times below will show both the average of the last 10 pings as well as the last ping. Pings will trigger itself every 10 seconds against each channel asynchronously.'
+          />
+        </Header>
         <Container>
           <StatusContainer>
             <HeaderContainer>

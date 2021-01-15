@@ -8,6 +8,11 @@ const Colors = {
     Yellow: "#ffb930",
     Red: "#e81515",
   },
+  Legion: {
+    Bronze: "radial-gradient(50% 50% at 50% 50%, #6a634b 0%, #2d2c29 100%)",
+    ContrastWhite: "white",
+    FadedWhite: "rgba(124,116,86, 0.2)",
+  },
 };
 
 export default Colors;
