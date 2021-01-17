@@ -64,7 +64,6 @@ const GridCell = styled.div`
   ${({ index }) => {
     const defaultShadow = `0 0 0 1px ${Colors.Legion.FadedWhite}`;
     const highlightBorder = `1px solid white`;
-    let 
     // hardcode horizontal outlines
     if (index === 120 || index === 340 || index === 224 || index === 235) {
       return css`
