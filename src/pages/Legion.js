@@ -5,12 +5,33 @@ import Colors from "../common/Colors";
 import Title from "../components/common/Title";
 import Header from "../components/common/Header";
 
-const tileSize = 30;
+const tileSize = 25;
 const numTilesWidth = 22;
 const numTilesHeight = 20;
 const verticalIndicies = [10, 32, 54];
 
 export default class Legion extends Component {
+  renderGrid() {
+    let count = 0;
+    return (
+      <tb>
+        {new Array(numTilesHeight).fill(0).map((_, i) => (
+          <tr key={i}>
+            {new Array(numTilesWidth).fill(0).map((_, j) => {
+              const cell = (
+                <GridCell key={count} index={count}>
+                  {count}
+                </GridCell>
+              );
+              count++;
+              return cell;
+            })}
+          </tr>
+        ))}
+      </tb>
+    );
+  }
+
   render() {
     return (
       <>
@@ -21,13 +42,7 @@ export default class Legion extends Component {
           />
         </Header>
         <Container>
-          <GridContainer>
-            {new Array(numTilesHeight * numTilesWidth).fill(0).map((_, i) => (
-              <GridCell key={i} index={i}>
-                {i}
-              </GridCell>
-            ))}
-          </GridContainer>
+          <GridContainer>{this.renderGrid()}</GridContainer>
         </Container>
       </>
     );
@@ -39,31 +54,26 @@ const Container = styled.div`
   margin: 40px auto;
 `;
 
-const GridContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-items: center;
-  flex-wrap: wrap;
+const GridContainer = styled.table`
   width: ${tileSize * numTilesWidth + 8}px;
   height: ${tileSize * numTilesHeight + 8}px;
   margin: 0 auto;
   padding: 4px;
   border-radius: 4px;
   background: ${Colors.Legion.Bronze};
+  /* WHAT IS BORDER COLLAPSE */
+  border-collapse: collapse;
+  border-spacing: 0px;
 `;
 
-const GridCell = styled.div`
-  flex: 1 0 4.5%;
-  width: ${tileSize}px;
-  height: ${tileSize}px;
-  padding: 5px;
+const GridCell = styled.td`
+  padding: ${tileSize / 2}px;
   font-size: 8px;
   color: white;
 
   ${({ index }) => {
-    const defaultShadow = `0 0 0 1px ${Colors.Legion.FadedWhite}`;
-    const highlightBorder = `1px solid white`;
+    const defaultShadow = `0 0 0 0.5px ${Colors.Legion.FadedWhite}`;
+    const highlightBorder = `3px solid white`;
     // hardcode horizontal outlines
     if (index === 120 || index === 340 || index === 224 || index === 235) {
       return css`
@@ -72,14 +82,12 @@ const GridCell = styled.div`
         border-right: ${highlightBorder};
       `;
     }
-
     if (index === 418 || index === 439) {
       return css`
         box-shadow: ${defaultShadow};
         border-bottom: ${highlightBorder};
       `;
     }
-
     if (index === 147 || index === 230) {
       return css`
         box-shadow: ${defaultShadow};
@@ -88,7 +96,6 @@ const GridCell = styled.div`
         border-left: ${highlightBorder};
       `;
     }
-
     // top-left quadrant
     if (index % 23 === 0 && index < 220) {
       return css`
@@ -97,7 +104,6 @@ const GridCell = styled.div`
         border-right: ${highlightBorder};
       `;
     }
-
     // bottom-right quadrant
     if ((index - 1) % 23 === 0 && index > 220) {
       return css`
@@ -106,7 +112,6 @@ const GridCell = styled.div`
         border-right: ${highlightBorder};
       `;
     }
-
     // top-right quadrant
     if (index % 21 === 0 && index < 220) {
       return css`
@@ -115,7 +120,6 @@ const GridCell = styled.div`
         border-left: ${highlightBorder};
       `;
     }
-
     // bottom-left quadrant
     if ((index + 1) % 21 === 0 && index > 220) {
       return css`
@@ -124,7 +128,6 @@ const GridCell = styled.div`
         border-left: ${highlightBorder};
       `;
     }
-
     // vertical middle
     if (index % (10 + 22 * Math.floor(index / numTilesWidth)) === 0) {
       return css`
@@ -132,7 +135,6 @@ const GridCell = styled.div`
         border-right: ${highlightBorder};
       `;
     }
-
     // horizontal middle
     if (index >= 220 && index <= 241) {
       return css`
@@ -140,7 +142,6 @@ const GridCell = styled.div`
         border-top: ${highlightBorder};
       `;
     }
-
     // top border of middle square
     if (index >= 115 && index <= 126) {
       return css`
@@ -148,7 +149,6 @@ const GridCell = styled.div`
         border-top: ${highlightBorder};
       `;
     }
-
     // bottom border of middle square
     if (index >= 335 && index <= 346) {
       return css`
@@ -156,7 +156,6 @@ const GridCell = styled.div`
         border-top: ${highlightBorder};
       `;
     }
-
     // left border of middle square
     if (
       index % (4 + 22 * Math.floor(index / numTilesWidth)) === 0 &&
@@ -172,7 +171,6 @@ const GridCell = styled.div`
         border-right: ${highlightBorder};
       `;
     }
-
     // right border of middle square
     if (
       index % (15 + 22 * Math.floor(index / numTilesWidth)) === 0 &&
@@ -184,7 +182,8 @@ const GridCell = styled.div`
         border-right: ${highlightBorder};
       `;
     }
-
-    return `box-shadow: 0 0 0 1px ${Colors.Legion.FadedWhite}`;
+    return css`
+      box-shadow: 0 0 0 1px ${Colors.Legion.FadedWhite};
+    `;
   }}
 `;
