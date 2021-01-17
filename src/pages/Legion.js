@@ -73,10 +73,10 @@ export default class Legion extends Component {
           <TextOverlay top={362} left={685}>
             Boss Damage
           </TextOverlay>
-          <TextOverlay top={460} left={570}>
+          <TextOverlay top={445} left={570}>
             Knockback <br /> Resistance
           </TextOverlay>
-          <TextOverlay top={460} left={380}>
+          <TextOverlay top={445} left={380}>
             Buff <br /> Duration
           </TextOverlay>
           <TextOverlay top={362} left={245}>
