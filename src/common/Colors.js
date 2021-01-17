@@ -10,7 +10,7 @@ const Colors = {
   },
   Legion: {
     Bronze: "radial-gradient(50% 50% at 50% 50%, #6a634b 0%, #2d2c29 100%)",
-    ContrastWhite: "white",
+    ContrastWhite: "#D6D3CB",
     FadedWhite: "rgba(124,116,86, 0.2)",
   },
 };

@@ -37,7 +37,7 @@ export default class Legion extends Component {
           />
         </Header>
         <Container>
-          <TextOverlay top={230} left={380}>
+          <TextOverlay top={210} left={380}>
             DEX
           </TextOverlay>
           <TextOverlay top={180} left={460}>
@@ -46,16 +46,16 @@ export default class Legion extends Component {
           <TextOverlay top={180} left={540}>
             HP
           </TextOverlay>
-          <TextOverlay top={230} left={610}>
+          <TextOverlay top={210} left={610}>
             INT
           </TextOverlay>
           <TextOverlay top={310} left={610}>
             ATT
           </TextOverlay>
-          <TextOverlay top={362} left={536}>
+          <TextOverlay top={340} left={536}>
             STR
           </TextOverlay>
-          <TextOverlay top={362} left={450}>
+          <TextOverlay top={340} left={450}>
             M.ATT
           </TextOverlay>
           <TextOverlay top={310} left={383}>
@@ -67,10 +67,10 @@ export default class Legion extends Component {
           <TextOverlay top={67} left={570}>
             Bonus EXP
           </TextOverlay>
-          <TextOverlay top={180} left={700}>
+          <TextOverlay top={180} left={685}>
             Critical Rate
           </TextOverlay>
-          <TextOverlay top={362} left={700}>
+          <TextOverlay top={362} left={685}>
             Boss Damage
           </TextOverlay>
           <TextOverlay top={460} left={570}>
@@ -79,10 +79,10 @@ export default class Legion extends Component {
           <TextOverlay top={460} left={380}>
             Buff <br /> Duration
           </TextOverlay>
-          <TextOverlay top={362} left={232}>
+          <TextOverlay top={362} left={245}>
             Ignore DEF
           </TextOverlay>
-          <TextOverlay top={180} left={215}>
+          <TextOverlay top={180} left={225}>
             Critical Damage
           </TextOverlay>
           <PaddingContainer>
@@ -112,8 +112,9 @@ const TextOverlay = styled.div`
   position: absolute;
   top: ${({ top }) => (top ? `${top}px` : 0)};
   left: ${({ left }) => (left ? `${left}px` : 0)};
-  color: white;
+  color: ${Colors.White};
   text-align: center;
+  text-shadow: 3px 3px 0 ${Colors.Black};
 `;
 
 const PaddingContainer = styled.div`
@@ -127,11 +128,11 @@ const PaddingContainer = styled.div`
 const GridCell = styled.td`
   padding: ${tileSize / 2}px;
   font-size: 8px;
-  color: white;
 
   ${({ index }) => {
     const defaultShadow = `0 0 0 0.5px ${Colors.Legion.FadedWhite}`;
-    const highlightBorder = `3px solid white`;
+    const highlightOpacity = 1 - Math.abs(index - 220) / 220;
+    const highlightBorder = `1px solid rgba(214, 211, 203, ${highlightOpacity})`;
     // hardcode outlines
     if (index === 120 || index === 340 || index === 224 || index === 236) {
       return css`
