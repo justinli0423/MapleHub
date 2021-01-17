@@ -8,7 +8,6 @@ import Header from "../components/common/Header";
 const tileSize = 25;
 const numTilesWidth = 22;
 const numTilesHeight = 20;
-const verticalIndicies = [10, 32, 54];
 
 export default class Legion extends Component {
   renderGrid() {
@@ -18,11 +17,7 @@ export default class Legion extends Component {
         {new Array(numTilesHeight).fill(0).map((_, i) => (
           <tr key={i}>
             {new Array(numTilesWidth).fill(0).map((_, j) => {
-              const cell = (
-                <GridCell key={count} index={count}>
-                  {count}
-                </GridCell>
-              );
+              const cell = <GridCell key={count} index={count}></GridCell>;
               count++;
               return cell;
             })}
@@ -42,7 +37,57 @@ export default class Legion extends Component {
           />
         </Header>
         <Container>
-          <GridContainer>{this.renderGrid()}</GridContainer>
+          <TextOverlay top={230} left={380}>
+            DEX
+          </TextOverlay>
+          <TextOverlay top={180} left={460}>
+            LUK
+          </TextOverlay>
+          <TextOverlay top={180} left={540}>
+            HP
+          </TextOverlay>
+          <TextOverlay top={230} left={610}>
+            INT
+          </TextOverlay>
+          <TextOverlay top={310} left={610}>
+            ATT
+          </TextOverlay>
+          <TextOverlay top={362} left={536}>
+            STR
+          </TextOverlay>
+          <TextOverlay top={362} left={450}>
+            M.ATT
+          </TextOverlay>
+          <TextOverlay top={310} left={383}>
+            MP
+          </TextOverlay>
+          <TextOverlay top={60} left={350}>
+            Abnormal Status <br /> Resistance
+          </TextOverlay>
+          <TextOverlay top={67} left={570}>
+            Bonus EXP
+          </TextOverlay>
+          <TextOverlay top={180} left={700}>
+            Critical Rate
+          </TextOverlay>
+          <TextOverlay top={362} left={700}>
+            Boss Damage
+          </TextOverlay>
+          <TextOverlay top={460} left={570}>
+            Knockback <br /> Resistance
+          </TextOverlay>
+          <TextOverlay top={460} left={380}>
+            Buff <br /> Duration
+          </TextOverlay>
+          <TextOverlay top={362} left={232}>
+            Ignore DEF
+          </TextOverlay>
+          <TextOverlay top={180} left={215}>
+            Critical Damage
+          </TextOverlay>
+          <PaddingContainer>
+            <GridContainer>{this.renderGrid()}</GridContainer>
+          </PaddingContainer>
         </Container>
       </>
     );
@@ -50,20 +95,33 @@ export default class Legion extends Component {
 }
 
 const Container = styled.div`
+  position: relative;
   width: 1024px;
   margin: 40px auto;
 `;
 
 const GridContainer = styled.table`
+  border-collapse: collapse;
+  border-spacing: 0px;
   width: ${tileSize * numTilesWidth + 8}px;
   height: ${tileSize * numTilesHeight + 8}px;
   margin: 0 auto;
-  padding: 4px;
+`;
+
+const TextOverlay = styled.div`
+  position: absolute;
+  top: ${({ top }) => (top ? `${top}px` : 0)};
+  left: ${({ left }) => (left ? `${left}px` : 0)};
+  color: white;
+  text-align: center;
+`;
+
+const PaddingContainer = styled.div`
+  width: fit-content;
+  margin: 0 auto;
+  padding: 8px;
   border-radius: 4px;
   background: ${Colors.Legion.Bronze};
-  /* WHAT IS BORDER COLLAPSE */
-  border-collapse: collapse;
-  border-spacing: 0px;
 `;
 
 const GridCell = styled.td`
@@ -74,21 +132,28 @@ const GridCell = styled.td`
   ${({ index }) => {
     const defaultShadow = `0 0 0 0.5px ${Colors.Legion.FadedWhite}`;
     const highlightBorder = `3px solid white`;
-    // hardcode horizontal outlines
-    if (index === 120 || index === 340 || index === 224 || index === 235) {
+    // hardcode outlines
+    if (index === 120 || index === 340 || index === 224 || index === 236) {
       return css`
         box-shadow: ${defaultShadow};
         border-top: ${highlightBorder};
         border-right: ${highlightBorder};
       `;
     }
+    if (index === 324) {
+      return css`
+        box-shadow: ${defaultShadow};
+        border-right: ${highlightBorder};
+      `;
+    }
+
     if (index === 418 || index === 439) {
       return css`
         box-shadow: ${defaultShadow};
         border-bottom: ${highlightBorder};
       `;
     }
-    if (index === 147 || index === 230) {
+    if (index === 126 || index === 230) {
       return css`
         box-shadow: ${defaultShadow};
         border-top: ${highlightBorder};
@@ -173,7 +238,7 @@ const GridCell = styled.td`
     }
     // right border of middle square
     if (
-      index % (15 + 22 * Math.floor(index / numTilesWidth)) === 0 &&
+      index % (16 + 22 * Math.floor(index / numTilesWidth)) === 0 &&
       index >= 114 &&
       index <= 312
     ) {
