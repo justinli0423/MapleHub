@@ -62,24 +62,28 @@ const GridCell = styled.div`
   color: white;
 
   ${({ index }) => {
-    const defaultBorder = `0 0 0 1px ${Colors.Legion.FadedWhite}`;
+    const defaultShadow = `0 0 0 1px ${Colors.Legion.FadedWhite}`;
     const highlightBorder = `1px solid white`;
+    let 
     // hardcode horizontal outlines
     if (index === 120 || index === 340 || index === 224 || index === 235) {
       return css`
-        box-shadow: ${defaultBorder};
+        box-shadow: ${defaultShadow};
         border-top: ${highlightBorder};
         border-right: ${highlightBorder};
       `;
     }
 
-    if (index === 125) {
-
+    if (index === 418 || index === 439) {
+      return css`
+        box-shadow: ${defaultShadow};
+        border-bottom: ${highlightBorder};
+      `;
     }
 
     if (index === 147 || index === 230) {
       return css`
-        box-shadow: ${defaultBorder};
+        box-shadow: ${defaultShadow};
         border-top: ${highlightBorder};
         border-right: ${highlightBorder};
         border-left: ${highlightBorder};
@@ -89,7 +93,7 @@ const GridCell = styled.div`
     // top-left quadrant
     if (index % 23 === 0 && index < 220) {
       return css`
-        box-shadow: ${defaultBorder};
+        box-shadow: ${defaultShadow};
         border-top: ${highlightBorder};
         border-right: ${highlightBorder};
       `;
@@ -98,7 +102,7 @@ const GridCell = styled.div`
     // bottom-right quadrant
     if ((index - 1) % 23 === 0 && index > 220) {
       return css`
-        box-shadow: ${defaultBorder};
+        box-shadow: ${defaultShadow};
         border-top: ${highlightBorder};
         border-right: ${highlightBorder};
       `;
@@ -107,7 +111,7 @@ const GridCell = styled.div`
     // top-right quadrant
     if (index % 21 === 0 && index < 220) {
       return css`
-        box-shadow: ${defaultBorder};
+        box-shadow: ${defaultShadow};
         border-top: ${highlightBorder};
         border-left: ${highlightBorder};
       `;
@@ -116,7 +120,7 @@ const GridCell = styled.div`
     // bottom-left quadrant
     if ((index + 1) % 21 === 0 && index > 220) {
       return css`
-        box-shadow: ${defaultBorder};
+        box-shadow: ${defaultShadow};
         border-top: ${highlightBorder};
         border-left: ${highlightBorder};
       `;
@@ -125,7 +129,7 @@ const GridCell = styled.div`
     // vertical middle
     if (index % (10 + 22 * Math.floor(index / numTilesWidth)) === 0) {
       return css`
-        box-shadow: ${defaultBorder};
+        box-shadow: ${defaultShadow};
         border-right: ${highlightBorder};
       `;
     }
@@ -133,7 +137,7 @@ const GridCell = styled.div`
     // horizontal middle
     if (index >= 220 && index <= 241) {
       return css`
-        box-shadow: ${defaultBorder};
+        box-shadow: ${defaultShadow};
         border-top: ${highlightBorder};
       `;
     }
@@ -141,7 +145,7 @@ const GridCell = styled.div`
     // top border of middle square
     if (index >= 115 && index <= 126) {
       return css`
-        box-shadow: ${defaultBorder};
+        box-shadow: ${defaultShadow};
         border-top: ${highlightBorder};
       `;
     }
@@ -149,7 +153,7 @@ const GridCell = styled.div`
     // bottom border of middle square
     if (index >= 335 && index <= 346) {
       return css`
-        box-shadow: ${defaultBorder};
+        box-shadow: ${defaultShadow};
         border-top: ${highlightBorder};
       `;
     }
@@ -165,7 +169,7 @@ const GridCell = styled.div`
       index <= 312
     ) {
       return css`
-        box-shadow: ${defaultBorder};
+        box-shadow: ${defaultShadow};
         border-right: ${highlightBorder};
       `;
     }
@@ -177,7 +181,7 @@ const GridCell = styled.div`
       index <= 312
     ) {
       return css`
-        box-shadow: ${defaultBorder};
+        box-shadow: ${defaultShadow};
         border-right: ${highlightBorder};
       `;
     }
