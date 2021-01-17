@@ -30,9 +30,29 @@ const FilterTypes = {
   FUTURE_EVENTS: "FUTURE_EVENTS",
 };
 
+const Classes = {
+  WARRIOR: "Warrior",
+  MAGICIAN: "Magician",
+  BOWMAN: "Bowman",
+  THIEF: "Thief",
+  PIRATE: "Pirate",
+  XENON: "Xenon",
+  ALL: "All",
+};
+
+const LegionRanks = {
+  B: "B",
+  A: "A",
+  S: "S",
+  SS: "SS",
+  SSS: "SSS",
+};
+
 Object.freeze(NodeNames);
 Object.freeze(Keywords);
 Object.freeze(EventTypes);
 Object.freeze(FilterTypes);
+Object.freeze(Classes);
+Object.freeze(LegionRanks);
 
-export { NodeNames, Keywords, EventTypes, FilterTypes };
+export { NodeNames, Keywords, EventTypes, FilterTypes, Classes, LegionRanks };

@@ -4,16 +4,72 @@ import Colors from "../common/Colors";
 
 import Title from "../components/common/Title";
 import Header from "../components/common/Header";
+import LegionNav from "../components/LegionNav";
 
 const tileSize = 25;
 const numTilesWidth = 22;
 const numTilesHeight = 20;
 
 export default class Legion extends Component {
+  renderTextOverlays() {
+    return (
+      <>
+        <TextOverlay top={210} left={380}>
+          DEX
+        </TextOverlay>
+        <TextOverlay top={180} left={460}>
+          LUK
+        </TextOverlay>
+        <TextOverlay top={180} left={540}>
+          HP
+        </TextOverlay>
+        <TextOverlay top={210} left={610}>
+          INT
+        </TextOverlay>
+        <TextOverlay top={310} left={610}>
+          ATT
+        </TextOverlay>
+        <TextOverlay top={340} left={536}>
+          STR
+        </TextOverlay>
+        <TextOverlay top={340} left={450}>
+          M.ATT
+        </TextOverlay>
+        <TextOverlay top={310} left={383}>
+          MP
+        </TextOverlay>
+        <TextOverlay top={60} left={350}>
+          Abnormal Status <br /> Resistance
+        </TextOverlay>
+        <TextOverlay top={67} left={570}>
+          Bonus EXP
+        </TextOverlay>
+        <TextOverlay top={180} left={685}>
+          Critical Rate
+        </TextOverlay>
+        <TextOverlay top={362} left={685}>
+          Boss Damage
+        </TextOverlay>
+        <TextOverlay top={445} left={570}>
+          Knockback <br /> Resistance
+        </TextOverlay>
+        <TextOverlay top={445} left={380}>
+          Buff <br /> Duration
+        </TextOverlay>
+        <TextOverlay top={362} left={245}>
+          Ignore DEF
+        </TextOverlay>
+        <TextOverlay top={180} left={225}>
+          Critical Damage
+        </TextOverlay>
+      </>
+    );
+  }
+
   renderGrid() {
     let count = 0;
     return (
-      <tb>
+      <tbody>
         {new Array(numTilesHeight).fill(0).map((_, i) => (
           <tr key={i}>
             {new Array(numTilesWidth).fill(0).map((_, j) => {
@@ -23,7 +79,7 @@ export default class Legion extends Component {
             })}
           </tr>
         ))}
-      </tb>
+      </tbody>
     );
   }
 
@@ -37,57 +93,13 @@ export default class Legion extends Component {
           />
         </Header>
         <Container>
-          <TextOverlay top={210} left={380}>
-            DEX
-          </TextOverlay>
-          <TextOverlay top={180} left={460}>
-            LUK
-          </TextOverlay>
-          <TextOverlay top={180} left={540}>
-            HP
-          </TextOverlay>
-          <TextOverlay top={210} left={610}>
-            INT
-          </TextOverlay>
-          <TextOverlay top={310} left={610}>
-            ATT
-          </TextOverlay>
-          <TextOverlay top={340} left={536}>
-            STR
-          </TextOverlay>
-          <TextOverlay top={340} left={450}>
-            M.ATT
-          </TextOverlay>
-          <TextOverlay top={310} left={383}>
-            MP
-          </TextOverlay>
-          <TextOverlay top={60} left={350}>
-            Abnormal Status <br /> Resistance
-          </TextOverlay>
-          <TextOverlay top={67} left={570}>
-            Bonus EXP
-          </TextOverlay>
-          <TextOverlay top={180} left={685}>
-            Critical Rate
-          </TextOverlay>
-          <TextOverlay top={362} left={685}>
-            Boss Damage
-          </TextOverlay>
-          <TextOverlay top={445} left={570}>
-            Knockback <br /> Resistance
-          </TextOverlay>
-          <TextOverlay top={445} left={380}>
-            Buff <br /> Duration
-          </TextOverlay>
-          <TextOverlay top={362} left={245}>
-            Ignore DEF
-          </TextOverlay>
-          <TextOverlay top={180} left={225}>
-            Critical Damage
-          </TextOverlay>
-          <PaddingContainer>
-            <GridContainer>{this.renderGrid()}</GridContainer>
-          </PaddingContainer>
+          <LegionNav />
+          <LegionContainer>
+            {/* {this.renderTextOverlays()} */}
+            <PaddingContainer>
+              <GridContainer>{this.renderGrid()}</GridContainer>
+            </PaddingContainer>
+          </LegionContainer>
         </Container>
       </>
     );
@@ -96,8 +108,15 @@ export default class Legion extends Component {
 
 const Container = styled.div`
   position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
   width: 1024px;
   margin: 40px auto;
+`;
+
+const LegionContainer = styled.div`
+  position: relative;
 `;
 
 const GridContainer = styled.table`
@@ -114,7 +133,7 @@ const TextOverlay = styled.div`
   left: ${({ left }) => (left ? `${left}px` : 0)};
   color: ${Colors.White};
   text-align: center;
-  text-shadow: 3px 3px 0 ${Colors.Black};
+  text-shadow: 3px 3px 0 ${Colors.TrueBlack};
 `;
 
 const PaddingContainer = styled.div`

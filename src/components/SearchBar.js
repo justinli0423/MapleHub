@@ -7,6 +7,53 @@ import { StylesProvider } from "@material-ui/core/styles";
 
 import Colors from "../common/Colors";
 
+export default class SearchBar extends React.Component {
+  handleAutocompleteInputChange(ev, val) {
+    this.props.callback(val);
+  }
+
+  // TODO: design better filter pills (hover and active state) as well as the tooltip
+  // currently the filter pills shift on hover... probably don't want zoom effect
+
+  render() {
+    return (
+      <Container>
+        <Autocomplete
+          options={this.props.searchObject.map((event) => event.eventName)}
+          onChange={this.handleAutocompleteInputChange.bind(this)}
+          renderInput={(params) => (
+            <StylesProvider injectFirst>
+              <TextField
+                style={{
+                  width: "300px",
+                }}
+                label='Event Name'
+                variant='outlined'
+                {...params}
+              />
+            </StylesProvider>
+          )}
+        />
+        <FilterPillsContainer>
+          {this.props.filterPills.map((filter, i) => (
+            <PillContainer key={i}>
+              <Tooltip>{filter.tooltip}</Tooltip>
+              <FilterPill
+                src={filter.icon}
+                isActive={filter.isActive}
+                onClick={() => {
+                  filter.callback(filter.filterType);
+                  filter.isActive = !filter.isActive;
+                }}
+              />
+            </PillContainer>
+          ))}
+        </FilterPillsContainer>
+      </Container>
+    );
+  }
+}
+
 const Container = styled.div`
   position: relative;
   display: flex;
@@ -83,50 +130,3 @@ const PillContainer = styled.div`
     visibility: visible;
   }
 `;
-
-export default class SearchBar extends React.Component {
-  handleAutocompleteInputChange(ev, val) {
-    this.props.callback(val);
-  }
-
-  // TODO: design better filter pills (hover and active state) as well as the tooltip
-  // currently the filter pills shift on hover... probably don't want zoom effect
-
-  render() {
-    return (
-      <Container>
-        <Autocomplete
-          options={this.props.searchObject.map((event) => event.eventName)}
-          onChange={this.handleAutocompleteInputChange.bind(this)}
-          renderInput={(params) => (
-            <StylesProvider injectFirst>
-              <TextField
-                style={{
-                  width: "300px",
-                }}
-                label='Event Name'
-                variant='outlined'
-                {...params}
-              />
-            </StylesProvider>
-          )}
-        />
-        <FilterPillsContainer>
-          {this.props.filterPills.map((filter, i) => (
-            <PillContainer key={i}>
-              <Tooltip>{filter.tooltip}</Tooltip>
-              <FilterPill
-                src={filter.icon}
-                isActive={filter.isActive}
-                onClick={() => {
-                  filter.callback(filter.filterType);
-                  filter.isActive = !filter.isActive;
-                }}
-              />
-            </PillContainer>
-          ))}
-        </FilterPillsContainer>
-      </Container>
-    );
-  }
-}
