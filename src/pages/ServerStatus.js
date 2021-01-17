@@ -15,15 +15,15 @@ export default class ServerStatus extends Component {
   constructor() {
     super();
     this.state = {
-      showStat: false,
+      showAverage: false,
       latencyThreshold: 1200,
       timer: null,
     };
   }
 
-  toggleShowStat = () => {
+  toggleShowAverage = () => {
     this.setState({
-      showStat: !this.state.showStat,
+      showAverage: !this.state.showAverage,
     });
   };
 
@@ -62,7 +62,7 @@ export default class ServerStatus extends Component {
   };
 
   render() {
-    const { latencyThreshold, showStat } = this.state;
+    const { latencyThreshold, showAverage } = this.state;
     return (
       <>
         <Header src={process.env.PUBLIC_URL + "/serverstatusbanner.jpg"}>
@@ -89,8 +89,8 @@ export default class ServerStatus extends Component {
                   onChange={this.deboundInput}
                 />
                 <StyledButton
-                  label='Toggle Average'
-                  callback={this.toggleShowStat}
+                  label={showAverage ? "Toggle Last Latency" : "Toggle Average"}
+                  callback={this.toggleShowAverage}
                 />
               </ControlsContainer>
             </HeaderContainer>
@@ -102,7 +102,7 @@ export default class ServerStatus extends Component {
                   port={server.port}
                   key={i}
                   latencyThreshold={latencyThreshold}
-                  showStat={showStat}
+                  showAverage={showAverage}
                 />
               ))}
             </ServerContainer>
@@ -148,6 +148,7 @@ const IconLabel = styled.h2`
 
 const StyledButton = styled(Button)`
   margin: 0;
+  width: 230px;
 `;
 
 const Icon = styled.img``;

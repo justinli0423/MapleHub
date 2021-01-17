@@ -49,7 +49,7 @@ export default class ServerTile extends Component {
 
   render() {
     const { channelId, averageTenLatencies, latency } = this.state;
-    const { showStat, latencyThreshold } = this.props;
+    const { showAverage, latencyThreshold } = this.props;
 
     const displayLatency = latency ? `Latency: ${latency}ms` : "Waiting...";
     const averageLatency = averageTenLatencies.length
@@ -63,16 +63,14 @@ export default class ServerTile extends Component {
     return (
       <Container>
         <ServerName>Ch. {channelId}</ServerName>
-        <Latency isActive>{displayLatency}</Latency>
-        <Latency
-          isActive={showStat}
-          latency={averageLatency}
-          threshold={latencyThreshold}
-        >
-          {displayAverageLatency}
+        <Latency isActive>
+          {showAverage ? displayAverageLatency : displayLatency}
         </Latency>
-        <StatusBar isActive={!showStat}>
-          <ActiveStatus threshold={latencyThreshold} latency={latency} />
+        <StatusBar>
+          <ActiveStatus
+            threshold={latencyThreshold}
+            latency={showAverage ? averageLatency : latency}
+          />
         </StatusBar>
       </Container>
     );
@@ -107,7 +105,7 @@ const ActiveStatus = styled.div`
 `;
 
 const StatusBar = styled.div`
-  display: ${({ isActive }) => (isActive ? "block" : "none")};
+  display: block;
   position: relative;
   width: ${statusWidth}px;
   height: ${statusHeight}px;
