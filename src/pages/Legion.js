@@ -12,54 +12,55 @@ const numTilesHeight = 20;
 
 export default class Legion extends Component {
   renderTextOverlays() {
+    // TODO: remove math calculation...
     return (
       <>
-        <TextOverlay top={210} left={380}>
+        <TextOverlay top={210} left={380 - 220}>
           DEX
         </TextOverlay>
-        <TextOverlay top={180} left={460}>
+        <TextOverlay top={180} left={460 - 220}>
           LUK
         </TextOverlay>
-        <TextOverlay top={180} left={540}>
+        <TextOverlay top={180} left={540 - 220}>
           HP
         </TextOverlay>
-        <TextOverlay top={210} left={610}>
+        <TextOverlay top={210} left={610 - 220}>
           INT
         </TextOverlay>
-        <TextOverlay top={310} left={610}>
+        <TextOverlay top={310} left={610 - 220}>
           ATT
         </TextOverlay>
-        <TextOverlay top={340} left={536}>
+        <TextOverlay top={340} left={536 - 220}>
           STR
         </TextOverlay>
-        <TextOverlay top={340} left={450}>
+        <TextOverlay top={340} left={450 - 220}>
           M.ATT
         </TextOverlay>
-        <TextOverlay top={310} left={383}>
+        <TextOverlay top={310} left={383 - 220}>
           MP
         </TextOverlay>
-        <TextOverlay top={60} left={350}>
+        <TextOverlay top={60} left={350 - 220}>
           Abnormal Status <br /> Resistance
         </TextOverlay>
-        <TextOverlay top={67} left={570}>
+        <TextOverlay top={67} left={570 - 220}>
           Bonus EXP
         </TextOverlay>
-        <TextOverlay top={180} left={685}>
+        <TextOverlay top={180} left={685 - 220}>
           Critical Rate
         </TextOverlay>
-        <TextOverlay top={362} left={685}>
+        <TextOverlay top={362} left={685 - 220}>
           Boss Damage
         </TextOverlay>
-        <TextOverlay top={445} left={570}>
+        <TextOverlay top={445} left={570 - 220}>
           Knockback <br /> Resistance
         </TextOverlay>
-        <TextOverlay top={445} left={380}>
+        <TextOverlay top={445} left={380 - 220}>
           Buff <br /> Duration
         </TextOverlay>
-        <TextOverlay top={362} left={245}>
+        <TextOverlay top={362} left={245 - 220}>
           Ignore DEF
         </TextOverlay>
-        <TextOverlay top={180} left={225}>
+        <TextOverlay top={180} left={225 - 220}>
           Critical Damage
         </TextOverlay>
       </>
@@ -109,7 +110,7 @@ export default class Legion extends Component {
 const Container = styled.div`
   position: relative;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-evenly;
   width: 1024px;
   margin: 40px auto;

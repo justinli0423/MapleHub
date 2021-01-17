@@ -37,7 +37,7 @@ const Classes = {
   THIEF: "Thief",
   PIRATE: "Pirate",
   XENON: "Xenon",
-  ALL: "All",
+  ALL: "All Classes",
 };
 
 const LegionRanks = {
