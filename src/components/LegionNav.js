@@ -11,8 +11,12 @@ import { LegionDetails, LegionClasses } from "../legionUtils/LegionDetails";
 import { Classes } from "../common/Consts";
 
 export default class LegionNav extends React.Component {
-  handleAutocompleteInputChange(ev, val) {
-    // this.props.callback(val);
+  handleAutocompleteInputChange(_, val) {
+    this.props.callback(
+      ...LegionDetails.filter(
+        (details) => details.name.concat(` - [Lv: ${details.minLevel}]`) === val
+      )
+    );
   }
 
   renderLegionPills() {
@@ -56,7 +60,9 @@ export default class LegionNav extends React.Component {
     return (
       <Container>
         <Autocomplete
-          options={LegionDetails.map((event) => event.name)}
+          options={LegionDetails.map(
+            (legion) => legion.name + ` - [Lv: ${legion.minLevel}]`
+          )}
           onChange={this.handleAutocompleteInputChange.bind(this)}
           renderInput={(params) => (
             <StylesProvider injectFirst>
@@ -64,7 +70,7 @@ export default class LegionNav extends React.Component {
                 style={{
                   width: "420px",
                 }}
-                label='Legion Level'
+                label='Legion Rank'
                 variant='outlined'
                 {...params}
               />

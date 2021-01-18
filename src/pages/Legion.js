@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 import styled, { css } from "styled-components";
+
+import LegionStore from "../legionUtils/LegionStore";
+
 import Colors from "../common/Colors";
 
 import Title from "../components/common/Title";
@@ -11,56 +14,54 @@ const numTilesWidth = 22;
 const numTilesHeight = 20;
 
 export default class Legion extends Component {
+  constructor() {
+    super();
+    this.state = {
+      legionStore: new LegionStore(this.forceRenderGrid),
+      gridCache: Date.now(),
+    };
+  }
+
+  componentDidMount() {
+    this.state.legionStore.updateLegionGrid();
+  }
+
+  forceRenderGrid = () => {
+    this.setState({
+      ...this.state,
+      gridCache: Date.now(),
+    });
+  };
+
+  setLegionRank = (legionRank) => {
+    this.state.legionStore.updateLegionGrid(legionRank);
+  };
+
   renderTextOverlays() {
-    // TODO: remove math calculation...
     return (
       <>
-        <TextOverlay top={210} left={380 - 220}>
-          DEX
-        </TextOverlay>
-        <TextOverlay top={180} left={460 - 220}>
-          LUK
-        </TextOverlay>
-        <TextOverlay top={180} left={540 - 220}>
-          HP
-        </TextOverlay>
-        <TextOverlay top={210} left={610 - 220}>
-          INT
-        </TextOverlay>
-        <TextOverlay top={310} left={610 - 220}>
-          ATT
-        </TextOverlay>
-        <TextOverlay top={340} left={536 - 220}>
-          STR
-        </TextOverlay>
-        <TextOverlay top={340} left={450 - 220}>
-          M.ATT
-        </TextOverlay>
-        <TextOverlay top={310} left={383 - 220}>
-          MP
-        </TextOverlay>
-        <TextOverlay top={60} left={350 - 220}>
+        <TextOverlay top={60} left={350}>
           Abnormal Status <br /> Resistance
         </TextOverlay>
-        <TextOverlay top={67} left={570 - 220}>
+        <TextOverlay top={67} left={570}>
           Bonus EXP
         </TextOverlay>
-        <TextOverlay top={180} left={685 - 220}>
+        <TextOverlay top={180} left={685}>
           Critical Rate
         </TextOverlay>
-        <TextOverlay top={362} left={685 - 220}>
+        <TextOverlay top={362} left={685}>
           Boss Damage
         </TextOverlay>
-        <TextOverlay top={445} left={570 - 220}>
+        <TextOverlay top={445} left={570}>
           Knockback <br /> Resistance
         </TextOverlay>
-        <TextOverlay top={445} left={380 - 220}>
+        <TextOverlay top={445} left={380}>
           Buff <br /> Duration
         </TextOverlay>
-        <TextOverlay top={362} left={245 - 220}>
+        <TextOverlay top={362} left={245}>
           Ignore DEF
         </TextOverlay>
-        <TextOverlay top={180} left={225 - 220}>
+        <TextOverlay top={180} left={225}>
           Critical Damage
         </TextOverlay>
       </>
@@ -68,13 +69,26 @@ export default class Legion extends Component {
   }
 
   renderGrid() {
+    const { grid, toggleLegionTile, toggleMouseEvent } = this.state.legionStore;
     let count = 0;
     return (
-      <tbody>
-        {new Array(numTilesHeight).fill(0).map((_, i) => (
+      <tbody onMouseLeave={(ev) => toggleMouseEvent(ev, false)}>
+        {grid.map((row, i) => (
           <tr key={i}>
-            {new Array(numTilesWidth).fill(0).map((_, j) => {
-              const cell = <GridCell key={count} index={count}></GridCell>;
+            {row.map((val, j) => {
+              const cell = (
+                <GridCell
+                  key={count}
+                  index={count}
+                  val={val}
+                  onMouseDown={(ev) => {
+                    toggleLegionTile(ev, i, j, true);
+                    toggleMouseEvent(ev, true);
+                  }}
+                  onMouseUp={(ev) => toggleMouseEvent(ev, false)}
+                  onMouseOver={(ev) => toggleLegionTile(ev, i, j)}
+                ></GridCell>
+              );
               count++;
               return cell;
             })}
@@ -94,9 +108,9 @@ export default class Legion extends Component {
           />
         </Header>
         <Container>
-          <LegionNav />
+          <LegionNav callback={this.setLegionRank} />
           <LegionContainer>
-            {/* {this.renderTextOverlays()} */}
+            {this.renderTextOverlays()}
             <PaddingContainer>
               <GridContainer>{this.renderGrid()}</GridContainer>
             </PaddingContainer>
@@ -129,6 +143,7 @@ const GridContainer = styled.table`
 `;
 
 const TextOverlay = styled.div`
+  pointer-events: none;
   position: absolute;
   top: ${({ top }) => (top ? `${top}px` : 0)};
   left: ${({ left }) => (left ? `${left}px` : 0)};
@@ -148,6 +163,13 @@ const PaddingContainer = styled.div`
 const GridCell = styled.td`
   padding: ${tileSize / 2}px;
   font-size: 8px;
+  color: white;
+  background: ${({ val }) =>
+    val === 0
+      ? "transparent"
+      : val < 1
+      ? Colors.Legion.Disabled
+      : Colors.Legion.Hover};
 
   ${({ index }) => {
     const defaultShadow = `0 0 0 0.5px ${Colors.Legion.FadedWhite}`;
