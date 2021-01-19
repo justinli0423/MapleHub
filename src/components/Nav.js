@@ -10,6 +10,7 @@ import styled from "styled-components";
 import Home from "../pages/Home";
 import ServerStatus from "../pages/ServerStatus";
 import Legion from "../pages/Legion";
+import Todos from "../pages/Todos";
 
 export default function Nav() {
   return (
@@ -33,10 +34,16 @@ export default function Nav() {
               Status
             </Item>
           </StyledLink>
-          <StyledLink exact to='/legion'>
+          {/* <StyledLink exact to='/legion'>
             <Item>
               <ActiveBar />
               Legion Board
+            </Item>
+          </StyledLink> */}
+          <StyledLink exact to='/todos'>
+            <Item>
+              <ActiveBar />
+              Todos
             </Item>
           </StyledLink>
           {/* <Item>
@@ -55,6 +62,9 @@ export default function Nav() {
           </Route>
           <Route path='/status'>
             <ServerStatus />
+          </Route>
+          <Route path='/todos'>
+            <Todos />
           </Route>
           <Route path='/'>
             <Home />
