@@ -4,10 +4,14 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import moment from "moment";
 import TextField from "@material-ui/core/TextField";
+import Input from "@material-ui/core/Input";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import FormControl from "@material-ui/core/FormControl";
+import Select from "@material-ui/core/Select";
 import Autocomplete, {
   createFilterOptions,
 } from "@material-ui/lab/Autocomplete";
-import { StylesProvider } from "@material-ui/core/styles";
 import DateFnsUtils from "@date-io/date-fns";
 import {
   MuiPickersUtilsProvider,
@@ -23,6 +27,20 @@ import Button from "../components/common/DefaultButton";
 const localizer = momentLocalizer(moment);
 const filter = createFilterOptions();
 
+const repeatableOptions = {
+  None: "None",
+  Everyday: "Everyday",
+  Weekdays: "Weekdays",
+  Weekends: "Weekends",
+  Mondays: "Mondays",
+  Tuesdays: "Tuesdays",
+  Wednesdays: "Wednesdays",
+  Thursdays: "Thursdays",
+  Fridays: "Fridays",
+  Saturdays: "Saturdays",
+  Sundays: "Sundays",
+};
+
 export default class Todos extends Component {
   constructor(props) {
     super(props);
@@ -31,6 +49,7 @@ export default class Todos extends Component {
       newEventName: "",
       newEventStartDate: Date.now(),
       newEventEndDate: Date.now(),
+      newEventRepeat: [repeatableOptions.None],
     };
   }
 
@@ -51,7 +70,7 @@ export default class Todos extends Component {
     });
   }
 
-  dateInputOnChange = (_, newValue) => {
+  eventSelectorOnChange = (_, newValue) => {
     if (typeof newValue === "string") {
       this.setState({
         ...this.state,
@@ -64,14 +83,29 @@ export default class Todos extends Component {
         newEventName: newValue.inputValue,
       });
     } else {
+      const eventDetails = this.state.events.find(
+        (event) => event.eventName === newValue.eventName
+      );
+      let newEventStartDate, newEventEndDate;
+      if (eventDetails.eventTimes[0].length) {
+        // multiEvent
+        newEventStartDate = eventDetails.eventTimes[0][0];
+        newEventEndDate =
+          eventDetails.eventTimes[eventDetails.eventTimes.length - 1][1];
+      } else {
+        newEventStartDate = eventDetails.eventTimes[0];
+        newEventEndDate = eventDetails.eventTimes[1];
+      }
       this.setState({
         ...this.state,
         newEventName: newValue,
+        newEventStartDate,
+        newEventEndDate,
       });
     }
   };
 
-  dateFilterOptions = (options, params) => {
+  eventFilterOptions = (options, params) => {
     const filtered = filter(options, params);
 
     // Suggest the creation of a new value
@@ -85,7 +119,7 @@ export default class Todos extends Component {
     return filtered;
   };
 
-  dateGetOptionLabel = (option) => {
+  eventGetOptionLabel = (option) => {
     // Value selected with enter, right from the input
     if (typeof option === "string") {
       return option;
@@ -112,6 +146,75 @@ export default class Todos extends Component {
     });
   };
 
+  eventRepeatLogic = (selectedDays) => {
+    const latestDay = selectedDays[selectedDays.length - 1];
+    const weekdays = [
+      repeatableOptions.Mondays,
+      repeatableOptions.Tuesdays,
+      repeatableOptions.Wednesdays,
+      repeatableOptions.Thursdays,
+      repeatableOptions.Fridays,
+    ];
+    const weekends = [repeatableOptions.Saturdays, repeatableOptions.Sundays];
+    let newEventRepeat = selectedDays;
+    console.log(latestDay);
+
+    if (latestDay === repeatableOptions.None) {
+      newEventRepeat = [repeatableOptions.None];
+      return newEventRepeat;
+    }
+
+    if (latestDay === repeatableOptions.Everyday) {
+      newEventRepeat = [repeatableOptions.Everyday];
+      return newEventRepeat;
+    }
+
+    if (latestDay === repeatableOptions.Weekdays) {
+      newEventRepeat = selectedDays.filter(
+        (day) =>
+          !weekdays.includes(day) &&
+          ![repeatableOptions.None, repeatableOptions.Everyday].includes(day)
+      );
+      return newEventRepeat;
+    }
+
+    if (latestDay === repeatableOptions.Weekends) {
+      newEventRepeat = selectedDays.filter(
+        (day) =>
+          !weekends.includes(day) &&
+          ![repeatableOptions.None, repeatableOptions.Everyday].includes(day)
+      );
+      return newEventRepeat;
+    }
+
+    if (weekdays.includes(latestDay)) {
+      newEventRepeat = selectedDays.filter(
+        (day) =>
+          weekdays.concat(weekends).includes(day) ||
+          day === repeatableOptions.Weekends
+      );
+      return newEventRepeat;
+    }
+
+    if (weekends.includes(latestDay)) {
+      newEventRepeat = selectedDays.filter(
+        (day) =>
+          weekdays.concat(weekends).includes(day) ||
+          day === repeatableOptions.weekdays
+      );
+      return newEventRepeat;
+    }
+
+    return selectedDays;
+  };
+
+  handleEventRepeatChange = (ev) => {
+    this.setState({
+      ...this.state,
+      newEventRepeat: this.eventRepeatLogic(ev.target.value),
+    });
+  };
+
   render() {
     return (
       <>
@@ -126,9 +229,9 @@ export default class Todos extends Component {
             <Autocomplete
               options={this.state.events}
               value={this.state.newEventName}
-              onChange={this.dateInputOnChange}
-              filterOptions={this.dateFilterOptions}
-              getOptionLabel={this.dateGetOptionLabel}
+              onChange={this.eventSelectorOnChange}
+              filterOptions={this.eventFilterOptions}
+              getOptionLabel={this.eventGetOptionLabel}
               renderOption={(option) => option.eventName}
               selectOnFocus
               clearOnBlur
@@ -166,21 +269,25 @@ export default class Todos extends Component {
               />
             </MuiPickersUtilsProvider>
 
-            <Autocomplete
-              options={["No", "Daily", "Weekly"]}
-              onChange={() => {}}
-              typeof={Date}
-              renderInput={(params) => (
-                <StylesProvider injectFirst>
-                  <StyledTextField
-                    label='Repeat?'
-                    margin='dense'
-                    width={150}
-                    {...params}
-                  />
-                </StylesProvider>
-              )}
-            />
+            <FormControl>
+              <InputLabel>Repeat?</InputLabel>
+              <Select
+                labelId='demo-mutiple-name-label'
+                multiple
+                value={this.state.newEventRepeat}
+                onChange={this.handleEventRepeatChange}
+                MenuProps={{
+                  getContentAnchorEl: () => null,
+                }}
+                input={<Input style={{ width: 150 }} />}
+              >
+                {Object.keys(repeatableOptions).map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <StyledButton label='Add' />
           </AddEvents>
           <EventContainer>
@@ -189,7 +296,7 @@ export default class Todos extends Component {
               <TodaysEvents>
                 <EventRow>
                   <span>Name</span>
-                  <span>Completed</span>
+                  <span>Completed?</span>
                   <span>Delete</span>
                 </EventRow>
               </TodaysEvents>
