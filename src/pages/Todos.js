@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import styled from "styled-components";
-import { Calendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import moment from "moment";
 import TextField from "@material-ui/core/TextField";
@@ -19,13 +18,14 @@ import {
 } from "@material-ui/pickers";
 
 import Colors from "../common/Colors";
+import ics from "../common/ics";
 
 import Title from "../components/common/Title";
 import Header from "../components/common/Header";
 import Button from "../components/common/DefaultButton";
 
-const localizer = momentLocalizer(moment);
 const filter = createFilterOptions();
+const cal = ics();
 
 const repeatableOptions = {
   None: "None",
@@ -41,10 +41,32 @@ const repeatableOptions = {
   Sundays: "Sundays",
 };
 
+const rruleOptions = {
+  Mondays: ["MO"],
+  Tuesdays: ["TU"],
+  Wednesdays: ["WE"],
+  Thursdays: ["TH"],
+  Fridays: ["FR"],
+  Saturdays: ["SA"],
+  Sundays: ["SU"],
+  Weekdays: ["MO", "TU", "WE", "TH", "FR"],
+  Weekends: ["SA", "SU"],
+};
+
+const weekdays = [
+  repeatableOptions.Mondays,
+  repeatableOptions.Tuesdays,
+  repeatableOptions.Wednesdays,
+  repeatableOptions.Thursdays,
+  repeatableOptions.Fridays,
+];
+const weekends = [repeatableOptions.Saturdays, repeatableOptions.Sundays];
+
 export default class Todos extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      calendarEvents: [],
       events: [],
       newEventName: "",
       newEventStartDate: Date.now(),
@@ -71,6 +93,13 @@ export default class Todos extends Component {
   }
 
   eventSelectorOnChange = (_, newValue) => {
+    if (!newValue) {
+      return this.setState({
+        ...this.state,
+        newEventName: newValue,
+      });
+    }
+
     if (typeof newValue === "string") {
       this.setState({
         ...this.state,
@@ -148,16 +177,7 @@ export default class Todos extends Component {
 
   eventRepeatLogic = (selectedDays) => {
     const latestDay = selectedDays[selectedDays.length - 1];
-    const weekdays = [
-      repeatableOptions.Mondays,
-      repeatableOptions.Tuesdays,
-      repeatableOptions.Wednesdays,
-      repeatableOptions.Thursdays,
-      repeatableOptions.Fridays,
-    ];
-    const weekends = [repeatableOptions.Saturdays, repeatableOptions.Sundays];
     let newEventRepeat = selectedDays;
-    console.log(latestDay);
 
     if (latestDay === repeatableOptions.None) {
       newEventRepeat = [repeatableOptions.None];
@@ -215,7 +235,79 @@ export default class Todos extends Component {
     });
   };
 
+  handleAddEvent = () => {
+    const {
+      newEventName,
+      newEventStartDate,
+      newEventEndDate,
+      newEventRepeat,
+    } = this.state;
+
+    if (!newEventName || !newEventStartDate || !newEventEndDate) {
+      return alert("Please enter all the fields for this event.");
+    }
+
+    const { calendarEvents } = this.state;
+    const actualEventName =
+      typeof newEventName === "string" ? newEventName : newEventName.eventName;
+
+    if (newEventRepeat[0] === repeatableOptions.None) {
+      calendarEvents.push({
+        subject: actualEventName,
+        description: "",
+        location: "",
+        begin: new Date(newEventStartDate),
+        end: new Date(newEventEndDate),
+      });
+    } else if (newEventRepeat[0] === repeatableOptions.Everyday) {
+      calendarEvents.push({
+        subject: actualEventName,
+        description: "",
+        location: "",
+        begin: new Date(newEventStartDate),
+        end: new Date(newEventEndDate),
+        rrule: {
+          freq: "DAILY",
+          until: new Date(newEventEndDate),
+          interval: 1,
+        },
+      });
+    } else {
+      const repeatArr = newEventRepeat.map((event) => rruleOptions[event]);
+      calendarEvents.push({
+        subject: actualEventName,
+        description: "",
+        location: "",
+        begin: new Date(newEventStartDate),
+        end: new Date(newEventEndDate),
+        rrule: {
+          freq: "WEEKLY",
+          until: new Date(newEventEndDate),
+          interval: 1,
+          byday: repeatArr.flat(),
+        },
+      });
+    }
+
+    this.setState({
+      ...this.state,
+      calendarEvents,
+      newEventName: "",
+      newEventStartDate: Date.now(),
+      newEventEndDate: Date.now(),
+      newEventRepeat: [repeatableOptions.None],
+    });
+  };
+
   render() {
+    const {
+      events,
+      newEventName,
+      newEventStartDate,
+      newEventEndDate,
+      newEventRepeat,
+      calendarEvents,
+    } = this.state;
     return (
       <>
         <Header src={process.env.PUBLIC_URL + "/todosbanner.jpg"}>
@@ -227,8 +319,8 @@ export default class Todos extends Component {
         <Container>
           <AddEvents>
             <Autocomplete
-              options={this.state.events}
-              value={this.state.newEventName}
+              options={events}
+              value={newEventName}
               onChange={this.eventSelectorOnChange}
               filterOptions={this.eventFilterOptions}
               getOptionLabel={this.eventGetOptionLabel}
@@ -249,7 +341,7 @@ export default class Todos extends Component {
                 format='MM/dd/yyyy'
                 margin='dense'
                 label='Start Date'
-                value={this.state.newEventStartDate}
+                value={newEventStartDate}
                 onChange={this.setStartDate}
                 KeyboardButtonProps={{
                   "aria-label": "change date",
@@ -261,7 +353,7 @@ export default class Todos extends Component {
                 format='MM/dd/yyyy'
                 margin='dense'
                 label='End Date'
-                value={this.state.newEventEndDate}
+                value={newEventEndDate}
                 onChange={this.setEndDate}
                 KeyboardButtonProps={{
                   "aria-label": "change date",
@@ -274,7 +366,7 @@ export default class Todos extends Component {
               <Select
                 labelId='demo-mutiple-name-label'
                 multiple
-                value={this.state.newEventRepeat}
+                value={newEventRepeat}
                 onChange={this.handleEventRepeatChange}
                 MenuProps={{
                   getContentAnchorEl: () => null,
@@ -288,33 +380,53 @@ export default class Todos extends Component {
                 ))}
               </Select>
             </FormControl>
-            <StyledButton label='Add' />
+            <StyledButton label='Add' callback={this.handleAddEvent} />
           </AddEvents>
           <EventContainer>
-            <EventList>
+            <EventList
+              style={{
+                flex: "1 0 40%",
+              }}
+            >
               <h2>Today's Missions</h2>
               <TodaysEvents>
                 <EventRow>
                   <span>Name</span>
                   <span>Completed?</span>
-                  <span>Delete</span>
                 </EventRow>
               </TodaysEvents>
             </EventList>
-            <Calendar
-              localizer={localizer}
-              events={[
-                {
-                  title: "hello",
-                  start: new Date(),
-                  end: new Date(),
-                  allDay: true,
-                },
-              ]}
-              startAccessor='start'
-              endAccessor='end'
-              style={{ height: 500 }}
-            />
+            <EventList
+              style={{
+                flex: "1 0 60%",
+              }}
+            >
+              <h2>Your Scheduled Events</h2>
+              <TodaysEvents>
+                <EventRow>
+                  <span>Name</span>
+                  <span>Recurrence</span>
+                  <span>Until</span>
+                  <span>Delete</span>
+                </EventRow>
+                {calendarEvents.map((calEvent) => {
+                  const occuranceString = !calEvent.rrule
+                    ? "None"
+                    : calEvent.rrule.freq === "DAILY"
+                    ? "DAILY"
+                    : calEvent.rrule.byday.join(", ");
+
+                  return (
+                    <EventRow>
+                      <span>{calEvent.subject}</span>
+                      <span>{occuranceString}</span>
+                      <span>{calEvent.end.toDateString()}</span>
+                      <span>Delete</span>
+                    </EventRow>
+                  );
+                })}
+              </TodaysEvents>
+            </EventList>
           </EventContainer>
         </Container>
       </>
@@ -365,11 +477,15 @@ const EventList = styled.div`
 
 const TodaysEvents = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
   margin: 8px 0;
+
+  & > * {
+    flex: 1 0 25%;
+  }
 `;
 
 const EventRow = styled.div`
