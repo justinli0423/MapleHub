@@ -11,11 +11,12 @@ import Select from "@material-ui/core/Select";
 import Autocomplete, {
   createFilterOptions,
 } from "@material-ui/lab/Autocomplete";
-import DateFnsUtils from "@date-io/date-fns";
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
+import { DataGrid } from "@material-ui/data-grid";
+import DateFnsUtils from "@date-io/date-fns";
 
 import Colors from "../common/Colors";
 import ics from "../common/ics";
@@ -28,7 +29,6 @@ const filter = createFilterOptions();
 const cal = ics();
 
 const repeatableOptions = {
-  None: "None",
   Everyday: "Everyday",
   Weekdays: "Weekdays",
   Weekends: "Weekends",
@@ -62,6 +62,17 @@ const weekdays = [
 ];
 const weekends = [repeatableOptions.Saturdays, repeatableOptions.Sundays];
 
+const todaysColumns = [
+  { field: "eventTitle", headerName: "Event", width: 400 },
+  { field: "completed", headerName: "Completed?", width: 600 },
+];
+
+const allEventsColumns = [
+  { field: "eventTitle", headerName: "Event", width: 400 },
+  { field: "endDate", headerName: "Last Day", width: 200 },
+  { field: "occurences", headerName: "Remind Me", width: 400 },
+];
+
 export default class Todos extends Component {
   constructor(props) {
     super(props);
@@ -71,7 +82,7 @@ export default class Todos extends Component {
       newEventName: "",
       newEventStartDate: Date.now(),
       newEventEndDate: Date.now(),
-      newEventRepeat: [repeatableOptions.None],
+      newEventRepeat: [repeatableOptions.Everyday],
     };
   }
 
@@ -79,13 +90,12 @@ export default class Todos extends Component {
     const updateEvents = JSON.parse(
       window.localStorage.getItem("mapleHubNews")
     );
-
-    if (!updateEvents) {
-      return;
-    }
+    const calendarEvents =
+      JSON.parse(window.localStorage.getItem("mapleHubTodos")) ?? [];
 
     this.setState({
       ...this.state,
+      calendarEvents,
       events: updateEvents.sectionDetails.filter(
         (event) => event.eventTimes.length && event.eventTimes[1]
       ),
@@ -179,11 +189,6 @@ export default class Todos extends Component {
     const latestDay = selectedDays[selectedDays.length - 1];
     let newEventRepeat = selectedDays;
 
-    if (latestDay === repeatableOptions.None) {
-      newEventRepeat = [repeatableOptions.None];
-      return newEventRepeat;
-    }
-
     if (latestDay === repeatableOptions.Everyday) {
       newEventRepeat = [repeatableOptions.Everyday];
       return newEventRepeat;
@@ -192,8 +197,7 @@ export default class Todos extends Component {
     if (latestDay === repeatableOptions.Weekdays) {
       newEventRepeat = selectedDays.filter(
         (day) =>
-          !weekdays.includes(day) &&
-          ![repeatableOptions.None, repeatableOptions.Everyday].includes(day)
+          !weekdays.includes(day) && ![repeatableOptions.Everyday].includes(day)
       );
       return newEventRepeat;
     }
@@ -201,8 +205,7 @@ export default class Todos extends Component {
     if (latestDay === repeatableOptions.Weekends) {
       newEventRepeat = selectedDays.filter(
         (day) =>
-          !weekends.includes(day) &&
-          ![repeatableOptions.None, repeatableOptions.Everyday].includes(day)
+          !weekends.includes(day) && ![repeatableOptions.Everyday].includes(day)
       );
       return newEventRepeat;
     }
@@ -235,6 +238,34 @@ export default class Todos extends Component {
     });
   };
 
+  handleTodaysEventRows = () => {
+    const { calendarEvents } = this.state;
+    return calendarEvents.map((calEvent, i) => {
+      return {
+        id: i,
+        eventTitle: calEvent.subject,
+        completed: false,
+      };
+    });
+  };
+
+  handleAllEventRows = () => {
+    const { calendarEvents } = this.state;
+    return calendarEvents.map((calEvent, i) => {
+      const occuranceString =
+        calEvent.rrule.freq === "DAILY"
+          ? "DAILY"
+          : calEvent.rrule.byday.join(", ");
+
+      return {
+        id: i,
+        eventTitle: calEvent.subject,
+        occurences: occuranceString,
+        endDate: new Date(calEvent.end).toDateString(),
+      };
+    });
+  };
+
   handleAddEvent = () => {
     const {
       newEventName,
@@ -248,18 +279,12 @@ export default class Todos extends Component {
     }
 
     const { calendarEvents } = this.state;
+    const eventIsDaily =
+      newEventRepeat[0] === repeatableOptions.Everyday ||
+      newEventRepeat.length === 7;
     const actualEventName =
       typeof newEventName === "string" ? newEventName : newEventName.eventName;
-
-    if (newEventRepeat[0] === repeatableOptions.None) {
-      calendarEvents.push({
-        subject: actualEventName,
-        description: "",
-        location: "",
-        begin: new Date(newEventStartDate),
-        end: new Date(newEventEndDate),
-      });
-    } else if (newEventRepeat[0] === repeatableOptions.Everyday) {
+    if (eventIsDaily) {
       calendarEvents.push({
         subject: actualEventName,
         description: "",
@@ -289,13 +314,18 @@ export default class Todos extends Component {
       });
     }
 
+    window.localStorage.setItem(
+      "mapleHubTodos",
+      JSON.stringify(calendarEvents)
+    );
+
     this.setState({
       ...this.state,
       calendarEvents,
       newEventName: "",
       newEventStartDate: Date.now(),
       newEventEndDate: Date.now(),
-      newEventRepeat: [repeatableOptions.None],
+      newEventRepeat: [repeatableOptions.Everyday],
     });
   };
 
@@ -306,7 +336,6 @@ export default class Todos extends Component {
       newEventStartDate,
       newEventEndDate,
       newEventRepeat,
-      calendarEvents,
     } = this.state;
     return (
       <>
@@ -383,50 +412,22 @@ export default class Todos extends Component {
             <StyledButton label='Add' callback={this.handleAddEvent} />
           </AddEvents>
           <EventContainer>
-            <EventList
-              style={{
-                flex: "1 0 40%",
-              }}
-            >
-              <h2>Today's Missions</h2>
-              <TodaysEvents>
-                <EventRow>
-                  <span>Name</span>
-                  <span>Completed?</span>
-                </EventRow>
-              </TodaysEvents>
-            </EventList>
-            <EventList
-              style={{
-                flex: "1 0 60%",
-              }}
-            >
-              <h2>Your Scheduled Events</h2>
-              <TodaysEvents>
-                <EventRow>
-                  <span>Name</span>
-                  <span>Recurrence</span>
-                  <span>Until</span>
-                  <span>Delete</span>
-                </EventRow>
-                {calendarEvents.map((calEvent) => {
-                  const occuranceString = !calEvent.rrule
-                    ? "None"
-                    : calEvent.rrule.freq === "DAILY"
-                    ? "DAILY"
-                    : calEvent.rrule.byday.join(", ");
-
-                  return (
-                    <EventRow>
-                      <span>{calEvent.subject}</span>
-                      <span>{occuranceString}</span>
-                      <span>{calEvent.end.toDateString()}</span>
-                      <span>Delete</span>
-                    </EventRow>
-                  );
-                })}
-              </TodaysEvents>
-            </EventList>
+            <TableHeader>Today's Events</TableHeader>
+            <DataGrid
+              rows={this.handleTodaysEventRows()}
+              columns={todaysColumns}
+              pageSize={5}
+              checkboxSelection
+            />
+          </EventContainer>
+          <EventContainer>
+            <TableHeader>Scheduled Events</TableHeader>
+            <DataGrid
+              rows={this.handleAllEventRows()}
+              columns={allEventsColumns}
+              pageSize={5}
+              checkboxSelection
+            />
           </EventContainer>
         </Container>
       </>
@@ -441,16 +442,12 @@ const Container = styled.div`
   align-items: center;
   width: 1024px;
   margin: 40px 0;
-  /* border: 1px solid black; */
 `;
 
 const EventContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-items: center;
   width: 100%;
-  margin-top: 16px;
+  height: 400px;
+  margin: 48px 8px;
 `;
 
 const AddEvents = styled.div`
@@ -466,37 +463,9 @@ const AddEvents = styled.div`
   }
 `;
 
-const EventList = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  height: 500px;
-  width: 400px;
-`;
-
-const TodaysEvents = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  width: 100%;
-  margin: 8px 0;
-
-  & > * {
-    flex: 1 0 25%;
-  }
-`;
-
-const EventRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-items: center;
-  width: 100%;
-  & > * {
-    margin: 8px auto;
-  }
+const TableHeader = styled.h2`
+  margin: 8px auto;
+  text-align: center;
 `;
 
 const StyledTextField = styled(TextField)`
