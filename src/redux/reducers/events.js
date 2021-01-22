@@ -1,4 +1,9 @@
-import { ADD_EVENT, TOGGLE_EVENT, RESTORE_EVENTS } from "../actionTypes";
+import {
+  ADD_EVENT,
+  TOGGLE_EVENT,
+  RESTORE_EVENTS,
+  DELETE_EVENT,
+} from "../actionTypes";
 import {
   LOCAL_STORAGE_EVENT_NOTES,
   LOCAL_STORAGE_EVENT_DETAILS,
@@ -59,6 +64,22 @@ const events = (state = initialState, action) => {
         updatedStore.calendarEvents
       );
       return updatedStore;
+    }
+    case DELETE_EVENT: {
+      const { id } = action.payload;
+      const calendarEvents = { ...state.calendarEvents };
+      const eventIds = state.eventIds.slice();
+      const eventIndex = eventIds.indexOf(id);
+      if (eventIndex > -1) {
+        eventIds.splice(eventIndex, 1);
+      }
+      delete calendarEvents[id];
+
+      updateCachedCalendarEvents(LOCAL_STORAGE_EVENT_DETAILS, calendarEvents);
+      return {
+        calendarEvents,
+        eventIds,
+      };
     }
     default:
       return state;

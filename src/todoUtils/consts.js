@@ -34,6 +34,7 @@ const weekends = [repeatableOptions.Saturdays, repeatableOptions.Sundays];
 
 const todaysColumns = [
   { id: "eventTitle", numeric: false, label: "Event Name" },
+  { id: "spaceTaker", numeric: false, label: "" },
   {
     id: "isComplete",
     numeric: false,
@@ -42,9 +43,9 @@ const todaysColumns = [
 ];
 
 const allEventsColumns = [
-  { field: "eventTitle", headerName: "Event", width: 400 },
-  { field: "endDate", headerName: "Last Day", width: 200 },
-  { field: "occurences", headerName: "Remind Me", width: 400 },
+  { id: "eventTitle", label: "Event", numeric: false },
+  { id: "end", label: "Last Day", numeric: false },
+  { id: "occurences", label: "Remind Me", numeric: false },
 ];
 
 Object.freeze(repeatableOptions);

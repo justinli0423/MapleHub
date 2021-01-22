@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import styled from "styled-components";
-import moment from "moment";
 
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -18,20 +16,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import DoneAllIcon from "@material-ui/icons/DoneAll";
 
-import DateFnsUtils from "@date-io/date-fns";
-
-import Colors from "../common/colors";
-import {
-  LOCAL_STORAGE_EVENT_NOTES,
-  LOCAL_STORAGE_EVENT_DETAILS,
-} from "../common/consts";
-import ics from "../common/ics";
-
-import Title from "../components/common/Title";
-import Header from "../components/common/Header";
-import Button from "../components/common/DefaultButton";
-
-import { toggleEvent, restoreEvents } from "../redux/actions";
+import { toggleEvent } from "../redux/actions";
 import {
   getAllEventDetails,
   getEventList,
@@ -173,12 +158,11 @@ class DailyTable extends Component {
                   <TableCell padding='checkbox'>
                     <Checkbox
                       indeterminate={
-                        selected.length > 0 &&
-                        selected.length < calendarEvents.length
+                        selected.length > 0 && selected.length < eventIds.length
                       }
                       checked={
-                        calendarEvents.length > 0 &&
-                        selected.length === calendarEvents.length
+                        eventIds.length > 0 &&
+                        selected.length === eventIds.length
                       }
                       onChange={this.handleSelectAllClick}
                       inputProps={{ "aria-label": "select all events" }}
@@ -242,6 +226,7 @@ class DailyTable extends Component {
                         >
                           {calendarEvents[eventId].subject}
                         </TableCell>
+                        <TableCell align='left'>{}</TableCell>
                         <TableCell align='left'>
                           {calendarEvents[eventId].isComplete ? "Yes" : "No"}
                         </TableCell>
@@ -283,5 +268,4 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps, {
   toggleEvent,
-  restoreEvents,
 })(DailyTable);

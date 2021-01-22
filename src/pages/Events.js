@@ -19,7 +19,6 @@ import {
 
 import DateFnsUtils from "@date-io/date-fns";
 
-import Colors from "../common/colors";
 import {
   LOCAL_STORAGE_EVENT_NOTES,
   LOCAL_STORAGE_EVENT_DETAILS,
@@ -42,10 +41,9 @@ import {
   rruleOptions,
   weekdays,
   weekends,
-  todaysColumns,
-  allEventsColumns,
 } from "../todoUtils/consts";
 import DailyTable from "../todoUtils/DailyTable";
+import TotalTable from "../todoUtils/TotalTable";
 
 const filter = createFilterOptions();
 const cal = ics();
@@ -54,7 +52,6 @@ class Events extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      calendarEvents: [],
       events: [],
       newEventName: "",
       newEventStartDate: Date.now(),
@@ -218,32 +215,6 @@ class Events extends Component {
     });
   };
 
-  // handleTodaysEventRows = () => {
-  //   return this.state.calendarEvents.map((calEvent) => {
-  //     return {
-  //       id: calEvent.id,
-  //       eventTitle: calEvent.subject,
-  //       isComplete: false,
-  //     };
-  //   });
-  // };
-
-  // handleAllEventRows = () => {
-  //   return this.state.calendarEvents.map((calEvent) => {
-  //     const occuranceString =
-  //       calEvent.rrule.freq === "DAILY"
-  //         ? "DAILY"
-  //         : calEvent.rrule.byday.join(", ");
-
-  //     return {
-  //       id: calEvent.id,
-  //       eventTitle: calEvent.subject,
-  //       occurences: occuranceString,
-  //       endDate: new Date(calEvent.end).toDateString(),
-  //     };
-  //   });
-  // };
-
   handleAddEvent = () => {
     const {
       newEventName,
@@ -256,6 +227,10 @@ class Events extends Component {
 
     if (!newEventName || !newEventStartDate || !newEventEndDate) {
       return alert("Please enter all the fields for this event.");
+    }
+
+    if (newEventStartDate > newEventEndDate || newEventEndDate < Date.now()) {
+      return alert("Please adjust your dates.");
     }
 
     const eventIsDaily =
@@ -390,6 +365,9 @@ class Events extends Component {
           <EventContainer>
             <DailyTable />
           </EventContainer>
+          <EventContainer>
+            <TotalTable />
+          </EventContainer>
         </Container>
       </>
     );
@@ -423,8 +401,8 @@ const Container = styled.div`
 
 const EventContainer = styled.div`
   width: 100%;
-  height: 400px;
-  margin: 48px 8px;
+  height: auto;
+  margin: 24px 8px;
 `;
 
 const AddEvents = styled.div`
