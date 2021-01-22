@@ -37,8 +37,8 @@ const todaysColumns = [
   {
     id: "isComplete",
     numeric: false,
-    label: "Completed?"
-  }
+    label: "Completed?",
+  },
 ];
 
 const allEventsColumns = [

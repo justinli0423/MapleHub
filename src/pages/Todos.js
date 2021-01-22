@@ -230,10 +230,9 @@ export default class Todos extends Component {
   };
 
   handleTodaysEventRows = () => {
-    const { calendarEvents } = this.state;
-    return calendarEvents.map((calEvent, i) => {
+    return this.state.calendarEvents.map((calEvent) => {
       return {
-        id: i,
+        id: calEvent.id,
         eventTitle: calEvent.subject,
         isComplete: false,
       };
@@ -241,15 +240,14 @@ export default class Todos extends Component {
   };
 
   handleAllEventRows = () => {
-    const { calendarEvents } = this.state;
-    return calendarEvents.map((calEvent, i) => {
+    return this.state.calendarEvents.map((calEvent) => {
       const occuranceString =
         calEvent.rrule.freq === "DAILY"
           ? "DAILY"
           : calEvent.rrule.byday.join(", ");
 
       return {
-        id: i,
+        id: calEvent.id,
         eventTitle: calEvent.subject,
         occurences: occuranceString,
         endDate: new Date(calEvent.end).toDateString(),
@@ -263,13 +261,13 @@ export default class Todos extends Component {
       newEventStartDate,
       newEventEndDate,
       newEventRepeat,
+      calendarEvents,
     } = this.state;
 
     if (!newEventName || !newEventStartDate || !newEventEndDate) {
       return alert("Please enter all the fields for this event.");
     }
 
-    const { calendarEvents } = this.state;
     const eventIsDaily =
       newEventRepeat[0] === repeatableOptions.Everyday ||
       newEventRepeat.length === 7;
@@ -277,6 +275,7 @@ export default class Todos extends Component {
       typeof newEventName === "string" ? newEventName : newEventName.eventName;
     if (eventIsDaily) {
       calendarEvents.push({
+        id: calendarEvents.length,
         subject: actualEventName,
         description: "",
         location: "",
@@ -292,6 +291,7 @@ export default class Todos extends Component {
     } else {
       const repeatArr = newEventRepeat.map((event) => rruleOptions[event]);
       calendarEvents.push({
+        id: calendarEvents.length,
         subject: actualEventName,
         description: "",
         location: "",
@@ -319,54 +319,22 @@ export default class Todos extends Component {
     });
   };
 
-  renderEnhancedTableToolbar = (numSelected) => {
-    return (
-      <Toolbar>
-        {numSelected > 0 ? (
-          <Typography color='inherit' variant='subtitle1' component='div'>
-            {numSelected} selected
-          </Typography>
-        ) : (
-          <Typography variant='h6' id='tableTitle' component='div'>
-            The Daily Grind
-          </Typography>
-        )}
-
-        {numSelected > 0 ? (
-          <Tooltip title='Complete' onClick={this.completeEvents}>
-            <IconButton aria-label='Complete'>
-              <DoneAllIcon />
-            </IconButton>
-          </Tooltip>
-        ) : (
-          <Tooltip title='Filter list'>
-            <IconButton aria-label='filter list'>
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-        )}
-      </Toolbar>
-    );
-  };
-
   handleSelectAllClick = (event) => {
     const isChecked = event.target.checked;
 
     this.setState({
       ...this.state,
-      selected: isChecked
-        ? this.state.calendarEvents.map((n) => n.subject)
-        : [],
+      selected: isChecked ? this.state.calendarEvents.map((n) => n.id) : [],
     });
   };
 
-  handleClick = (_, subject) => {
+  handleClick = (_, id) => {
     const { selected } = this.state;
-    const selectedIndex = selected.indexOf(subject);
+    const selectedIndex = selected.indexOf(id);
     let newSelected = [];
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, subject);
+      newSelected = newSelected.concat(selected, id);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -403,10 +371,8 @@ export default class Todos extends Component {
     const { selected, calendarEvents } = this.state;
     const calendarEventsCopy = [...calendarEvents];
 
-    selected.forEach((selectedSubject) => {
-      const event = calendarEventsCopy.find(
-        (calEv) => calEv.subject === selectedSubject
-      );
+    selected.forEach((id) => {
+      const event = calendarEventsCopy.find((calEv) => calEv.id === id);
       if (event) {
         event.isComplete = !event.isComplete;
       }
@@ -493,7 +459,6 @@ export default class Todos extends Component {
             <FormControl>
               <InputLabel>Scheduled</InputLabel>
               <Select
-                labelId='demo-mutiple-name-label'
                 multiple
                 value={newEventRepeat}
                 onChange={this.handleEventRepeatChange}
@@ -514,7 +479,29 @@ export default class Todos extends Component {
           <EventContainer>
             <div>
               <Paper>
-                {this.renderEnhancedTableToolbar(selected.length)}
+                <Toolbar>
+                  {selected.length > 0 ? (
+                    <Typography
+                      color='inherit'
+                      variant='subtitle1'
+                      component='div'
+                    >
+                      {selected.length} selected
+                    </Typography>
+                  ) : (
+                    <Typography variant='h6' id='tableTitle' component='div'>
+                      The Daily Grind
+                    </Typography>
+                  )}
+
+                  {selected.length > 0 ? (
+                    <Tooltip title='Complete' onClick={this.completeEvents}>
+                      <IconButton aria-label='Complete'>
+                        <DoneAllIcon />
+                      </IconButton>
+                    </Tooltip>
+                  ) : null}
+                </Toolbar>
                 <TableContainer>
                   <Table
                     aria-labelledby='tableTitle'
@@ -557,29 +544,26 @@ export default class Todos extends Component {
                           page * rowsPerPage + rowsPerPage
                         )
                         .sort((a, b) => {
-                          if (!a.isComplete) {
+                          if (!a.isComplete && b.isComplete) {
                             return -1;
                           }
-                          if (!b.isComplete) {
+                          if (!b.isComplete && a.isComplete) {
                             return 1;
                           }
-                          return 0;
+                          return a.id - b.id;
                         })
-                        .map((event, index) => {
+                        .map((event) => {
                           const isItemSelected =
-                            selected.indexOf(event.subject) !== -1;
-                          const labelId = `enhanced-table-checkbox-${index}`;
-
+                            selected.indexOf(event.id) !== -1;
+                          const labelId = `enhanced-table-checkbox-${event.id}`;
                           return (
                             <TableRow
                               hover
-                              onClick={(_) =>
-                                this.handleClick(_, event.subject)
-                              }
+                              onClick={(_) => this.handleClick(_, event.id)}
                               role='checkbox'
                               aria-checked={isItemSelected}
                               tabIndex={-1}
-                              key={event.subject}
+                              key={event.id}
                               selected={isItemSelected}
                             >
                               <TableCell padding='checkbox'>
@@ -622,7 +606,7 @@ export default class Todos extends Component {
               </Paper>
             </div>
           </EventContainer>
-          <EventContainer>
+          {/* <EventContainer>
             <TableHeader>Scheduled Events</TableHeader>
             <DataGrid
               rows={this.handleAllEventRows()}
@@ -630,7 +614,7 @@ export default class Todos extends Component {
               pageSize={5}
               checkboxSelection
             />
-          </EventContainer>
+          </EventContainer> */}
         </Container>
       </>
     );
