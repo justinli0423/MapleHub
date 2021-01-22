@@ -24,54 +24,33 @@ import ics from "../common/ics";
 import Title from "../components/common/Title";
 import Header from "../components/common/Header";
 import Button from "../components/common/DefaultButton";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TablePagination from "@material-ui/core/TablePagination";
+import TableRow from "@material-ui/core/TableRow";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import Paper from "@material-ui/core/Paper";
+import Checkbox from "@material-ui/core/Checkbox";
+import IconButton from "@material-ui/core/IconButton";
+import Tooltip from "@material-ui/core/Tooltip";
+import DeleteIcon from "@material-ui/icons/Delete";
+import FilterListIcon from "@material-ui/icons/FilterList";
+
+import {
+  repeatableOptions,
+  rruleOptions,
+  weekdays,
+  weekends,
+  todaysColumns,
+  allEventsColumns,
+} from "../todoUtils/consts";
 
 const filter = createFilterOptions();
 const cal = ics();
-
-const repeatableOptions = {
-  Everyday: "Everyday",
-  Weekdays: "Weekdays",
-  Weekends: "Weekends",
-  Mondays: "Mondays",
-  Tuesdays: "Tuesdays",
-  Wednesdays: "Wednesdays",
-  Thursdays: "Thursdays",
-  Fridays: "Fridays",
-  Saturdays: "Saturdays",
-  Sundays: "Sundays",
-};
-
-const rruleOptions = {
-  Mondays: ["MO"],
-  Tuesdays: ["TU"],
-  Wednesdays: ["WE"],
-  Thursdays: ["TH"],
-  Fridays: ["FR"],
-  Saturdays: ["SA"],
-  Sundays: ["SU"],
-  Weekdays: ["MO", "TU", "WE", "TH", "FR"],
-  Weekends: ["SA", "SU"],
-};
-
-const weekdays = [
-  repeatableOptions.Mondays,
-  repeatableOptions.Tuesdays,
-  repeatableOptions.Wednesdays,
-  repeatableOptions.Thursdays,
-  repeatableOptions.Fridays,
-];
-const weekends = [repeatableOptions.Saturdays, repeatableOptions.Sundays];
-
-const todaysColumns = [
-  { field: "eventTitle", headerName: "Event", width: 400 },
-  { field: "completed", headerName: "Completed?", width: 600 },
-];
-
-const allEventsColumns = [
-  { field: "eventTitle", headerName: "Event", width: 400 },
-  { field: "endDate", headerName: "Last Day", width: 200 },
-  { field: "occurences", headerName: "Remind Me", width: 400 },
-];
 
 export default class Todos extends Component {
   constructor(props) {
@@ -83,6 +62,9 @@ export default class Todos extends Component {
       newEventStartDate: Date.now(),
       newEventEndDate: Date.now(),
       newEventRepeat: [repeatableOptions.Everyday],
+      selected: [],
+      page: 0,
+      rowsPerPage: 5,
     };
   }
 
@@ -96,9 +78,10 @@ export default class Todos extends Component {
     this.setState({
       ...this.state,
       calendarEvents,
-      events: updateEvents.sectionDetails.filter(
-        (event) => event.eventTimes.length && event.eventTimes[1]
-      ),
+      events: (updateEvents && updateEvents.sectionDetails.length
+        ? updateEvents.sectionDetails
+        : []
+      ).filter((event) => event.eventTimes.length && event.eventTimes[1]),
     });
   }
 
@@ -244,7 +227,7 @@ export default class Todos extends Component {
       return {
         id: i,
         eventTitle: calEvent.subject,
-        completed: false,
+        isComplete: false,
       };
     });
   };
@@ -291,6 +274,7 @@ export default class Todos extends Component {
         location: "",
         begin: new Date(newEventStartDate),
         end: new Date(newEventEndDate),
+        isComplete: false,
         rrule: {
           freq: "DAILY",
           until: new Date(newEventEndDate),
@@ -305,6 +289,7 @@ export default class Todos extends Component {
         location: "",
         begin: new Date(newEventStartDate),
         end: new Date(newEventEndDate),
+        isComplete: false,
         rrule: {
           freq: "WEEKLY",
           until: new Date(newEventEndDate),
@@ -329,14 +314,105 @@ export default class Todos extends Component {
     });
   };
 
+  createDate = (name, isComplete) => {
+    return { name, isComplete };
+  };
+
+  renderEnhancedTableToolbar = (numSelected) => {
+    return (
+      <Toolbar>
+        {numSelected > 0 ? (
+          <Typography color='inherit' variant='subtitle1' component='div'>
+            {numSelected} selected
+          </Typography>
+        ) : (
+          <Typography variant='h6' id='tableTitle' component='div'>
+            The Daily Grind
+          </Typography>
+        )}
+
+        {numSelected > 0 ? (
+          <Tooltip title='Delete'>
+            <IconButton aria-label='delete'>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <Tooltip title='Filter list'>
+            <IconButton aria-label='filter list'>
+              <FilterListIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Toolbar>
+    );
+  };
+
+  handleSelectAllClick = (event) => {
+    const isChecked = event.target.checked;
+
+    this.setState({
+      ...this.state,
+      selected: isChecked ? this.state.rows.map((n) => n.name) : [],
+    });
+  };
+
+  handleClick = (_, subject) => {
+    const { selected } = this.state;
+    const selectedIndex = selected.indexOf(subject);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, subject);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+
+    this.setState({
+      ...this.state,
+      selected: newSelected,
+    });
+  };
+
+  handleChangePage = (_, newPage) => {
+    this.setState({
+      ...this.state,
+      page: newPage,
+    });
+  };
+
+  handleChangeRowsPerPage = (event) => {
+    this.setState({
+      ...this.state,
+      rowsPerPage: parseInt(event.target.value, 10),
+      page: 0,
+    });
+  };
+
   render() {
     const {
       events,
+      calendarEvents,
+      page,
       newEventName,
       newEventStartDate,
       newEventEndDate,
       newEventRepeat,
+      rowsPerPage,
+      selected,
     } = this.state;
+
+    const emptyRows =
+      rowsPerPage -
+      Math.min(rowsPerPage, calendarEvents.length - page * rowsPerPage);
+
     return (
       <>
         <Header src={process.env.PUBLIC_URL + "/todosbanner.jpg"}>
@@ -412,13 +488,111 @@ export default class Todos extends Component {
             <StyledButton label='Add' callback={this.handleAddEvent} />
           </AddEvents>
           <EventContainer>
-            <TableHeader>Today's Events</TableHeader>
+            <div>
+              <Paper>
+                {this.renderEnhancedTableToolbar(selected.length)}
+                <TableContainer>
+                  <Table
+                    aria-labelledby='tableTitle'
+                    size={"medium"}
+                    aria-label='enhanced table'
+                  >
+                    <TableHead>
+                      <TableRow>
+                        <TableCell padding='checkbox'>
+                          <Checkbox
+                            indeterminate={
+                              selected.length > 0 &&
+                              selected.length < calendarEvents.length
+                            }
+                            checked={
+                              calendarEvents.length > 0 &&
+                              selected.length === calendarEvents.length
+                            }
+                            onChange={this.handleSelectAllClick}
+                            inputProps={{ "aria-label": "select all events" }}
+                          />
+                        </TableCell>
+                        {todaysColumns.map((headCell) => (
+                          <TableCell
+                            key={headCell.id}
+                            align='left'
+                            padding='default'
+                          >
+                            <b>{headCell.label}</b>
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {calendarEvents
+                        .slice(
+                          page * rowsPerPage,
+                          page * rowsPerPage + rowsPerPage
+                        )
+                        .map((event, index) => {
+                          const isItemSelected =
+                            selected.indexOf(event.name) !== -1;
+                          const labelId = `enhanced-table-checkbox-${index}`;
+
+                          return (
+                            <TableRow
+                              hover
+                              onClick={(event) =>
+                                this.handleClick(event, event.subject)
+                              }
+                              role='checkbox'
+                              aria-checked={isItemSelected}
+                              tabIndex={-1}
+                              key={event.name}
+                              selected={isItemSelected}
+                            >
+                              <TableCell padding='checkbox'>
+                                <Checkbox
+                                  checked={isItemSelected}
+                                  inputProps={{ "aria-labelledby": labelId }}
+                                />
+                              </TableCell>
+                              <TableCell
+                                component='th'
+                                id={labelId}
+                                scope='row'
+                                align='left'
+                              >
+                                {event.subject}
+                              </TableCell>
+                              <TableCell align='left'>
+                                {event.isComplete ? "Yes" : "No"}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      {emptyRows > 0 && (
+                        <TableRow style={{ height: 50 * emptyRows }}>
+                          <TableCell colSpan={6} />
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25]}
+                  component='div'
+                  count={calendarEvents.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onChangePage={this.handleChangePage}
+                  onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                />
+              </Paper>
+            </div>
+            {/* <TableHeader>Today's Events</TableHeader>
             <DataGrid
               rows={this.handleTodaysEventRows()}
               columns={todaysColumns}
               pageSize={5}
               checkboxSelection
-            />
+            /> */}
           </EventContainer>
           <EventContainer>
             <TableHeader>Scheduled Events</TableHeader>
