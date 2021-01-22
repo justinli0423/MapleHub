@@ -38,6 +38,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import DeleteIcon from "@material-ui/icons/Delete";
+import DoneAllIcon from "@material-ui/icons/DoneAll";
 import FilterListIcon from "@material-ui/icons/FilterList";
 
 import {
@@ -84,6 +85,13 @@ export default class Todos extends Component {
       ).filter((event) => event.eventTimes.length && event.eventTimes[1]),
     });
   }
+
+  storeOnCache = () => {
+    window.localStorage.setItem(
+      "mapleHubTodos",
+      JSON.stringify(this.state.calendarEvents)
+    );
+  };
 
   eventSelectorOnChange = (_, newValue) => {
     if (!newValue) {
@@ -299,10 +307,7 @@ export default class Todos extends Component {
       });
     }
 
-    window.localStorage.setItem(
-      "mapleHubTodos",
-      JSON.stringify(calendarEvents)
-    );
+    this.storeOnCache();
 
     this.setState({
       ...this.state,
@@ -312,10 +317,6 @@ export default class Todos extends Component {
       newEventEndDate: Date.now(),
       newEventRepeat: [repeatableOptions.Everyday],
     });
-  };
-
-  createDate = (name, isComplete) => {
-    return { name, isComplete };
   };
 
   renderEnhancedTableToolbar = (numSelected) => {
@@ -332,9 +333,9 @@ export default class Todos extends Component {
         )}
 
         {numSelected > 0 ? (
-          <Tooltip title='Delete'>
-            <IconButton aria-label='delete'>
-              <DeleteIcon />
+          <Tooltip title='Complete' onClick={this.completeEvents}>
+            <IconButton aria-label='Complete'>
+              <DoneAllIcon />
             </IconButton>
           </Tooltip>
         ) : (
@@ -353,7 +354,9 @@ export default class Todos extends Component {
 
     this.setState({
       ...this.state,
-      selected: isChecked ? this.state.rows.map((n) => n.name) : [],
+      selected: isChecked
+        ? this.state.calendarEvents.map((n) => n.subject)
+        : [],
     });
   };
 
@@ -394,6 +397,28 @@ export default class Todos extends Component {
       rowsPerPage: parseInt(event.target.value, 10),
       page: 0,
     });
+  };
+
+  completeEvents = () => {
+    const { selected, calendarEvents } = this.state;
+    const calendarEventsCopy = [...calendarEvents];
+
+    selected.forEach((selectedSubject) => {
+      const event = calendarEventsCopy.find(
+        (calEv) => calEv.subject === selectedSubject
+      );
+      if (event) {
+        event.isComplete = !event.isComplete;
+      }
+    });
+
+    this.setState({
+      ...this.state,
+      calendarEvents: calendarEventsCopy,
+      selected: [],
+    });
+
+    this.storeOnCache();
   };
 
   render() {
@@ -438,7 +463,6 @@ export default class Todos extends Component {
                 <StyledTextField {...params} label='Event Name' />
               )}
             />
-
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <StyledKeyboardDatePicker
                 disableToolbar
@@ -467,7 +491,7 @@ export default class Todos extends Component {
             </MuiPickersUtilsProvider>
 
             <FormControl>
-              <InputLabel>Repeat?</InputLabel>
+              <InputLabel>Scheduled</InputLabel>
               <Select
                 labelId='demo-mutiple-name-label'
                 multiple
@@ -515,9 +539,11 @@ export default class Todos extends Component {
                         </TableCell>
                         {todaysColumns.map((headCell) => (
                           <TableCell
+                            style={{
+                              width: "800px",
+                            }}
                             key={headCell.id}
                             align='left'
-                            padding='default'
                           >
                             <b>{headCell.label}</b>
                           </TableCell>
@@ -530,21 +556,30 @@ export default class Todos extends Component {
                           page * rowsPerPage,
                           page * rowsPerPage + rowsPerPage
                         )
+                        .sort((a, b) => {
+                          if (!a.isComplete) {
+                            return -1;
+                          }
+                          if (!b.isComplete) {
+                            return 1;
+                          }
+                          return 0;
+                        })
                         .map((event, index) => {
                           const isItemSelected =
-                            selected.indexOf(event.name) !== -1;
+                            selected.indexOf(event.subject) !== -1;
                           const labelId = `enhanced-table-checkbox-${index}`;
 
                           return (
                             <TableRow
                               hover
-                              onClick={(event) =>
-                                this.handleClick(event, event.subject)
+                              onClick={(_) =>
+                                this.handleClick(_, event.subject)
                               }
                               role='checkbox'
                               aria-checked={isItemSelected}
                               tabIndex={-1}
-                              key={event.name}
+                              key={event.subject}
                               selected={isItemSelected}
                             >
                               <TableCell padding='checkbox'>
@@ -586,13 +621,6 @@ export default class Todos extends Component {
                 />
               </Paper>
             </div>
-            {/* <TableHeader>Today's Events</TableHeader>
-            <DataGrid
-              rows={this.handleTodaysEventRows()}
-              columns={todaysColumns}
-              pageSize={5}
-              checkboxSelection
-            /> */}
           </EventContainer>
           <EventContainer>
             <TableHeader>Scheduled Events</TableHeader>
