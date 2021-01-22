@@ -2,8 +2,14 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import { Modal } from "@material-ui/core";
 
-import { EventTypes, Keywords, NodeNames, FilterTypes } from "../common/Consts";
-import Colors from "../common/Colors";
+import {
+  EventTypes,
+  Keywords,
+  NodeNames,
+  FilterTypes,
+  LOCAL_STORAGE_EVENT_NOTES,
+} from "../common/consts";
+import Colors from "../common/colors";
 
 import Button from "../components/common/DefaultButton";
 import Title from "../components/common/Title";
@@ -293,7 +299,9 @@ export default class Home extends Component {
   }
 
   componentDidMount() {
-    const newsDetails = JSON.parse(localStorage.getItem("mapleHubNews"));
+    const newsDetails = JSON.parse(
+      localStorage.getItem(LOCAL_STORAGE_EVENT_NOTES)
+    );
     if (newsDetails) {
       this.setState({
         ...this.state,
@@ -382,7 +390,7 @@ export default class Home extends Component {
       },
       () => {
         window.localStorage.setItem(
-          "mapleHubNews",
+          LOCAL_STORAGE_EVENT_NOTES,
           JSON.stringify(this.state.newsDetails)
         );
       }

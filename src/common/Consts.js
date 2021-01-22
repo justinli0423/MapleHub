@@ -48,6 +48,9 @@ const LegionRanks = {
   SSS: "SSS",
 };
 
+const LOCAL_STORAGE_EVENT_DETAILS = "mapleHubEventDetails";
+const LOCAL_STORAGE_EVENT_NOTES = "mapleHubEventNotes";
+
 Object.freeze(NodeNames);
 Object.freeze(Keywords);
 Object.freeze(EventTypes);
@@ -55,4 +58,13 @@ Object.freeze(FilterTypes);
 Object.freeze(Classes);
 Object.freeze(LegionRanks);
 
-export { NodeNames, Keywords, EventTypes, FilterTypes, Classes, LegionRanks };
+export {
+  NodeNames,
+  Keywords,
+  EventTypes,
+  FilterTypes,
+  Classes,
+  LegionRanks,
+  LOCAL_STORAGE_EVENT_DETAILS,
+  LOCAL_STORAGE_EVENT_NOTES,
+};

@@ -3,7 +3,7 @@ import styled, { css } from "styled-components";
 
 import LegionStore from "../legionUtils/LegionStore";
 
-import Colors from "../common/Colors";
+import Colors from "../common/colors";
 
 import Title from "../components/common/Title";
 import Header from "../components/common/Header";

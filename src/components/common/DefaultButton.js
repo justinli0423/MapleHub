@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Button } from "@material-ui/core";
 import { StylesProvider } from "@material-ui/core/styles";
 
-import Colors from "../../common/Colors";
+import Colors from "../../common/colors";
 
 const StyledButton = styled(Button)`
   color: white;

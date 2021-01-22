@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 import PingServer from "../serverUtils/PingServer";
 
-import Colors from "./../common/Colors";
+import Colors from "./../common/colors";
 
 const statusWidth = 150;
 const statusHeight = 16;

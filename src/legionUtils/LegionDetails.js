@@ -1,4 +1,4 @@
-import { Classes, LegionRanks } from "../common/Consts";
+import { Classes, LegionRanks } from "../common/consts";
 
 const Coords = {
   first: [

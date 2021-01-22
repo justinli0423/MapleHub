@@ -10,7 +10,7 @@ import styled from "styled-components";
 import Home from "../pages/Home";
 import ServerStatus from "../pages/ServerStatus";
 import Legion from "../pages/Legion";
-import Todos from "../pages/Todos";
+import Events from "../pages/Events";
 
 export default function Nav() {
   return (
@@ -40,10 +40,10 @@ export default function Nav() {
               Legion Board
             </Item>
           </StyledLink> */}
-          <StyledLink exact to='/todos'>
+          <StyledLink exact to='/reminders'>
             <Item>
               <ActiveBar />
-              Todos
+              Reminders
             </Item>
           </StyledLink>
           {/* <Item>
@@ -63,8 +63,8 @@ export default function Nav() {
           <Route path='/status'>
             <ServerStatus />
           </Route>
-          <Route path='/todos'>
-            <Todos />
+          <Route path='/reminders'>
+            <Events />
           </Route>
           <Route path='/'>
             <Home />

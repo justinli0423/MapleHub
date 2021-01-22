@@ -5,10 +5,10 @@ import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { StylesProvider } from "@material-ui/core/styles";
 
-import Colors from "../common/Colors";
+import Colors from "../common/colors";
 
 import { LegionDetails, LegionClasses } from "../legionUtils/LegionDetails";
-import { Classes } from "../common/Consts";
+import { Classes } from "../common/consts";
 
 export default class LegionNav extends React.Component {
   handleAutocompleteInputChange(_, val) {

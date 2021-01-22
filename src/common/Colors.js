@@ -1,4 +1,4 @@
-import { Classes } from "../common/Consts";
+import { Classes } from "./consts";
 
 const Colors = {
   MapleRed: "#b60d0d",

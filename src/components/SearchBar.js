@@ -5,7 +5,7 @@ import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { StylesProvider } from "@material-ui/core/styles";
 
-import Colors from "../common/Colors";
+import Colors from "../common/colors";
 
 export default class SearchBar extends React.Component {
   handleAutocompleteInputChange(ev, val) {

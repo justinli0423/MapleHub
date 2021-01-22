@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import styled, { keyframes, css } from "styled-components";
 
-import { EventTypes, FilterTypes } from "../common/Consts";
-import Colors from "../common/Colors";
+import { EventTypes, FilterTypes } from "../common/consts";
+import Colors from "../common/colors";
 
 import ArrowDownIcon from "../icons/chevron-down-solid.svg";
 import ArrowUpIcon from "../icons/chevron-up-solid.svg";

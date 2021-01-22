@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import Colors from "../../common/Colors";
+import Colors from "../../common/colors";
 
 const Header = styled.h1`
   padding: 72px 0 24px 0;

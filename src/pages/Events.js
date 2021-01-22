@@ -1,7 +1,8 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import styled from "styled-components";
-import "react-big-calendar/lib/css/react-big-calendar.css";
 import moment from "moment";
+
 import TextField from "@material-ui/core/TextField";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -15,31 +16,26 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
-import { DataGrid } from "@material-ui/data-grid";
+
 import DateFnsUtils from "@date-io/date-fns";
 
-import Colors from "../common/Colors";
+import Colors from "../common/colors";
+import {
+  LOCAL_STORAGE_EVENT_NOTES,
+  LOCAL_STORAGE_EVENT_DETAILS,
+} from "../common/consts";
 import ics from "../common/ics";
 
 import Title from "../components/common/Title";
 import Header from "../components/common/Header";
 import Button from "../components/common/DefaultButton";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TablePagination from "@material-ui/core/TablePagination";
-import TableRow from "@material-ui/core/TableRow";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import Paper from "@material-ui/core/Paper";
-import Checkbox from "@material-ui/core/Checkbox";
-import IconButton from "@material-ui/core/IconButton";
-import Tooltip from "@material-ui/core/Tooltip";
-import DeleteIcon from "@material-ui/icons/Delete";
-import DoneAllIcon from "@material-ui/icons/DoneAll";
-import FilterListIcon from "@material-ui/icons/FilterList";
+
+import { toggleEvent, addEvent, restoreEvents } from "../redux/actions";
+import {
+  getAllEventDetails,
+  getEventList,
+  getEventsStore,
+} from "../redux/selectors";
 
 import {
   repeatableOptions,
@@ -49,11 +45,12 @@ import {
   todaysColumns,
   allEventsColumns,
 } from "../todoUtils/consts";
+import DailyTable from "../todoUtils/DailyTable";
 
 const filter = createFilterOptions();
 const cal = ics();
 
-export default class Todos extends Component {
+class Events extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -63,35 +60,27 @@ export default class Todos extends Component {
       newEventStartDate: Date.now(),
       newEventEndDate: Date.now(),
       newEventRepeat: [repeatableOptions.Everyday],
-      selected: [],
-      page: 0,
-      rowsPerPage: 5,
     };
   }
 
   componentDidMount() {
     const updateEvents = JSON.parse(
-      window.localStorage.getItem("mapleHubNews")
+      window.localStorage.getItem(LOCAL_STORAGE_EVENT_NOTES)
     );
     const calendarEvents =
-      JSON.parse(window.localStorage.getItem("mapleHubTodos")) ?? [];
+      JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_EVENT_DETAILS)) ??
+      {};
+
+    this.props.restoreEvents(calendarEvents, Object.keys(calendarEvents));
 
     this.setState({
       ...this.state,
-      calendarEvents,
       events: (updateEvents && updateEvents.sectionDetails.length
         ? updateEvents.sectionDetails
         : []
       ).filter((event) => event.eventTimes.length && event.eventTimes[1]),
     });
   }
-
-  storeOnCache = () => {
-    window.localStorage.setItem(
-      "mapleHubTodos",
-      JSON.stringify(this.state.calendarEvents)
-    );
-  };
 
   eventSelectorOnChange = (_, newValue) => {
     if (!newValue) {
@@ -229,31 +218,31 @@ export default class Todos extends Component {
     });
   };
 
-  handleTodaysEventRows = () => {
-    return this.state.calendarEvents.map((calEvent) => {
-      return {
-        id: calEvent.id,
-        eventTitle: calEvent.subject,
-        isComplete: false,
-      };
-    });
-  };
+  // handleTodaysEventRows = () => {
+  //   return this.state.calendarEvents.map((calEvent) => {
+  //     return {
+  //       id: calEvent.id,
+  //       eventTitle: calEvent.subject,
+  //       isComplete: false,
+  //     };
+  //   });
+  // };
 
-  handleAllEventRows = () => {
-    return this.state.calendarEvents.map((calEvent) => {
-      const occuranceString =
-        calEvent.rrule.freq === "DAILY"
-          ? "DAILY"
-          : calEvent.rrule.byday.join(", ");
+  // handleAllEventRows = () => {
+  //   return this.state.calendarEvents.map((calEvent) => {
+  //     const occuranceString =
+  //       calEvent.rrule.freq === "DAILY"
+  //         ? "DAILY"
+  //         : calEvent.rrule.byday.join(", ");
 
-      return {
-        id: calEvent.id,
-        eventTitle: calEvent.subject,
-        occurences: occuranceString,
-        endDate: new Date(calEvent.end).toDateString(),
-      };
-    });
-  };
+  //     return {
+  //       id: calEvent.id,
+  //       eventTitle: calEvent.subject,
+  //       occurences: occuranceString,
+  //       endDate: new Date(calEvent.end).toDateString(),
+  //     };
+  //   });
+  // };
 
   handleAddEvent = () => {
     const {
@@ -261,8 +250,9 @@ export default class Todos extends Component {
       newEventStartDate,
       newEventEndDate,
       newEventRepeat,
-      calendarEvents,
     } = this.state;
+
+    const { eventIds } = this.props;
 
     if (!newEventName || !newEventStartDate || !newEventEndDate) {
       return alert("Please enter all the fields for this event.");
@@ -271,11 +261,12 @@ export default class Todos extends Component {
     const eventIsDaily =
       newEventRepeat[0] === repeatableOptions.Everyday ||
       newEventRepeat.length === 7;
+    // TODO: how does newEventName become an object? fix it
     const actualEventName =
       typeof newEventName === "string" ? newEventName : newEventName.eventName;
     if (eventIsDaily) {
-      calendarEvents.push({
-        id: calendarEvents.length,
+      this.props.addEvent({
+        id: eventIds.length,
         subject: actualEventName,
         description: "",
         location: "",
@@ -290,8 +281,8 @@ export default class Todos extends Component {
       });
     } else {
       const repeatArr = newEventRepeat.map((event) => rruleOptions[event]);
-      calendarEvents.push({
-        id: calendarEvents.length,
+      this.props.addEvent({
+        id: eventIds.length,
         subject: actualEventName,
         description: "",
         location: "",
@@ -307,11 +298,8 @@ export default class Todos extends Component {
       });
     }
 
-    this.storeOnCache();
-
     this.setState({
       ...this.state,
-      calendarEvents,
       newEventName: "",
       newEventStartDate: Date.now(),
       newEventEndDate: Date.now(),
@@ -319,90 +307,14 @@ export default class Todos extends Component {
     });
   };
 
-  handleSelectAllClick = (event) => {
-    const isChecked = event.target.checked;
-
-    this.setState({
-      ...this.state,
-      selected: isChecked ? this.state.calendarEvents.map((n) => n.id) : [],
-    });
-  };
-
-  handleClick = (_, id) => {
-    const { selected } = this.state;
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-
-    this.setState({
-      ...this.state,
-      selected: newSelected,
-    });
-  };
-
-  handleChangePage = (_, newPage) => {
-    this.setState({
-      ...this.state,
-      page: newPage,
-    });
-  };
-
-  handleChangeRowsPerPage = (event) => {
-    this.setState({
-      ...this.state,
-      rowsPerPage: parseInt(event.target.value, 10),
-      page: 0,
-    });
-  };
-
-  completeEvents = () => {
-    const { selected, calendarEvents } = this.state;
-    const calendarEventsCopy = [...calendarEvents];
-
-    selected.forEach((id) => {
-      const event = calendarEventsCopy.find((calEv) => calEv.id === id);
-      if (event) {
-        event.isComplete = !event.isComplete;
-      }
-    });
-
-    this.setState({
-      ...this.state,
-      calendarEvents: calendarEventsCopy,
-      selected: [],
-    });
-
-    this.storeOnCache();
-  };
-
   render() {
     const {
       events,
-      calendarEvents,
-      page,
       newEventName,
       newEventStartDate,
       newEventEndDate,
       newEventRepeat,
-      rowsPerPage,
-      selected,
     } = this.state;
-
-    const emptyRows =
-      rowsPerPage -
-      Math.min(rowsPerPage, calendarEvents.length - page * rowsPerPage);
 
     return (
       <>
@@ -455,7 +367,6 @@ export default class Todos extends Component {
                 }}
               />
             </MuiPickersUtilsProvider>
-
             <FormControl>
               <InputLabel>Scheduled</InputLabel>
               <Select
@@ -477,149 +388,29 @@ export default class Todos extends Component {
             <StyledButton label='Add' callback={this.handleAddEvent} />
           </AddEvents>
           <EventContainer>
-            <div>
-              <Paper>
-                <Toolbar>
-                  {selected.length > 0 ? (
-                    <Typography
-                      color='inherit'
-                      variant='subtitle1'
-                      component='div'
-                    >
-                      {selected.length} selected
-                    </Typography>
-                  ) : (
-                    <Typography variant='h6' id='tableTitle' component='div'>
-                      The Daily Grind
-                    </Typography>
-                  )}
-
-                  {selected.length > 0 ? (
-                    <Tooltip title='Complete' onClick={this.completeEvents}>
-                      <IconButton aria-label='Complete'>
-                        <DoneAllIcon />
-                      </IconButton>
-                    </Tooltip>
-                  ) : null}
-                </Toolbar>
-                <TableContainer>
-                  <Table
-                    aria-labelledby='tableTitle'
-                    size={"medium"}
-                    aria-label='enhanced table'
-                  >
-                    <TableHead>
-                      <TableRow>
-                        <TableCell padding='checkbox'>
-                          <Checkbox
-                            indeterminate={
-                              selected.length > 0 &&
-                              selected.length < calendarEvents.length
-                            }
-                            checked={
-                              calendarEvents.length > 0 &&
-                              selected.length === calendarEvents.length
-                            }
-                            onChange={this.handleSelectAllClick}
-                            inputProps={{ "aria-label": "select all events" }}
-                          />
-                        </TableCell>
-                        {todaysColumns.map((headCell) => (
-                          <TableCell
-                            style={{
-                              width: "800px",
-                            }}
-                            key={headCell.id}
-                            align='left'
-                          >
-                            <b>{headCell.label}</b>
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {calendarEvents
-                        .slice(
-                          page * rowsPerPage,
-                          page * rowsPerPage + rowsPerPage
-                        )
-                        .sort((a, b) => {
-                          if (!a.isComplete && b.isComplete) {
-                            return -1;
-                          }
-                          if (!b.isComplete && a.isComplete) {
-                            return 1;
-                          }
-                          return a.id - b.id;
-                        })
-                        .map((event) => {
-                          const isItemSelected =
-                            selected.indexOf(event.id) !== -1;
-                          const labelId = `enhanced-table-checkbox-${event.id}`;
-                          return (
-                            <TableRow
-                              hover
-                              onClick={(_) => this.handleClick(_, event.id)}
-                              role='checkbox'
-                              aria-checked={isItemSelected}
-                              tabIndex={-1}
-                              key={event.id}
-                              selected={isItemSelected}
-                            >
-                              <TableCell padding='checkbox'>
-                                <Checkbox
-                                  checked={isItemSelected}
-                                  inputProps={{ "aria-labelledby": labelId }}
-                                />
-                              </TableCell>
-                              <TableCell
-                                component='th'
-                                id={labelId}
-                                scope='row'
-                                align='left'
-                              >
-                                {event.subject}
-                              </TableCell>
-                              <TableCell align='left'>
-                                {event.isComplete ? "Yes" : "No"}
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      {emptyRows > 0 && (
-                        <TableRow style={{ height: 50 * emptyRows }}>
-                          <TableCell colSpan={6} />
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25]}
-                  component='div'
-                  count={calendarEvents.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onChangePage={this.handleChangePage}
-                  onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                />
-              </Paper>
-            </div>
+            <DailyTable />
           </EventContainer>
-          {/* <EventContainer>
-            <TableHeader>Scheduled Events</TableHeader>
-            <DataGrid
-              rows={this.handleAllEventRows()}
-              columns={allEventsColumns}
-              pageSize={5}
-              checkboxSelection
-            />
-          </EventContainer> */}
         </Container>
       </>
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  const eventStore = getEventsStore(state);
+  const calendarEvents = getAllEventDetails(eventStore);
+  const eventIds = getEventList(eventStore);
+  return {
+    calendarEvents,
+    eventIds,
+  };
+};
+
+export default connect(mapStateToProps, {
+  addEvent,
+  toggleEvent,
+  restoreEvents,
+})(Events);
 
 const Container = styled.div`
   display: flex;
@@ -647,11 +438,6 @@ const AddEvents = styled.div`
   & > * {
     flex: 1 0 20%;
   }
-`;
-
-const TableHeader = styled.h2`
-  margin: 8px auto;
-  text-align: center;
 `;
 
 const StyledTextField = styled(TextField)`
