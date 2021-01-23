@@ -199,6 +199,12 @@ class TotalTable extends Component {
                           id={labelId}
                           scope='row'
                           align='left'
+                          style={{
+                            textDecoration:
+                              rruleObj.options.until < Date.now()
+                                ? "line-through"
+                                : undefined,
+                          }}
                         >
                           {calendarEvents[eventId].subject}
                         </TableCell>

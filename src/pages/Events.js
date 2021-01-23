@@ -55,8 +55,8 @@ class Events extends Component {
     this.state = {
       events: [],
       newEventName: "",
-      newEventStartDate: Date.now(),
-      newEventEndDate: Date.now(),
+      newEventStartDate: moment().second(0).minute(0).hour(0).valueOf(),
+      newEventEndDate: moment().second(59).minute(59).hour(23).valueOf(),
       newEventRepeat: [repeatableOptions.Everyday],
     };
   }
@@ -150,7 +150,7 @@ class Events extends Component {
   };
 
   setStartDate = (date) => {
-    const newEventStartDate = moment(date).second(0).minute(0).hour(0);
+    const newEventStartDate = moment(date).second(0).minute(0).hour(0).valueOf();
     this.setState({
       ...this.state,
       newEventStartDate,
@@ -158,7 +158,7 @@ class Events extends Component {
   };
 
   setEndDate = (date) => {
-    const newEventEndDate = moment(date).second(59).minute(59).hour(23);
+    const newEventEndDate = moment(date).second(59).minute(59).hour(23).valueOf();
     this.setState({
       ...this.state,
       newEventEndDate,
@@ -242,7 +242,7 @@ class Events extends Component {
       typeof newEventName === "string" ? newEventName : newEventName.eventName;
     if (eventIsDaily) {
       this.props.addEvent({
-        id: `${actualEventName.replaceAll(' ', '_')}#${Date.now()}`,
+        id: `${actualEventName.replaceAll(" ", "_")}#${Date.now()}`,
         subject: actualEventName,
         rrule: new RRule({
           freq: RRule.DAILY,
@@ -253,7 +253,7 @@ class Events extends Component {
     } else {
       const repeatArr = newEventRepeat.map((event) => rruleOptions[event]);
       this.props.addEvent({
-        id: `${actualEventName.replaceAll(' ', '_')}#${Date.now()}`,
+        id: `${actualEventName.replaceAll(" ", "_")}#${Date.now()}`,
         subject: actualEventName,
         rrule: new RRule({
           freq: RRule.WEEKLY,
@@ -267,8 +267,8 @@ class Events extends Component {
     this.setState({
       ...this.state,
       newEventName: "",
-      newEventStartDate: Date.now(),
-      newEventEndDate: Date.now(),
+      newEventStartDate: moment().second(0).minute(0).hour(0).valueOf(),
+      newEventEndDate: moment().second(59).minute(59).hour(23).valueOf(),
       newEventRepeat: [repeatableOptions.Everyday],
     });
   };

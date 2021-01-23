@@ -1,16 +1,16 @@
+import moment from "moment";
 import {
   ADD_EVENT,
   TOGGLE_EVENT,
   RESTORE_EVENTS,
   DELETE_EVENT,
 } from "../actionTypes";
-import {
-  LOCAL_STORAGE_EVENT_NOTES,
-  LOCAL_STORAGE_EVENT_DETAILS,
-} from "../../common/consts";
+import { LOCAL_STORAGE_EVENT_DETAILS } from "../../common/consts";
 
 const initialState = {
-  calendarEvents: {},
+  calendarEvents: {
+    lastUpdatedTime: Date.now(),
+  },
   eventIds: [],
 };
 
@@ -22,6 +22,18 @@ const events = (state = initialState, action) => {
   switch (action.type) {
     case RESTORE_EVENTS: {
       const { calendarEvents, eventIds } = action.payload;
+      const { lastUpdatedTime } = calendarEvents;
+      const today = moment().day();
+      const lastUpdatedDay = moment(lastUpdatedTime).day();
+      eventIds.splice(eventIds.indexOf("lastUpdatedTime"), 1);
+
+      if (today !== lastUpdatedDay) {
+        calendarEvents.lastUpdatedTime = Date.now();
+        eventIds.forEach((id) => {
+          calendarEvents[id].isComplete = false;
+        });
+      }
+
       return {
         ...state,
         calendarEvents,
@@ -53,6 +65,7 @@ const events = (state = initialState, action) => {
         ...state,
         calendarEvents: {
           ...state.calendarEvents,
+          lastUpdatedTime: Date.now(),
           [id]: {
             ...state.calendarEvents[id],
             isComplete: isComplete ?? !state.calendarEvents[id].isComplete,
