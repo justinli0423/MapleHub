@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
+import { RRule, rrulestr } from "rrule";
+
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -23,18 +25,13 @@ import {
   getEventsStore,
 } from "../redux/selectors";
 
-import { repeatableOptions, allEventsColumns } from "../todoUtils/consts";
+import { allEventsColumns } from "../todoUtils/consts";
 
 class TotalTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
       calendarEvents: [],
-      events: [],
-      newEventName: "",
-      newEventStartDate: Date.now(),
-      newEventEndDate: Date.now(),
-      newEventRepeat: [repeatableOptions.Everyday],
       selected: [],
       page: 0,
       rowsPerPage: 5,
@@ -99,10 +96,10 @@ class TotalTable extends Component {
     });
   };
 
+  // TODO: use rrule.toText()??
   handleEventReoccurenceText = (calEvent) => {
-    return calEvent.rrule.freq === "DAILY"
-      ? "DAILY"
-      : calEvent.rrule.byday.join(", ");
+    const rruleObj = rrulestr(calEvent.rrule);
+    return rruleObj.toText();
   };
 
   render() {
@@ -178,6 +175,7 @@ class TotalTable extends Component {
                   .map((eventId) => {
                     const isItemSelected = selected.indexOf(eventId) !== -1;
                     const labelId = `enhanced-table-checkbox-${eventId}`;
+                    const rruleObj = rrulestr(calendarEvents[eventId].rrule);
                     return (
                       <TableRow
                         hover
@@ -203,9 +201,12 @@ class TotalTable extends Component {
                           {calendarEvents[eventId].subject}
                         </TableCell>
                         <TableCell align='left'>
-                          {new Date(calendarEvents[eventId].end).toDateString()}
+                          {rruleObj.options.until.toDateString()}
                         </TableCell>
-                        <TableCell align='left'>
+                        <TableCell
+                          align='left'
+                          style={{ textTransform: "capitalize" }}
+                        >
                           {this.handleEventReoccurenceText(
                             calendarEvents[eventId]
                           )}

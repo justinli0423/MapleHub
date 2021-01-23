@@ -18,23 +18,18 @@ import DoneAllIcon from "@material-ui/icons/DoneAll";
 
 import { toggleEvent } from "../redux/actions";
 import {
+  getActiveEventIds,
   getAllEventDetails,
-  getEventList,
   getEventsStore,
 } from "../redux/selectors";
 
-import { repeatableOptions, todaysColumns } from "../todoUtils/consts";
+import { todaysColumns } from "../todoUtils/consts";
 
 class DailyTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
       calendarEvents: [],
-      events: [],
-      newEventName: "",
-      newEventStartDate: Date.now(),
-      newEventEndDate: Date.now(),
-      newEventRepeat: [repeatableOptions.Everyday],
       selected: [],
       page: 0,
       rowsPerPage: 5,
@@ -259,7 +254,7 @@ class DailyTable extends Component {
 const mapStateToProps = (state) => {
   const eventStore = getEventsStore(state);
   const calendarEvents = getAllEventDetails(eventStore);
-  const eventIds = getEventList(eventStore);
+  const eventIds = getActiveEventIds(eventStore);
   return {
     calendarEvents,
     eventIds,

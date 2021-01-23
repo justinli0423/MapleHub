@@ -1,3 +1,5 @@
+import { RRule } from 'rrule'
+
 const repeatableOptions = {
   Everyday: "Everyday",
   Weekdays: "Weekdays",
@@ -12,15 +14,15 @@ const repeatableOptions = {
 };
 
 const rruleOptions = {
-  Mondays: ["MO"],
-  Tuesdays: ["TU"],
-  Wednesdays: ["WE"],
-  Thursdays: ["TH"],
-  Fridays: ["FR"],
-  Saturdays: ["SA"],
-  Sundays: ["SU"],
-  Weekdays: ["MO", "TU", "WE", "TH", "FR"],
-  Weekends: ["SA", "SU"],
+  Mondays: [RRule.MO],
+  Tuesdays: [RRule.TU],
+  Wednesdays: [RRule.WE],
+  Thursdays: [RRule.TH],
+  Fridays: [RRule.FR],
+  Saturdays: [RRule.SA],
+  Sundays: [RRule.SU],
+  Weekdays: [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR],
+  Weekends: [RRule.SA, RRule.SU],
 };
 
 const weekdays = [

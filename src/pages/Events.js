@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
+import { RRule } from "rrule";
 import moment from "moment";
 
 import TextField from "@material-ui/core/TextField";
@@ -229,47 +230,37 @@ class Events extends Component {
       return alert("Please enter all the fields for this event.");
     }
 
-    if (newEventStartDate > newEventEndDate || newEventEndDate < Date.now()) {
+    if (newEventStartDate > newEventEndDate) {
       return alert("Please adjust your dates.");
     }
 
     const eventIsDaily =
       newEventRepeat[0] === repeatableOptions.Everyday ||
       newEventRepeat.length === 7;
-    // TODO: how does newEventName become an object? fix it
+    // TODO: how did newEventName become an object? fix it
     const actualEventName =
       typeof newEventName === "string" ? newEventName : newEventName.eventName;
     if (eventIsDaily) {
       this.props.addEvent({
         id: eventIds.length,
         subject: actualEventName,
-        description: "",
-        location: "",
-        begin: new Date(newEventStartDate),
-        end: new Date(newEventEndDate),
-        isComplete: false,
-        rrule: {
-          freq: "DAILY",
+        rrule: new RRule({
+          freq: RRule.DAILY,
+          dtstart: new Date(newEventStartDate),
           until: new Date(newEventEndDate),
-          interval: 1,
-        },
+        }).toString(),
       });
     } else {
       const repeatArr = newEventRepeat.map((event) => rruleOptions[event]);
       this.props.addEvent({
         id: eventIds.length,
         subject: actualEventName,
-        description: "",
-        location: "",
-        begin: new Date(newEventStartDate),
-        end: new Date(newEventEndDate),
-        isComplete: false,
-        rrule: {
-          freq: "WEEKLY",
+        rrule: new RRule({
+          freq: RRule.WEEKLY,
+          dtstart: new Date(newEventStartDate),
           until: new Date(newEventEndDate),
-          interval: 1,
-          byday: repeatArr.flat(),
-        },
+          byweekday: repeatArr.flat(),
+        }).toString(),
       });
     }
 
