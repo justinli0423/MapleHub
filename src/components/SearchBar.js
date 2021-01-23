@@ -39,7 +39,9 @@ export default class SearchBar extends React.Component {
             <PillContainer key={i}>
               <Tooltip>{filter.tooltip}</Tooltip>
               <FilterPill
-                src={filter.icon}
+                src={
+                  filter.isActive ? filter.selectedIcon : filter.deselectedIcon
+                }
                 isActive={filter.isActive}
                 onClick={() => {
                   filter.callback(filter.filterType);
@@ -74,8 +76,14 @@ const FilterPillsContainer = styled.div`
 
 const FilterPill = styled.img`
   cursor: pointer;
-  width: ${({ isActive }) => (isActive ? "28px" : "20px")};
-  height: ${({ isActive }) => (isActive ? "28px" : "20px")};
+  width: 20px;
+  height: 20px;
+  padding: 8px 24px;
+  border-radius: 5px;
+  border: ${({ isActive }) =>
+    isActive
+      ? `2px solid ${Colors.Black}`
+      : `2px solid ${Colors.BackgroundGrey}`};
 `;
 
 const Tooltip = styled.div`
@@ -120,10 +128,6 @@ const PillContainer = styled.div`
   justify-content: center;
   padding: 4px 8px;
   background: ${({ isActive }) => (isActive ? "red" : "transparent")};
-
-  &:hover ${FilterPill} {
-    transform: scale(1.4);
-  }
 
   &:hover ${Tooltip} {
     opacity: 1;

@@ -17,11 +17,16 @@ import Header from "../components/common/Header";
 import EventTile from "../components/EventTile";
 import SearchBar from "../components/SearchBar";
 
-import MultiEventIcon from "../icons/tasks-solid.svg";
-import ActiveEventIcon from "../icons/hourglass-start-solid.svg";
-import FutureEventIcon from "../icons/fast-forward-solid.svg";
-import PastEventIcon from "../icons/history-solid.svg";
-import PermanentEventIcon from "../icons/infinity-solid.svg";
+import MultiEventSelectedIcon from "../icons/tasks-solid.svg";
+import ActiveEventSelectedIcon from "../icons/hourglass-start-solid.svg";
+import FutureEventSelectedIcon from "../icons/fast-forward-solid.svg";
+import PastEventSelectedIcon from "../icons/history-solid.svg";
+import PermanentEventSelectedIcon from "../icons/infinity-solid.svg";
+import MultiEventUnselectedIcon from "../icons/tasks-grey.svg";
+import ActiveEventUnselectedIcon from "../icons/hourglass-start-grey.svg";
+import FutureEventUnselectedIcon from "../icons/fast-forward-grey.svg";
+import PastEventUnselectedIcon from "../icons/history-grey.svg";
+import PermanentEventUnselectedIcon from "../icons/infinity-grey.svg";
 
 const HTMLQuickValidate = (str) => {
   const doc = new DOMParser().parseFromString(str, "text/html");
@@ -238,7 +243,6 @@ export default class Home extends Component {
       isModalActive: false,
       filterValue: "",
       modalInputText: null,
-      // TODO: break HTML apart -> store the object into localStorage instead
       newsDetails: {
         backupBanner: process.env.PUBLIC_URL + "/testbanner.png",
         bannerURL: null,
@@ -256,7 +260,8 @@ export default class Home extends Component {
         {
           name: "updatesAndPatches",
           tooltip: "Updates and Patches",
-          icon: PermanentEventIcon,
+          selectedIcon: PermanentEventSelectedIcon,
+          deselectedIcon: PermanentEventUnselectedIcon,
           filterType: FilterTypes.UPDATES_PATCHES,
           isActive: false,
           callback: this.handleFilterToggle.bind(this),
@@ -264,7 +269,8 @@ export default class Home extends Component {
         {
           name: "activeEvents",
           tooltip: "Active Events",
-          icon: ActiveEventIcon,
+          selectedIcon: ActiveEventSelectedIcon,
+          deselectedIcon: ActiveEventUnselectedIcon,
           filterType: FilterTypes.ACTIVE_EVENTS,
           isActive: false,
           callback: this.handleFilterToggle.bind(this),
@@ -272,7 +278,8 @@ export default class Home extends Component {
         {
           name: "multiEvents",
           tooltip: "Multiple Events",
-          icon: MultiEventIcon,
+          selectedIcon: MultiEventSelectedIcon,
+          deselectedIcon: MultiEventUnselectedIcon,
           filterType: FilterTypes.MULTIPLE_EVENTS,
           isActive: false,
           callback: this.handleFilterToggle.bind(this),
@@ -280,7 +287,8 @@ export default class Home extends Component {
         {
           name: "futureEvents",
           tooltip: "Future Events",
-          icon: FutureEventIcon,
+          selectedIcon: FutureEventSelectedIcon,
+          deselectedIcon: FutureEventUnselectedIcon,
           filterType: FilterTypes.FUTURE_EVENTS,
           isActive: false,
           callback: this.handleFilterToggle.bind(this),
@@ -288,7 +296,8 @@ export default class Home extends Component {
         {
           name: "pastEvents",
           tooltip: "Past Events",
-          icon: PastEventIcon,
+          selectedIcon: PastEventSelectedIcon,
+          deselectedIcon: PastEventUnselectedIcon,
           filterType: FilterTypes.PAST_EVENTS,
           isActive: false,
           callback: this.handleFilterToggle.bind(this),
@@ -397,25 +406,6 @@ export default class Home extends Component {
     );
   }
 
-  renderModalBody() {
-    return (
-      <ModalContainer>
-        <div>
-          <h2>Steps:</h2>
-          <ol>
-            <li>Open patch notes</li>
-            <li>
-              Right click anywhere on the page and select 'View Page Source'
-            </li>
-            <li>Copy the entire page (Ctrl + A) and paste below!</li>
-          </ol>
-        </div>
-
-        <ModalTextArea onChange={this.handleModalInputChange.bind(this)} />
-      </ModalContainer>
-    );
-  }
-
   renderHeader() {
     const { newsDetails } = this.state;
     const src = newsDetails.bannerURL ?? newsDetails.backupBanner;
@@ -432,7 +422,20 @@ export default class Home extends Component {
           aria-labelledby='simple-modal-title'
           aria-describedby='simple-modal-description'
         >
-          {this.renderModalBody()}
+          <ModalContainer>
+            <div>
+              <h2>Steps:</h2>
+              <ol>
+                <li>Open patch notes</li>
+                <li>
+                  Right click anywhere on the page and select 'View Page Source'
+                </li>
+                <li>Copy the entire page (Ctrl + A) and paste below!</li>
+              </ol>
+            </div>
+
+            <ModalTextArea onChange={this.handleModalInputChange.bind(this)} />
+          </ModalContainer>
         </Modal>
       </Header>
     );
@@ -493,7 +496,7 @@ const ModalContainer = styled.div`
 const ModalTextArea = styled.textarea`
   width: 400px;
   height: 300px;
-  background: ${Colors.BackgroundGrey};
+  background: ${Colors.White};
 `;
 
 const LastUpdatedHeader = styled.h2`
