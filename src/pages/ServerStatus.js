@@ -33,7 +33,7 @@ export default class ServerStatus extends Component {
       isNaN(parseInt(latencyThreshold)) ||
       latencyThreshold < 700
     ) {
-      alert("Values should ideally be > 700");
+      alert("Values should be more than 700ms");
       return;
     }
     this.setState({
@@ -80,10 +80,11 @@ export default class ServerStatus extends Component {
               </ServerName>
               <ControlsContainer>
                 <TextField
-                  label='Latency Threshold'
+                  label='Latency Threshold (ms)'
                   style={{
                     marginRight: "24px",
                     height: "56px",
+                    width: "180px",
                   }}
                   defaultValue={latencyThreshold}
                   onChange={this.deboundInput}

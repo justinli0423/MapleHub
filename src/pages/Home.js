@@ -362,7 +362,7 @@ export default class Home extends Component {
     if (!sectionDetails || !sectionDetails.length) {
       return (
         <EventEmptyIntro>
-          No Events found, click the button above to get started!
+          No Events found, click <b>UPDATE NEWS HUB</b> above to get started!
         </EventEmptyIntro>
       );
     }
