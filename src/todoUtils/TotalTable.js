@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
-import { RRule, rrulestr } from "rrule";
+import { rrulestr } from "rrule";
 
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";

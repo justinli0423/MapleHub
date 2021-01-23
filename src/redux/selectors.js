@@ -1,5 +1,5 @@
 import moment from "moment";
-import { RRule, RRuleSet, rrulestr } from "rrule";
+import { rrulestr } from "rrule";
 
 export const getEventsStore = (store) => store.events;
 

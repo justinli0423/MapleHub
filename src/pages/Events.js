@@ -226,8 +226,6 @@ class Events extends Component {
       newEventRepeat,
     } = this.state;
 
-    const { eventIds } = this.props;
-
     if (!newEventName || !newEventStartDate || !newEventEndDate) {
       return alert("Please enter all the fields for this event.");
     }
