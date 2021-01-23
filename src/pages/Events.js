@@ -150,7 +150,11 @@ class Events extends Component {
   };
 
   setStartDate = (date) => {
-    const newEventStartDate = moment(date).second(0).minute(0).hour(0).valueOf();
+    const newEventStartDate = moment(date)
+      .second(0)
+      .minute(0)
+      .hour(0)
+      .valueOf();
     this.setState({
       ...this.state,
       newEventStartDate,
@@ -158,7 +162,11 @@ class Events extends Component {
   };
 
   setEndDate = (date) => {
-    const newEventEndDate = moment(date).second(59).minute(59).hour(23).valueOf();
+    const newEventEndDate = moment(date)
+      .second(59)
+      .minute(59)
+      .hour(23)
+      .valueOf();
     this.setState({
       ...this.state,
       newEventEndDate,
@@ -296,11 +304,15 @@ class Events extends Component {
               options={events}
               value={newEventName}
               onChange={this.eventSelectorOnChange}
+              onClose={(ev) => {
+                this.eventSelectorOnChange(ev, ev.target.value);
+              }}
               filterOptions={this.eventFilterOptions}
               getOptionLabel={this.eventGetOptionLabel}
               renderOption={(option) => option.eventName}
+              autoHighlight
               selectOnFocus
-              clearOnBlur
+              clearOnBlur={false}
               handleHomeEndKeys
               freeSolo
               renderInput={(params) => (
