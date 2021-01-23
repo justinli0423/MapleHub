@@ -149,14 +149,16 @@ class Events extends Component {
     return option.eventName;
   };
 
-  setStartDate = (newEventStartDate) => {
+  setStartDate = (date) => {
+    const newEventStartDate = moment(date).second(0).minute(0).hour(0);
     this.setState({
       ...this.state,
       newEventStartDate,
     });
   };
 
-  setEndDate = (newEventEndDate) => {
+  setEndDate = (date) => {
+    const newEventEndDate = moment(date).second(59).minute(59).hour(23);
     this.setState({
       ...this.state,
       newEventEndDate,
@@ -242,7 +244,7 @@ class Events extends Component {
       typeof newEventName === "string" ? newEventName : newEventName.eventName;
     if (eventIsDaily) {
       this.props.addEvent({
-        id: eventIds.length,
+        id: `${actualEventName.replaceAll(' ', '_')}#${Date.now()}`,
         subject: actualEventName,
         rrule: new RRule({
           freq: RRule.DAILY,
@@ -253,7 +255,7 @@ class Events extends Component {
     } else {
       const repeatArr = newEventRepeat.map((event) => rruleOptions[event]);
       this.props.addEvent({
-        id: eventIds.length,
+        id: `${actualEventName.replaceAll(' ', '_')}#${Date.now()}`,
         subject: actualEventName,
         rrule: new RRule({
           freq: RRule.WEEKLY,

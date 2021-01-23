@@ -168,8 +168,10 @@ class TotalTable extends Component {
                 {eventIds
                   .sort(
                     (a, b) =>
-                      new Date(calendarEvents[a].end).getTime() -
-                      new Date(calendarEvents[b].end).getTime()
+                      new Date(
+                        rrulestr(calendarEvents[a].rrule).options.until
+                      ) -
+                      new Date(rrulestr(calendarEvents[b].rrule).options.until)
                   )
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((eventId) => {
