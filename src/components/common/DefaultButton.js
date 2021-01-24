@@ -1,18 +1,10 @@
-import styled from "styled-components";
-
 import { Button } from "@material-ui/core";
 import { StylesProvider } from "@material-ui/core/styles";
 
 import Colors from "../../common/colors";
 
-const StyledButton = styled(Button)({
-  color: "white",
-  margin: "24px 0 40px",
-  fontSize: "16px",
-  fontWeight: "normal",
-  background: Colors.MapleRed,
-});
-
+// styled components not rendering consistently
+// using inline instead
 function DefaultButton({
   className,
   label = "Button",
@@ -21,15 +13,22 @@ function DefaultButton({
   },
 }) {
   return (
-    <StylesProvider injectFirst>
-      <StyledButton
-        variant='contained'
-        onClick={callback}
-        className={className}
-      >
-        {label}
-      </StyledButton>
-    </StylesProvider>
+    <Button
+      variant='contained'
+      onClick={callback}
+      className={className}
+      style={{
+        color: "white",
+        margin: "24px 0 40px",
+        fontSize: "16px",
+        padding: "6px 14px",
+        fontWeight: "normal",
+        borderRadius: "8px",
+        background: Colors.MapleRed,
+      }}
+    >
+      {label}
+    </Button>
   );
 }
 
