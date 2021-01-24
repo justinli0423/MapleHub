@@ -1,6 +1,4 @@
 import { Button } from "@material-ui/core";
-import { StylesProvider } from "@material-ui/core/styles";
-
 import Colors from "../../common/colors";
 
 // styled components not rendering consistently
