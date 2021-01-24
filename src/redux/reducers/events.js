@@ -26,6 +26,7 @@ const resetTodaysEvents = (originalCalEvs, originalEvIds) => {
   const { lastUpdatedTime } = calendarEvents;
   const today = moment().utc().date();
   const lastUpdatedDay = moment(lastUpdatedTime).utc().date();
+  const startOfToday = moment().utc().second(0).minute(0).hour(0);
   const endOfToday = moment().utc().second(59).minute(59).hour(23);
   const eventTimeStampIndex = eventIds.indexOf("lastUpdatedTime");
 
@@ -38,10 +39,9 @@ const resetTodaysEvents = (originalCalEvs, originalEvIds) => {
     calendarEvents.lastUpdatedTime = Date.now();
     eventIds.forEach((id) => {
       // reset rruleObj start date to today to remove any past dates from list
-      const rruleObj = {
-        ...rrulestr(calendarEvents[id].rrule),
-        dtstart: Date.now(),
-      };
+      const rruleObj = rrulestr(calendarEvents[id].rrule);
+      rruleObj.options.dtstart = new Date(startOfToday.valueOf());
+      rruleObj.origOptions.dtstart = new Date(startOfToday.valueOf());
       calendarEvents[id].rrule = rruleObj.toString();
       if (rruleObj.options.freq === RRule.DAILY) {
         calendarEvents[id].isComplete = false;
