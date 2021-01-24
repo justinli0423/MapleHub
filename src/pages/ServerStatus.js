@@ -54,7 +54,7 @@ export default class ServerStatus extends Component {
 
     newTimer = setTimeout(() => {
       this.handleLatencyThreshold(parseInt(value));
-    }, 600);
+    }, 1000);
 
     this.setState({
       timer: newTimer,

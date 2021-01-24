@@ -92,15 +92,14 @@ const ActiveStatus = styled.div`
   right: 0;
   width: ${({ threshold, latency }) => {
     const ratio = latency / threshold;
-    if (ratio >= 1) {
+    if (ratio >= 0.995) {
       return 0;
     } else {
-      return `${(1 - ratio) * (statusWidth - 10)}px`;
+      return `${Math.max(7, (1 - ratio) * (statusWidth - 10))}px`;
     }
   }};
   height: ${statusHeight}px;
   background: ${Colors.White};
-  box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.25);
   border-radius: 0 10px 10px 0;
 `;
 
@@ -116,7 +115,7 @@ const StatusBar = styled.div`
     ${Colors.StatusBar.Yellow} 50%,
     ${Colors.StatusBar.Red} 100%
   );
-  box-shadow: 1px 2px 1px rgba(0, 0, 0, 0.25);
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
 `;
 
