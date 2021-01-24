@@ -25,6 +25,8 @@ import {
   getEventsStore,
 } from "../redux/selectors";
 
+import Colors from "../common/colors";
+
 import { allEventsColumns } from "../todoUtils/consts";
 
 class TotalTable extends Component {
@@ -200,6 +202,10 @@ class TotalTable extends Component {
                           scope='row'
                           align='left'
                           style={{
+                            color:
+                              rruleObj.options.until < Date.now()
+                                ? Colors.BackgroundGrey
+                                : undefined,
                             textDecoration:
                               rruleObj.options.until < Date.now()
                                 ? "line-through"

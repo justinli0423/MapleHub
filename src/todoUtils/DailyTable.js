@@ -32,6 +32,8 @@ import {
   getEventsStore,
 } from "../redux/selectors";
 
+import Colors from "../common/colors";
+
 import { todaysColumns } from "../todoUtils/consts";
 
 class DailyTable extends Component {
@@ -313,6 +315,9 @@ class DailyTable extends Component {
                           scope='row'
                           align='left'
                           style={{
+                            color: calendarEvents[eventId].isComplete
+                              ? Colors.BackgroundGrey
+                              : undefined,
                             textDecoration: calendarEvents[eventId].isComplete
                               ? "line-through"
                               : undefined,
