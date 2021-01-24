@@ -8,8 +8,8 @@ export const getAllEventDetails = (store) => store.calendarEvents;
 export const getEventList = (store) => store.eventIds;
 
 export const getActiveEventIds = (store) => {
-  const today = moment().utc().day(6).second(0).minute(0).hour(0);
-  const endOfToday = moment().utc().day(6).second(59).minute(59).hour(23);
+  const today = moment().utc().second(0).minute(0).hour(0);
+  const endOfToday = moment().utc().second(59).minute(59).hour(23);
   const weekday = today.weekday();
   const events = store.calendarEvents;
   const eventIds = store.eventIds;
