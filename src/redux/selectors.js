@@ -8,7 +8,8 @@ export const getAllEventDetails = (store) => store.calendarEvents;
 export const getEventList = (store) => store.eventIds;
 
 export const getActiveEventIds = (store) => {
-  const today = moment().utc().second(0).minute(0).hour(0);
+  const today = moment().utc().day(6).second(0).minute(0).hour(0);
+  const endOfToday = moment().utc().day(6).second(59).minute(59).hour(23);
   const weekday = today.weekday();
   const events = store.calendarEvents;
   const eventIds = store.eventIds;
@@ -20,14 +21,17 @@ export const getActiveEventIds = (store) => {
       return;
     }
 
+    // query for first date that either matches the weekday
+    // or skip if the dates aren't matching
     const allDates = rruleObj.all();
-    const isTodayActive = allDates.find((date) => {
-      const momentDate = moment(date).utc();
-      return momentDate.weekday() === weekday;
-    });
-
-    if (isTodayActive) {
-      activeEventIds.push(id);
+    for (let i = 0; i < allDates.length; i++) {
+      const date = moment(allDates[i]).utc();
+      if (date > endOfToday) {
+        return;
+      }
+      if (date.weekday() === weekday) {
+        return activeEventIds.push(id);
+      }
     }
   });
 
