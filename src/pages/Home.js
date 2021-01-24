@@ -426,9 +426,9 @@ export default class Home extends Component {
             <div>
               <h2>Steps:</h2>
               <ol>
-                <li>Open patch notes</li>
+                <li>Open patch notes from the Official Maplestory Website.</li>
                 <li>
-                  Right click anywhere on the page and select 'View Page Source'
+                  Right click anywhere on the page and select 'View Page Source'.
                 </li>
                 <li>Copy the entire page (Ctrl + A) and paste below!</li>
               </ol>
@@ -483,7 +483,7 @@ const ModalContainer = styled.div`
   align-items: center;
   width: 600px;
   height: 300px;
-  padding: 8px 0;
+  padding: 24px 0;
   outline: none;
   background: ${Colors.White};
   border-radius: 5px;
