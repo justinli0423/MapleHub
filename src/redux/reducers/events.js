@@ -6,6 +6,7 @@ import {
   DELETE_EVENT,
   RESET_EVENTS,
 } from "../actionTypes";
+import { RRule, rrulestr } from "rrule";
 import { LOCAL_STORAGE_EVENT_DETAILS } from "../../common/consts";
 
 const initialState = {
@@ -19,40 +20,75 @@ const updateCachedCalendarEvents = (type, data) => {
   window.localStorage.setItem(type, JSON.stringify(data));
 };
 
+const resetTodaysEvents = (originalCalEvs, originalEvIds) => {
+  const calendarEvents = { ...originalCalEvs };
+  const eventIds = originalEvIds.slice();
+  const { lastUpdatedTime } = calendarEvents;
+  const today = moment().utc().date();
+  const lastUpdatedDay = moment(lastUpdatedTime).utc().date();
+  const endOfToday = moment().utc().second(59).minute(59).hour(23);
+  const eventTimeStampIndex = eventIds.indexOf("lastUpdatedTime");
+
+  if (eventTimeStampIndex > -1) {
+    eventIds.splice(eventTimeStampIndex, 1);
+  }
+
+  if (today !== lastUpdatedDay) {
+    // new day: check if any events should be reset
+    calendarEvents.lastUpdatedTime = Date.now();
+    eventIds.forEach((id) => {
+      // reset rruleObj start date to today to remove any past dates from list
+      const rruleObj = {
+        ...rrulestr(calendarEvents[id].rrule),
+        dtstart: Date.now(),
+      };
+      calendarEvents[id].rrule = rruleObj.toString();
+      if (rruleObj.options.freq === RRule.DAILY) {
+        calendarEvents[id].isComplete = false;
+      } else {
+        const allDates = rruleObj.all();
+        for (let i = 0; i < allDates.length; i++) {
+          const date = moment(allDates[i]).utc();
+          // do not reset if the reset date is in the future
+          if (date > endOfToday) {
+            return;
+          }
+          // if the date matches today then reset completion
+          if (date.date() === today) {
+            calendarEvents[id].isComplete = false;
+            return;
+          }
+        }
+      }
+    });
+  }
+  return {
+    eventIds,
+    calendarEvents,
+  };
+};
+
 const events = (state = initialState, action) => {
   switch (action.type) {
     case RESTORE_EVENTS: {
       const { calendarEvents, eventIds } = action.payload;
-      const { lastUpdatedTime } = calendarEvents;
-      const today = moment().utc().day();
-      const lastUpdatedDay = moment(lastUpdatedTime).utc().day();
-      eventIds.splice(eventIds.indexOf("lastUpdatedTime"), 1);
-
-      if (today !== lastUpdatedDay) {
-        calendarEvents.lastUpdatedTime = Date.now();
-        eventIds.forEach((id) => {
-          calendarEvents[id].isComplete = false;
-        });
-      }
-
       return {
         ...state,
-        calendarEvents,
-        eventIds,
+        ...resetTodaysEvents(calendarEvents, eventIds),
       };
     }
     case RESET_EVENTS: {
-      const calendarEvents = { ...state.calendarEvents };
-      calendarEvents.lastUpdatedTime = Date.now();
-      state.eventIds.forEach((id) => {
-        calendarEvents[id].isComplete = false;
-      });
+      const newEventObject = resetTodaysEvents(
+        state.calendarEvents,
+        state.eventIds
+      );
+      updateCachedCalendarEvents(
+        LOCAL_STORAGE_EVENT_DETAILS,
+        newEventObject.calendarEvents
+      );
       return {
         ...state,
-        calendarEvents: {
-          ...state.calendarEvents,
-          lastUpdatedTime: Date.now(),
-        },
+        ...newEventObject,
       };
     }
     case ADD_EVENT: {

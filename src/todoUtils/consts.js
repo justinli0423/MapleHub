@@ -1,4 +1,4 @@
-import { RRule } from 'rrule'
+import { RRule } from "rrule";
 
 const repeatableOptions = {
   Everyday: "Everyday",
@@ -45,9 +45,9 @@ const todaysColumns = [
 ];
 
 const allEventsColumns = [
-  { id: "eventTitle", label: "Event", numeric: false },
+  { id: "eventTitle", label: "Event Name", numeric: false },
   { id: "end", label: "Last Day", numeric: false },
-  { id: "occurences", label: "Remind Me", numeric: false },
+  { id: "occurences", label: "Reset On", numeric: false },
 ];
 
 Object.freeze(repeatableOptions);

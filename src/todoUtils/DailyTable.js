@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import moment from "moment";
+import { rrulestr } from "rrule";
 
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -149,7 +150,7 @@ class DailyTable extends Component {
     const { serverTime } = this.state;
     const curTime = Date.now();
 
-    if (moment(curTime).utc().day() !== moment(serverTime).utc().day()) {
+    if (moment(curTime).utc().date() !== moment(serverTime).utc().date()) {
       this.setState({
         ...this.state,
         serverTime: new Date(),
@@ -161,6 +162,27 @@ class DailyTable extends Component {
         serverTime: new Date(),
       });
     }
+  };
+
+  sortHandler = (id1, id2) => {
+    const { calendarEvents } = this.props;
+    const eventOneDates = rrulestr(calendarEvents[id1].rrule).all();
+    const eventTwoDates = rrulestr(calendarEvents[id2].rrule).all();
+
+    if (!calendarEvents[id1].isComplete && calendarEvents[id2].isComplete) {
+      return -1;
+    }
+    if (!calendarEvents[id2].isComplete && calendarEvents[id1].isComplete) {
+      return 1;
+    }
+
+    if (eventOneDates.length > 0 && eventTwoDates.length > 0) {
+      // compare the first date: will always be the future date because past dates
+      // gets filtered on render everytime
+      return eventOneDates[0] - eventTwoDates[0];
+    }
+
+    return id1 - id2;
   };
 
   renderResetDialog() {
@@ -264,21 +286,7 @@ class DailyTable extends Component {
               </TableHead>
               <TableBody>
                 {eventIds
-                  .sort((a, b) => {
-                    if (
-                      !calendarEvents[a].isComplete &&
-                      calendarEvents[b].isComplete
-                    ) {
-                      return -1;
-                    }
-                    if (
-                      !calendarEvents[b].isComplete &&
-                      calendarEvents[a].isComplete
-                    ) {
-                      return 1;
-                    }
-                    return a - b;
-                  })
+                  .sort(this.sortHandler)
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((eventId) => {
                     const isItemSelected = selected.indexOf(eventId) !== -1;
@@ -304,6 +312,11 @@ class DailyTable extends Component {
                           id={labelId}
                           scope='row'
                           align='left'
+                          style={{
+                            textDecoration: calendarEvents[eventId].isComplete
+                              ? "line-through"
+                              : undefined,
+                          }}
                         >
                           {calendarEvents[eventId].subject}
                         </TableCell>
