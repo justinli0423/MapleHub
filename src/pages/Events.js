@@ -55,8 +55,8 @@ class Events extends Component {
     this.state = {
       events: [],
       newEventName: "",
-      newEventStartDate: moment().second(0).minute(0).hour(0).valueOf(),
-      newEventEndDate: moment().second(59).minute(59).hour(23).valueOf(),
+      newEventStartDate: moment().utc().second(0).minute(0).hour(0).valueOf(),
+      newEventEndDate: moment().utc().second(59).minute(59).hour(23).valueOf(),
       newEventRepeat: [repeatableOptions.Everyday],
     };
   }
@@ -151,6 +151,7 @@ class Events extends Component {
 
   setStartDate = (date) => {
     const newEventStartDate = moment(date)
+      .utc()
       .second(0)
       .minute(0)
       .hour(0)
@@ -163,6 +164,7 @@ class Events extends Component {
 
   setEndDate = (date) => {
     const newEventEndDate = moment(date)
+      .utc()
       .second(59)
       .minute(59)
       .hour(23)
@@ -254,8 +256,8 @@ class Events extends Component {
         subject: actualEventName,
         rrule: new RRule({
           freq: RRule.DAILY,
-          dtstart: new Date(newEventStartDate),
-          until: new Date(newEventEndDate),
+          dtstart: new Date(Date.UTC(newEventStartDate)),
+          until: new Date(Date.UTC(newEventEndDate)),
         }).toString(),
       });
     } else {
@@ -265,8 +267,8 @@ class Events extends Component {
         subject: actualEventName,
         rrule: new RRule({
           freq: RRule.WEEKLY,
-          dtstart: new Date(newEventStartDate),
-          until: new Date(newEventEndDate),
+          dtstart: new Date(Date.UTC(newEventStartDate)),
+          until: new Date(Date.UTC(newEventEndDate)),
           byweekday: repeatArr.flat(),
         }).toString(),
       });
@@ -275,8 +277,8 @@ class Events extends Component {
     this.setState({
       ...this.state,
       newEventName: "",
-      newEventStartDate: moment().second(0).minute(0).hour(0).valueOf(),
-      newEventEndDate: moment().second(59).minute(59).hour(23).valueOf(),
+      newEventStartDate: moment().utc().second(0).minute(0).hour(0).valueOf(),
+      newEventEndDate: moment().utc().second(59).minute(59).hour(23).valueOf(),
       newEventRepeat: [repeatableOptions.Everyday],
     });
   };

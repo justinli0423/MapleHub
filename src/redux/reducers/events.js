@@ -23,7 +23,7 @@ const events = (state = initialState, action) => {
     case RESTORE_EVENTS: {
       const { calendarEvents, eventIds } = action.payload;
       const { lastUpdatedTime } = calendarEvents;
-      const today = moment().day();
+      const today = moment().utc().day();
       const lastUpdatedDay = moment(lastUpdatedTime).day();
       eventIds.splice(eventIds.indexOf("lastUpdatedTime"), 1);
 

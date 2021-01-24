@@ -8,7 +8,7 @@ export const getAllEventDetails = (store) => store.calendarEvents;
 export const getEventList = (store) => store.eventIds;
 
 export const getActiveEventIds = (store) => {
-  const today = moment().second(0).minute(0).hour(0);
+  const today = moment().utc().second(0).minute(0).hour(0);
   const weekday = today.weekday();
   const events = store.calendarEvents;
   const eventIds = store.eventIds;
@@ -17,7 +17,7 @@ export const getActiveEventIds = (store) => {
   eventIds.forEach((id) => {
     const rruleObj = rrulestr(events[id].rrule);
 
-    if (moment(rruleObj.options.until) < today) {
+    if (moment(rruleObj.options.until).utc() < today) {
       return;
     }
 
