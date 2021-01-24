@@ -2,6 +2,7 @@ import {
   ADD_EVENT,
   TOGGLE_EVENT,
   RESTORE_EVENTS,
+  RESET_EVENTS,
   DELETE_EVENT,
 } from "./actionTypes";
 
@@ -29,3 +30,7 @@ export const deleteEvent = (id) => ({
   type: DELETE_EVENT,
   payload: { id },
 });
+
+export const resetEvents = () => ({
+  type: RESET_EVENTS
+})

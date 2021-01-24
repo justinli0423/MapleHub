@@ -23,7 +23,7 @@ export const getActiveEventIds = (store) => {
 
     const allDates = rruleObj.all();
     const isTodayActive = allDates.find((date) => {
-      const momentDate = moment(date);
+      const momentDate = moment(date).utc();
       return momentDate.weekday() === weekday;
     });
     if (isTodayActive) {

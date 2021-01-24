@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import moment from "moment";
 
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -16,7 +17,14 @@ import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import DoneAllIcon from "@material-ui/icons/DoneAll";
 
-import { toggleEvent } from "../redux/actions";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+
+import { toggleEvent, resetEvents } from "../redux/actions";
 import {
   getActiveEventIds,
   getAllEventDetails,
@@ -33,8 +41,9 @@ class DailyTable extends Component {
       selected: [],
       page: 0,
       rowsPerPage: 5,
-      serverTime: new Date(),
+      serverTime: Date.now(),
       timerHandler: null,
+      isActiveResetDialog: false,
     };
   }
 
@@ -129,12 +138,65 @@ class DailyTable extends Component {
     });
   };
 
-  setTimer = () => {
+  handleCloseDialog = () => {
     this.setState({
       ...this.state,
-      serverTime: new Date(),
+      isActiveResetDialog: false,
     });
   };
+
+  setTimer = () => {
+    const { serverTime } = this.state;
+    const curTime = Date.now();
+
+    if (moment(curTime).utc().day() !== moment(serverTime).utc().day()) {
+      this.setState({
+        ...this.state,
+        serverTime: new Date(),
+        isActiveResetDialog: true,
+      });
+    } else {
+      this.setState({
+        ...this.state,
+        serverTime: new Date(),
+      });
+    }
+  };
+
+  renderResetDialog() {
+    return (
+      <div>
+        <Dialog
+          open={this.state.isActiveResetDialog}
+          onClose={this.handleCloseDialog}
+          aria-labelledby='alert-dialog-title'
+          aria-describedby='alert-dialog-description'
+        >
+          <DialogTitle id='alert-dialog-title'>{"Daily Reset"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id='alert-dialog-description'>
+              It's a new day! Would you like to reset your dailies?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleCloseDialog} color='primary'>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                this.props.resetEvents();
+                this.handleCloseDialog();
+              }}
+              color='primary'
+              autoFocus
+            >
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    );
+  }
 
   render() {
     const { page, rowsPerPage, selected, serverTime } = this.state;
@@ -144,6 +206,7 @@ class DailyTable extends Component {
 
     return (
       <div>
+        {this.renderResetDialog()}
         <Paper>
           <Toolbar>
             {selected.length > 0 ? (
@@ -152,7 +215,8 @@ class DailyTable extends Component {
               </Typography>
             ) : (
               <Typography variant='h6' id='tableTitle' component='div'>
-                The Daily Grind - {serverTime.toUTCString()}
+                The Daily Grind -{" "}
+                {moment(serverTime).utc().format("ddd, MMM Do YYYY, h:mm:ss a")}
               </Typography>
             )}
 
@@ -285,4 +349,5 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps, {
   toggleEvent,
+  resetEvents,
 })(DailyTable);

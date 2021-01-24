@@ -256,8 +256,8 @@ class Events extends Component {
         subject: actualEventName,
         rrule: new RRule({
           freq: RRule.DAILY,
-          dtstart: new Date(Date.UTC(newEventStartDate)),
-          until: new Date(Date.UTC(newEventEndDate)),
+          dtstart: new Date(newEventStartDate),
+          until: new Date(newEventEndDate),
         }).toString(),
       });
     } else {
@@ -267,8 +267,8 @@ class Events extends Component {
         subject: actualEventName,
         rrule: new RRule({
           freq: RRule.WEEKLY,
-          dtstart: new Date(Date.UTC(newEventStartDate)),
-          until: new Date(Date.UTC(newEventEndDate)),
+          dtstart: new Date(newEventStartDate),
+          until: new Date(newEventEndDate),
           byweekday: repeatArr.flat(),
         }).toString(),
       });

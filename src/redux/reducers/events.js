@@ -4,6 +4,7 @@ import {
   TOGGLE_EVENT,
   RESTORE_EVENTS,
   DELETE_EVENT,
+  RESET_EVENTS,
 } from "../actionTypes";
 import { LOCAL_STORAGE_EVENT_DETAILS } from "../../common/consts";
 
@@ -24,7 +25,7 @@ const events = (state = initialState, action) => {
       const { calendarEvents, eventIds } = action.payload;
       const { lastUpdatedTime } = calendarEvents;
       const today = moment().utc().day();
-      const lastUpdatedDay = moment(lastUpdatedTime).day();
+      const lastUpdatedDay = moment(lastUpdatedTime).utc().day();
       eventIds.splice(eventIds.indexOf("lastUpdatedTime"), 1);
 
       if (today !== lastUpdatedDay) {
@@ -38,6 +39,20 @@ const events = (state = initialState, action) => {
         ...state,
         calendarEvents,
         eventIds,
+      };
+    }
+    case RESET_EVENTS: {
+      const calendarEvents = { ...state.calendarEvents };
+      calendarEvents.lastUpdatedTime = Date.now();
+      state.eventIds.forEach((id) => {
+        calendarEvents[id].isComplete = false;
+      });
+      return {
+        ...state,
+        calendarEvents: {
+          ...state.calendarEvents,
+          lastUpdatedTime: Date.now(),
+        },
       };
     }
     case ADD_EVENT: {
