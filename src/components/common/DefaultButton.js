@@ -5,13 +5,13 @@ import { StylesProvider } from "@material-ui/core/styles";
 
 import Colors from "../../common/colors";
 
-const StyledButton = styled(Button)`
-  color: white;
-  margin: 24px 0 40px;
-  font-size: 16px;
-  font-weight: normal;
-  background: ${Colors.MapleRed};
-`;
+const StyledButton = styled(Button)({
+  color: "white",
+  margin: "24px 0 40px",
+  fontSize: "16px",
+  fontWeight: "normal",
+  background: Colors.MapleRed,
+});
 
 function DefaultButton({
   className,
