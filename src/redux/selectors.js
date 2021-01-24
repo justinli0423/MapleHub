@@ -16,7 +16,6 @@ export const getActiveEventIds = (store) => {
 
   eventIds.forEach((id) => {
     const rruleObj = rrulestr(events[id].rrule);
-
     if (moment(rruleObj.options.until).utc() < today) {
       return;
     }
@@ -26,6 +25,7 @@ export const getActiveEventIds = (store) => {
       const momentDate = moment(date).utc();
       return momentDate.weekday() === weekday;
     });
+
     if (isTodayActive) {
       activeEventIds.push(id);
     }

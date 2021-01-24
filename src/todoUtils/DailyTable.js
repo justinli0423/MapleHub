@@ -216,7 +216,7 @@ class DailyTable extends Component {
             ) : (
               <Typography variant='h6' id='tableTitle' component='div'>
                 The Daily Grind -{" "}
-                {moment(serverTime).utc().format("ddd, MMM Do YYYY, h:mm:ss a")}
+                {moment(serverTime).utc().format("ddd MMM Do, h:mm:ss a")}
               </Typography>
             )}
 
