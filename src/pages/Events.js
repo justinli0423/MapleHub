@@ -305,7 +305,9 @@ class Events extends Component {
               value={newEventName}
               onChange={this.eventSelectorOnChange}
               onClose={(ev) => {
-                this.eventSelectorOnChange(ev, ev.target.value);
+                if (typeof ev.target.value === "string") {
+                  this.eventSelectorOnChange(ev, ev.target.value);
+                }
               }}
               filterOptions={this.eventFilterOptions}
               getOptionLabel={this.eventGetOptionLabel}

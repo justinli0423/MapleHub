@@ -33,7 +33,22 @@ class DailyTable extends Component {
       selected: [],
       page: 0,
       rowsPerPage: 5,
+      serverTime: new Date(),
+      timerHandler: null,
     };
+  }
+
+  componentDidMount() {
+    const timerHandler = setInterval(() => {
+      this.setTimer();
+    }, 1000);
+    this.setState({
+      timerHandler,
+    });
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.timerHandler);
   }
 
   handleClick = (_, id) => {
@@ -114,8 +129,15 @@ class DailyTable extends Component {
     });
   };
 
+  setTimer = () => {
+    this.setState({
+      ...this.state,
+      serverTime: new Date(),
+    });
+  };
+
   render() {
-    const { page, rowsPerPage, selected } = this.state;
+    const { page, rowsPerPage, selected, serverTime } = this.state;
     const { calendarEvents, eventIds } = this.props;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, eventIds.length - page * rowsPerPage);
@@ -130,7 +152,7 @@ class DailyTable extends Component {
               </Typography>
             ) : (
               <Typography variant='h6' id='tableTitle' component='div'>
-                The Daily Grind
+                The Daily Grind - {serverTime.toUTCString()}
               </Typography>
             )}
 
