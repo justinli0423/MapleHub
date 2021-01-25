@@ -44,7 +44,6 @@ export default class ServerStatus extends Component {
 
   deboundInput = (ev) => {
     const value = ev.target.value;
-
     const { timer } = this.state;
     let newTimer;
 

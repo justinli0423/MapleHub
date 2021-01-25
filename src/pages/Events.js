@@ -24,7 +24,7 @@ import {
   LOCAL_STORAGE_EVENT_NOTES,
   LOCAL_STORAGE_EVENT_DETAILS,
 } from "../common/consts";
-import ics from "../common/ics";
+// import ics from "../common/ics";
 
 import Title from "../components/common/Title";
 import Header from "../components/common/Header";
@@ -47,14 +47,14 @@ import DailyTable from "../todoUtils/DailyTable";
 import TotalTable from "../todoUtils/TotalTable";
 
 const filter = createFilterOptions();
-const cal = ics();
+// const cal = ics();
 
 class Events extends Component {
   constructor(props) {
     super(props);
     this.state = {
       events: [],
-      newEventName: "",
+      newEvent: "",
       newEventStartDate: moment().utc().second(0).minute(0).hour(0).valueOf(),
       newEventEndDate: moment().utc().second(59).minute(59).hour(23).valueOf(),
       newEventRepeat: [repeatableOptions.Everyday],
@@ -84,20 +84,26 @@ class Events extends Component {
     if (!newValue) {
       return this.setState({
         ...this.state,
-        newEventName: newValue,
+        newEvent: {
+          eventName: null,
+        },
       });
     }
 
     if (typeof newValue === "string") {
       this.setState({
         ...this.state,
-        newEventName: newValue,
+        newEvent: {
+          eventName: newValue,
+        },
       });
     } else if (newValue && newValue.inputValue) {
       // Create a new value from the user input
       this.setState({
         ...this.state,
-        newEventName: newValue.inputValue,
+        newEvent: {
+          eventName: newValue.inputValue,
+        },
       });
     } else {
       const eventDetails = this.state.events.find(
@@ -115,7 +121,7 @@ class Events extends Component {
       }
       this.setState({
         ...this.state,
-        newEventName: newValue,
+        newEvent: newValue,
         newEventStartDate,
         newEventEndDate,
       });
@@ -230,13 +236,13 @@ class Events extends Component {
 
   handleAddEvent = () => {
     const {
-      newEventName,
+      newEvent,
       newEventStartDate,
       newEventEndDate,
       newEventRepeat,
     } = this.state;
 
-    if (!newEventName || !newEventStartDate || !newEventEndDate) {
+    if (!newEvent || !newEventStartDate || !newEventEndDate) {
       return alert("Please enter all the fields for this event.");
     }
 
@@ -247,9 +253,7 @@ class Events extends Component {
     const eventIsDaily =
       newEventRepeat[0] === repeatableOptions.Everyday ||
       newEventRepeat.length === 7;
-    // TODO: how did newEventName become an object? fix it
-    const actualEventName =
-      typeof newEventName === "string" ? newEventName : newEventName.eventName;
+    const actualEventName = newEvent.eventName;
     if (eventIsDaily) {
       this.props.addEvent({
         id: `${actualEventName.replaceAll(" ", "_")}#${Date.now()}`,
@@ -276,7 +280,7 @@ class Events extends Component {
 
     this.setState({
       ...this.state,
-      newEventName: "",
+      newEvent: null,
       newEventStartDate: moment().utc().second(0).minute(0).hour(0).valueOf(),
       newEventEndDate: moment().utc().second(59).minute(59).hour(23).valueOf(),
       newEventRepeat: [repeatableOptions.Everyday],
@@ -286,7 +290,7 @@ class Events extends Component {
   render() {
     const {
       events,
-      newEventName,
+      newEvent,
       newEventStartDate,
       newEventEndDate,
       newEventRepeat,
@@ -304,7 +308,7 @@ class Events extends Component {
           <AddEvents>
             <Autocomplete
               options={events}
-              value={newEventName}
+              value={newEvent}
               onChange={this.eventSelectorOnChange}
               onClose={(ev) => {
                 if (typeof ev.target.value === "string") {
