@@ -30,7 +30,7 @@ import Title from "../components/common/Title";
 import Header from "../components/common/Header";
 import Button from "../components/common/DefaultButton";
 
-import { toggleEvent, addEvent, restoreEvents } from "../redux/actions";
+import { addEvent, restoreEvents } from "../redux/actions";
 import {
   getAllEventDetails,
   getEventList,
@@ -258,6 +258,7 @@ class Events extends Component {
       this.props.addEvent({
         id: `${actualEventName.replaceAll(" ", "_")}#${Date.now()}`,
         subject: actualEventName,
+        isComplete: false,
         rrule: new RRule({
           freq: RRule.DAILY,
           dtstart: new Date(newEventStartDate),
@@ -269,6 +270,7 @@ class Events extends Component {
       this.props.addEvent({
         id: `${actualEventName.replaceAll(" ", "_")}#${Date.now()}`,
         subject: actualEventName,
+        isComplete: false,
         rrule: new RRule({
           freq: RRule.WEEKLY,
           dtstart: new Date(newEventStartDate),
@@ -397,7 +399,6 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps, {
   addEvent,
-  toggleEvent,
   restoreEvents,
 })(Events);
 

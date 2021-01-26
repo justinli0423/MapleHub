@@ -11,7 +11,7 @@ import { LOCAL_STORAGE_EVENT_DETAILS } from "../../common/consts";
 
 const initialState = {
   calendarEvents: {
-    lastUpdatedTime: Date.now(),
+    lastUpdatedTime: 0,
   },
   eventIds: [],
 };
@@ -43,20 +43,22 @@ const resetTodaysEvents = (originalCalEvs, originalEvIds) => {
       rruleObj.options.dtstart = new Date(startOfToday.valueOf());
       rruleObj.origOptions.dtstart = new Date(startOfToday.valueOf());
       calendarEvents[id].rrule = rruleObj.toString();
-      if (rruleObj.options.freq === RRule.DAILY) {
-        calendarEvents[id].isComplete = false;
-      } else {
-        const allDates = rruleObj.all();
-        for (let i = 0; i < allDates.length; i++) {
-          const date = moment(allDates[i]).utc();
-          // do not reset if the reset date is in the future
-          if (date > endOfToday) {
-            return;
-          }
-          // if the date matches today then reset completion
-          if (date.date() === today) {
-            calendarEvents[id].isComplete = false;
-            return;
+      if (calendarEvents[id].isComplete) {
+        if (rruleObj.options.freq === RRule.DAILY) {
+          calendarEvents[id].isComplete = false;
+        } else {
+          const allDates = rruleObj.all();
+          for (let i = 0; i < allDates.length; i++) {
+            const date = moment(allDates[i]).utc();
+            // do not reset if the reset date is in the future
+            if (date > endOfToday) {
+              return;
+            }
+            // if the date matches today then reset completion
+            if (date.date() === today) {
+              calendarEvents[id].isComplete = false;
+              return;
+            }
           }
         }
       }
