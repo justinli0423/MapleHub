@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-target-blank */
 import React, { Component } from "react";
 import styled from "styled-components";
 import { Modal } from "@material-ui/core";
@@ -167,8 +168,8 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
       element.nodeName !== NodeNames.H3
     ) {
       // details inbetween
-      // TODO: not all details are working properly (i.e. maplehood watch)
       const innerText = element.innerText;
+      let isDetails = element.nodeName === NodeNames.UL;
       if (element.nodeName === NodeNames.P) {
         const isRewardsIMG = element.childNodes[0].nodeName === NodeNames.IMG;
         // either event duration or requirements
@@ -195,11 +196,15 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
               break;
             default:
               // multiple dates
-              lastSectionDetail.eventType = EventTypes.MULTIPLE_EVENTS;
-              lastSectionDetail.eventTimes = handleMultipleEvents(
-                unfilteredDate,
-                patchNodesTimeStamp
-              );
+              if (!lastSectionDetail.eventTimes.length) {
+                lastSectionDetail.eventType = EventTypes.MULTIPLE_EVENTS;
+                lastSectionDetail.eventTimes = handleMultipleEvents(
+                  unfilteredDate,
+                  patchNodesTimeStamp
+                );
+              } else {
+                isDetails = true;
+              }
               break;
           }
         }
@@ -214,7 +219,7 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
         }
       }
 
-      if (element.nodeName === NodeNames.UL) {
+      if (isDetails) {
         // reward details
         if (hasReward) {
           lastSectionDetail.rewards += element.innerHTML;
@@ -244,7 +249,7 @@ export default class Home extends Component {
       filterValue: "",
       modalInputText: null,
       newsDetails: {
-        backupBanner: process.env.PUBLIC_URL + "/testbanner.png",
+        backupBanner: process.env.PUBLIC_URL + "/testbanner.jpg",
         bannerURL: null,
         patchNodesTimeStamp: null,
         sectionDetails: [],
@@ -380,7 +385,6 @@ export default class Home extends Component {
 
   // TODO: find count of subsections (count of h3s) and render placeholders?
   getNews(patchNotesSrc = "") {
-    // convert to mobx? (loading state)
     const doc = new DOMParser().parseFromString(patchNotesSrc, "text/html");
     const body = doc.querySelector("div.article-content");
     const banner = body.querySelector("img#__mcenew");
@@ -426,9 +430,16 @@ export default class Home extends Component {
             <div>
               <h2>Steps:</h2>
               <ol>
-                <li>Open patch notes from the Official Maplestory Website.</li>
                 <li>
-                  Right click anywhere on the page and select 'View Page Source'.
+                  Open patch notes from the{" "}
+                  <a href='https://maplestory.nexon.net/' target='_blank'>
+                    Official Maplestory Website
+                  </a>
+                  .
+                </li>
+                <li>
+                  Right click anywhere on the page and select 'View Page
+                  Source'.
                 </li>
                 <li>Copy the entire page (Ctrl + A) and paste below!</li>
               </ol>

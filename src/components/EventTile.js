@@ -324,7 +324,7 @@ export default class EventTile extends Component {
                   dangerouslySetInnerHTML={{ __html: eventDetails.rewards }}
                 />
                 {eventDetails.rewardImages.map((imgSrc, i) => (
-                  <img key={i} src={imgSrc} />
+                  <RewardImage key={i} src={imgSrc} alt='reward' />
                 ))}
               </Rewards>
             </DetailsContainer>
@@ -470,7 +470,7 @@ const Details = styled.ul`
   list-style-position: outside;
   & > li {
     font-size: 14px;
-    font-weight: bold;
+    font-weight: normal;
 
     & ul {
       font-size: 12px;
@@ -479,8 +479,10 @@ const Details = styled.ul`
     }
   }
 
-  & img {
-    max-width: 600px;
+  & > strong {
+    display: block;
+    margin-left: -16px;
+    font-weight: bold;
   }
 
   & br {
@@ -494,6 +496,10 @@ const Details = styled.ul`
   & > span {
     padding-right: 4px;
   }
+`;
+
+const RewardImage = styled.img`
+  max-width: 800px;
 `;
 
 const Rewards = styled.div`
