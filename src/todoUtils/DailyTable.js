@@ -80,19 +80,14 @@ class DailyTable extends Component {
         selected.slice(selectedIndex + 1)
       );
     }
-    this.setState({
-      ...this.state,
-      selected: newSelected,
-    });
+
+    this.completeEvents(newSelected);
   };
 
   handleSelectAllClick = (event) => {
     const isChecked = event.target.checked;
 
-    this.setState({
-      ...this.state,
-      selected: isChecked ? this.props.eventIds : [],
-    });
+    this.completeEvents(isChecked ? this.props.eventIds : []);
   };
 
   handleChangePage = (_, newPage) => {
@@ -110,12 +105,8 @@ class DailyTable extends Component {
     });
   };
 
-  completeEvents = () => {
-    const { selected } = this.state;
-
+  completeEvents = (selected) => {
     if (selected.length === this.props.eventIds.length) {
-      const { selected } = this.state;
-
       const isNotAllcomplete =
         selected.filter((id) => !this.props.calendarEvents[id].isComplete)
           .length > 0;
@@ -152,7 +143,9 @@ class DailyTable extends Component {
     const { serverTime } = this.state;
     const curTime = Date.now();
 
-    if (moment(curTime).utc().dayOfYear() !== moment(serverTime).utc().dayOfYear()) {
+    if (
+      moment(curTime).utc().dayOfYear() !== moment(serverTime).utc().dayOfYear()
+    ) {
       this.setState({
         ...this.state,
         serverTime: new Date(),
