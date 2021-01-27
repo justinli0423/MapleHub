@@ -152,7 +152,7 @@ class DailyTable extends Component {
     const { serverTime } = this.state;
     const curTime = Date.now();
 
-    if (moment(curTime).utc().date() !== moment(serverTime).utc().date()) {
+    if (moment(curTime).utc().dayOfYear() !== moment(serverTime).utc().dayOfYear()) {
       this.setState({
         ...this.state,
         serverTime: new Date(),

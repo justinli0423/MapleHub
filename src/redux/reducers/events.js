@@ -24,8 +24,8 @@ const resetTodaysEvents = (originalCalEvs, originalEvIds) => {
   const calendarEvents = { ...originalCalEvs };
   const eventIds = originalEvIds.slice();
   const { lastUpdatedTime } = calendarEvents;
-  const today = moment().utc().date();
-  const lastUpdatedDay = moment(lastUpdatedTime).utc().date();
+  const today = moment().utc().dayOfYear();
+  const lastUpdatedDay = moment(lastUpdatedTime).utc().dayOfYear();
   const startOfToday = moment().utc().second(0).minute(0).hour(0);
   const endOfToday = moment().utc().second(59).minute(59).hour(23);
   const eventTimeStampIndex = eventIds.indexOf("lastUpdatedTime");
@@ -55,7 +55,7 @@ const resetTodaysEvents = (originalCalEvs, originalEvIds) => {
               return;
             }
             // if the date matches today then reset completion
-            if (date.date() === today) {
+            if (date.dayOfYear() === today) {
               calendarEvents[id].isComplete = false;
               return;
             }
