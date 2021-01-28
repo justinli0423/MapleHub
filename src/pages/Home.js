@@ -18,6 +18,12 @@ import Header from "../components/common/Header";
 import EventTile from "../components/EventTile";
 import SearchBar from "../components/SearchBar";
 
+import {
+  DefaultEventDetails,
+  DefaultBannerUrl,
+  DefaultTimeStamp,
+} from "../homeUtils/defaultEventDetails";
+
 import MultiEventSelectedIcon from "../icons/tasks-solid.svg";
 import ActiveEventSelectedIcon from "../icons/hourglass-start-solid.svg";
 import FutureEventSelectedIcon from "../icons/fast-forward-solid.svg";
@@ -250,9 +256,9 @@ export default class Home extends Component {
       modalInputText: null,
       newsDetails: {
         backupBanner: process.env.PUBLIC_URL + "/testbanner.jpg",
-        bannerURL: null,
-        patchNodesTimeStamp: null,
-        sectionDetails: [],
+        bannerURL: DefaultBannerUrl ?? null,
+        patchNodesTimeStamp: DefaultTimeStamp ?? null,
+        sectionDetails: DefaultEventDetails ?? [],
       },
       filters: {
         [FilterTypes.MULTIPLE_EVENTS]: false,
@@ -316,11 +322,17 @@ export default class Home extends Component {
     const newsDetails = JSON.parse(
       localStorage.getItem(LOCAL_STORAGE_EVENT_NOTES)
     );
+    // if user updated patch notes manually, load that state instead
     if (newsDetails) {
       this.setState({
         ...this.state,
         newsDetails,
       });
+    } else {
+      window.localStorage.setItem(
+        LOCAL_STORAGE_EVENT_NOTES,
+        JSON.stringify(this.state.newsDetails)
+      );
     }
   }
 
