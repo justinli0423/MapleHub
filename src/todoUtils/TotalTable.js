@@ -203,11 +203,11 @@ class TotalTable extends Component {
                           align='left'
                           style={{
                             color:
-                              rruleObj.options.until.now() < Date.now()
+                              rruleObj.options.until.valueOf() < Date.now()
                                 ? Colors.BackgroundGrey
                                 : undefined,
                             textDecoration:
-                              rruleObj.options.until.now() < Date.now()
+                              rruleObj.options.until.valueOf() < Date.now()
                                 ? "line-through"
                                 : undefined,
                           }}
