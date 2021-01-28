@@ -15,7 +15,7 @@ export default class ServerStatus extends Component {
   constructor() {
     super();
     this.state = {
-      showAverage: false,
+      showAverage: true,
       latencyThreshold: 1200,
       timer: null,
     };
