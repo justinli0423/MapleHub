@@ -55,8 +55,10 @@ class Events extends Component {
     this.state = {
       events: [],
       newEvent: "",
-      newEventStartDate: moment().utc().second(0).minute(0).hour(0).valueOf(),
-      newEventEndDate: moment().utc().second(59).minute(59).hour(23).valueOf(),
+      newEventStartDate: moment().valueOf(),
+      newEventEndDate: moment()
+        .day(moment().day() + 1)
+        .valueOf(),
       newEventRepeat: [repeatableOptions.Everyday],
     };
   }
@@ -283,8 +285,10 @@ class Events extends Component {
     this.setState({
       ...this.state,
       newEvent: null,
-      newEventStartDate: moment().utc().second(0).minute(0).hour(0).valueOf(),
-      newEventEndDate: moment().utc().second(59).minute(59).hour(23).valueOf(),
+      newEventStartDate: moment().valueOf(),
+      newEventEndDate: moment()
+        .day(moment().day() + 1)
+        .valueOf(),
       newEventRepeat: [repeatableOptions.Everyday],
     });
   };
@@ -336,7 +340,10 @@ class Events extends Component {
                 format='MM/dd/yyyy'
                 margin='dense'
                 label='Start Date'
-                value={newEventStartDate}
+                value={
+                  newEventStartDate +
+                  new Date(newEventStartDate).getTimezoneOffset() * 60000
+                }
                 onChange={this.setStartDate}
                 KeyboardButtonProps={{
                   "aria-label": "change date",
@@ -348,7 +355,10 @@ class Events extends Component {
                 format='MM/dd/yyyy'
                 margin='dense'
                 label='End Date'
-                value={newEventEndDate}
+                value={
+                  newEventEndDate +
+                  new Date(newEventEndDate).getTimezoneOffset() * 60000
+                }
                 onChange={this.setEndDate}
                 KeyboardButtonProps={{
                   "aria-label": "change date",
