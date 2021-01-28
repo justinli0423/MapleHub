@@ -47,7 +47,7 @@ const todaysColumns = [
 const allEventsColumns = [
   { id: "eventTitle", label: "Event Name", numeric: false },
   { id: "end", label: "Last Day", numeric: false },
-  { id: "occurences", label: "Reset On", numeric: false },
+  { id: "occurences", label: "Reset (End of Day)", numeric: false },
 ];
 
 Object.freeze(repeatableOptions);

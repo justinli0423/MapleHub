@@ -27,7 +27,6 @@ const resetTodaysEvents = (originalCalEvs, originalEvIds) => {
   const today = moment().utc().dayOfYear();
   const lastUpdatedDay = moment(lastUpdatedTime).utc().dayOfYear();
   const startOfToday = moment().utc().second(0).minute(0).hour(0);
-  const endOfToday = moment().utc().second(59).minute(59).hour(23);
   const eventTimeStampIndex = eventIds.indexOf("lastUpdatedTime");
 
   if (eventTimeStampIndex > -1) {
@@ -40,6 +39,7 @@ const resetTodaysEvents = (originalCalEvs, originalEvIds) => {
     eventIds.forEach((id) => {
       // reset rruleObj start date to today to remove any past dates from list
       const rruleObj = rrulestr(calendarEvents[id].rrule);
+      const oldAllDates = rruleObj.all();
       rruleObj.options.dtstart = new Date(startOfToday.valueOf());
       rruleObj.origOptions.dtstart = new Date(startOfToday.valueOf());
       calendarEvents[id].rrule = rruleObj.toString();
@@ -48,17 +48,10 @@ const resetTodaysEvents = (originalCalEvs, originalEvIds) => {
           calendarEvents[id].isComplete = false;
         } else {
           const allDates = rruleObj.all();
-          for (let i = 0; i < allDates.length; i++) {
-            const date = moment(allDates[i]).utc();
-            // do not reset if the reset date is in the future
-            if (date > endOfToday) {
-              return;
-            }
-            // if the date matches today then reset completion
-            if (date.dayOfYear() === today) {
-              calendarEvents[id].isComplete = false;
-              return;
-            }
+          // rrule.all strips away all unnecessary dates
+          // which makes it easy to know when things should reset
+          if (oldAllDates.length !== allDates.length) {
+            calendarEvents[id].isComplete = false;
           }
         }
       }

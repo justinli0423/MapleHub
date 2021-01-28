@@ -356,7 +356,7 @@ class Events extends Component {
               />
             </MuiPickersUtilsProvider>
             <FormControl>
-              <InputLabel>Scheduled</InputLabel>
+              <InputLabel>Reset (End of Day)</InputLabel>
               <Select
                 multiple
                 value={newEventRepeat}

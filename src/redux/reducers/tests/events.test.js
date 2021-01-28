@@ -2,11 +2,11 @@ import reducer from "../index";
 import * as types from "../../actionTypes";
 import MockDate from "mockdate";
 import moment from "moment";
-import { RRule } from "rrule";
+import { RRule, rrulestr } from "rrule";
 
 import { rruleOptions } from "../../../todoUtils/consts";
 
-MockDate.set("2021-01-01");
+MockDate.set("2021-01-04");
 const startDate = new Date(Date.now());
 MockDate.set("2021-02-28");
 const endDate = new Date(Date.now());
@@ -14,7 +14,7 @@ const endDate = new Date(Date.now());
 const completeStore = {
   events: {
     calendarEvents: {
-      lastUpdatedTime: new Date("2021-01-12").valueOf(),
+      lastUpdatedTime: new Date("2021-01-04").valueOf(),
       [`monday`]: {
         id: `monday`,
         subject: "monday",
@@ -183,6 +183,16 @@ const completeStore = {
       `daily`,
     ],
   },
+};
+
+const resetEventStartDates = (copyOfStore) => {
+  copyOfStore.events.calendarEvents.lastUpdatedTime = Date.now();
+  copyOfStore.events.eventIds.forEach((id) => {
+    const rruleObj = rrulestr(copyOfStore.events.calendarEvents[id].rrule);
+    rruleObj.options.dtstart = new Date();
+    rruleObj.origOptions.dtstart = new Date();
+    copyOfStore.events.calendarEvents[id].rrule = rruleObj.toString();
+  });
 };
 
 describe("event reducer", () => {
@@ -380,8 +390,9 @@ describe("event reducer", () => {
 
   it("should reset the proper events when daily reset (monday events)", () => {
     const copyOfStore = JSON.parse(JSON.stringify(completeStore));
-
-    MockDate.set("2021-01-18");
+    MockDate.set("2021-01-04");
+    resetEventStartDates(copyOfStore);
+    MockDate.set("2021-01-05");
     moment.now = function () {
       return new Date();
     };
@@ -407,14 +418,17 @@ describe("event reducer", () => {
 
   it("should reset the proper events when daily reset (tuesday events)", () => {
     const copyOfStore = JSON.parse(JSON.stringify(completeStore));
-
-    MockDate.set("2021-01-19");
+    MockDate.set("2021-01-05");
+    resetEventStartDates(copyOfStore);
+    MockDate.set("2021-01-06");
     moment.now = function () {
       return new Date();
     };
     const results = reducer(copyOfStore, {
       type: types.RESET_EVENTS,
     }).events.calendarEvents;
+
+    // console.log(rrulestr(results[`mon/wed/fri/sun`].rrule).all());
 
     expect(results.lastUpdatedTime).toStrictEqual(Date.now());
     expect(results[`monday`].isComplete).toEqual(true);
@@ -434,7 +448,9 @@ describe("event reducer", () => {
 
   it("should reset the proper events when daily reset (wednesday events)", () => {
     const copyOfStore = JSON.parse(JSON.stringify(completeStore));
-    MockDate.set("2021-01-20");
+    MockDate.set("2021-01-06");
+    resetEventStartDates(copyOfStore);
+    MockDate.set("2021-01-07");
     moment.now = function () {
       return new Date(Date.now());
     };
@@ -461,8 +477,9 @@ describe("event reducer", () => {
 
   it("should reset the proper events when daily reset (thursday events)", () => {
     const copyOfStore = JSON.parse(JSON.stringify(completeStore));
-
-    MockDate.set("2021-01-21");
+    MockDate.set("2021-01-07");
+    resetEventStartDates(copyOfStore);
+    MockDate.set("2021-01-08");
     moment.now = function () {
       return new Date();
     };
@@ -488,8 +505,9 @@ describe("event reducer", () => {
 
   it("should reset the proper events when daily reset (friday events)", () => {
     const copyOfStore = JSON.parse(JSON.stringify(completeStore));
-
-    MockDate.set("2021-01-22");
+    MockDate.set("2021-01-08");
+    resetEventStartDates(copyOfStore);
+    MockDate.set("2021-01-09");
     moment.now = function () {
       return new Date();
     };
@@ -515,8 +533,9 @@ describe("event reducer", () => {
 
   it("should reset the proper events when daily reset (saturday events)", () => {
     const copyOfStore = JSON.parse(JSON.stringify(completeStore));
-
-    MockDate.set("2021-01-23");
+    MockDate.set("2021-01-09");
+    resetEventStartDates(copyOfStore);
+    MockDate.set("2021-01-10");
     moment.now = function () {
       return new Date();
     };
@@ -542,8 +561,9 @@ describe("event reducer", () => {
 
   it("should reset the proper events when daily reset (sunday events)", () => {
     const copyOfStore = JSON.parse(JSON.stringify(completeStore));
-
-    MockDate.set("2021-01-24");
+    MockDate.set("2021-01-10");
+    resetEventStartDates(copyOfStore);
+    MockDate.set("2021-01-11");
     moment.now = function () {
       return new Date();
     };
@@ -564,6 +584,141 @@ describe("event reducer", () => {
     expect(results[`weekends`].isComplete).toEqual(false);
     expect(results[`tues/thurs/sat`].isComplete).toEqual(true);
     expect(results[`tues/fri`].isComplete).toEqual(true);
+    expect(results[`daily`].isComplete).toEqual(false);
+  });
+
+  it("should reset the proper events when daily reset (monday to wednesday)", () => {
+    const copyOfStore = JSON.parse(JSON.stringify(completeStore));
+    MockDate.set("2021-01-04");
+    resetEventStartDates(copyOfStore);
+    MockDate.set("2021-01-07");
+    moment.now = function () {
+      return new Date();
+    };
+    const results = reducer(copyOfStore, {
+      type: types.RESET_EVENTS,
+    }).events.calendarEvents;
+    expect(results.lastUpdatedTime).toStrictEqual(Date.now());
+    expect(results[`monday`].isComplete).toEqual(false);
+    expect(results[`tuesday`].isComplete).toEqual(false);
+    expect(results[`wednesday`].isComplete).toEqual(false);
+    expect(results[`thursday`].isComplete).toEqual(true);
+    expect(results[`friday`].isComplete).toEqual(true);
+    expect(results[`saturday`].isComplete).toEqual(true);
+    expect(results[`sunday`].isComplete).toEqual(true);
+    expect(results[`mon/wed/fri/sun`].isComplete).toEqual(false);
+    expect(results[`weekdays`].isComplete).toEqual(false);
+    expect(results[`weekends`].isComplete).toEqual(true);
+    expect(results[`tues/thurs/sat`].isComplete).toEqual(false);
+    expect(results[`tues/fri`].isComplete).toEqual(false);
+    expect(results[`daily`].isComplete).toEqual(false);
+  });
+
+  it("should reset the proper events when daily reset (thursday to sunday)", () => {
+    const copyOfStore = JSON.parse(JSON.stringify(completeStore));
+    MockDate.set("2021-01-07");
+    resetEventStartDates(copyOfStore);
+    MockDate.set("2021-01-11");
+    moment.now = function () {
+      return new Date();
+    };
+    const results = reducer(copyOfStore, {
+      type: types.RESET_EVENTS,
+    }).events.calendarEvents;
+    expect(results.lastUpdatedTime).toStrictEqual(Date.now());
+    expect(results[`monday`].isComplete).toEqual(true);
+    expect(results[`tuesday`].isComplete).toEqual(true);
+    expect(results[`wednesday`].isComplete).toEqual(true);
+    expect(results[`thursday`].isComplete).toEqual(false);
+    expect(results[`friday`].isComplete).toEqual(false);
+    expect(results[`saturday`].isComplete).toEqual(false);
+    expect(results[`sunday`].isComplete).toEqual(false);
+    expect(results[`mon/wed/fri/sun`].isComplete).toEqual(false);
+    expect(results[`weekdays`].isComplete).toEqual(false);
+    expect(results[`weekends`].isComplete).toEqual(false);
+    expect(results[`tues/thurs/sat`].isComplete).toEqual(false);
+    expect(results[`tues/fri`].isComplete).toEqual(false);
+    expect(results[`daily`].isComplete).toEqual(false);
+  });
+
+  it("should reset the proper events when daily reset (saturday to monday)", () => {
+    const copyOfStore = JSON.parse(JSON.stringify(completeStore));
+    MockDate.set("2021-01-09");
+    resetEventStartDates(copyOfStore);
+    MockDate.set("2021-01-12");
+    moment.now = function () {
+      return new Date();
+    };
+    const results = reducer(copyOfStore, {
+      type: types.RESET_EVENTS,
+    }).events.calendarEvents;
+    expect(results.lastUpdatedTime).toStrictEqual(Date.now());
+    expect(results[`monday`].isComplete).toEqual(false);
+    expect(results[`tuesday`].isComplete).toEqual(true);
+    expect(results[`wednesday`].isComplete).toEqual(true);
+    expect(results[`thursday`].isComplete).toEqual(true);
+    expect(results[`friday`].isComplete).toEqual(true);
+    expect(results[`saturday`].isComplete).toEqual(false);
+    expect(results[`sunday`].isComplete).toEqual(false);
+    expect(results[`mon/wed/fri/sun`].isComplete).toEqual(false);
+    expect(results[`weekdays`].isComplete).toEqual(false);
+    expect(results[`weekends`].isComplete).toEqual(false);
+    expect(results[`tues/thurs/sat`].isComplete).toEqual(false);
+    expect(results[`tues/fri`].isComplete).toEqual(true);
+    expect(results[`daily`].isComplete).toEqual(false);
+  });
+
+  it("should reset all events after 1 week", () => {
+    const copyOfStore = JSON.parse(JSON.stringify(completeStore));
+    MockDate.set("2021-01-09");
+    resetEventStartDates(copyOfStore);
+    MockDate.set("2021-01-16");
+    moment.now = function () {
+      return new Date();
+    };
+    const results = reducer(copyOfStore, {
+      type: types.RESET_EVENTS,
+    }).events.calendarEvents;
+    expect(results.lastUpdatedTime).toStrictEqual(Date.now());
+    expect(results[`monday`].isComplete).toEqual(false);
+    expect(results[`tuesday`].isComplete).toEqual(false);
+    expect(results[`wednesday`].isComplete).toEqual(false);
+    expect(results[`thursday`].isComplete).toEqual(false);
+    expect(results[`friday`].isComplete).toEqual(false);
+    expect(results[`saturday`].isComplete).toEqual(false);
+    expect(results[`sunday`].isComplete).toEqual(false);
+    expect(results[`mon/wed/fri/sun`].isComplete).toEqual(false);
+    expect(results[`weekdays`].isComplete).toEqual(false);
+    expect(results[`weekends`].isComplete).toEqual(false);
+    expect(results[`tues/thurs/sat`].isComplete).toEqual(false);
+    expect(results[`tues/fri`].isComplete).toEqual(false);
+    expect(results[`daily`].isComplete).toEqual(false);
+  });
+
+  it("should reset all events except sunday", () => {
+    const copyOfStore = JSON.parse(JSON.stringify(completeStore));
+    MockDate.set("2021-01-10");
+    resetEventStartDates(copyOfStore);
+    MockDate.set("2021-01-16");
+    moment.now = function () {
+      return new Date();
+    };
+    const results = reducer(copyOfStore, {
+      type: types.RESET_EVENTS,
+    }).events.calendarEvents;
+    expect(results.lastUpdatedTime).toStrictEqual(Date.now());
+    expect(results[`monday`].isComplete).toEqual(false);
+    expect(results[`tuesday`].isComplete).toEqual(false);
+    expect(results[`wednesday`].isComplete).toEqual(false);
+    expect(results[`thursday`].isComplete).toEqual(false);
+    expect(results[`friday`].isComplete).toEqual(false);
+    expect(results[`saturday`].isComplete).toEqual(true);
+    expect(results[`sunday`].isComplete).toEqual(false);
+    expect(results[`mon/wed/fri/sun`].isComplete).toEqual(false);
+    expect(results[`weekdays`].isComplete).toEqual(false);
+    expect(results[`weekends`].isComplete).toEqual(false);
+    expect(results[`tues/thurs/sat`].isComplete).toEqual(false);
+    expect(results[`tues/fri`].isComplete).toEqual(false);
     expect(results[`daily`].isComplete).toEqual(false);
   });
 
