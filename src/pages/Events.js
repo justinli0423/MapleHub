@@ -263,7 +263,9 @@ class Events extends Component {
         isComplete: false,
         rrule: new RRule({
           freq: RRule.DAILY,
-          dtstart: new Date(newEventStartDate),
+          dtstart: new Date(
+            moment(newEventStartDate).second(0).minute(0).hour(0).valueOf()
+          ),
           until: new Date(newEventEndDate),
         }).toString(),
       });
@@ -275,7 +277,9 @@ class Events extends Component {
         isComplete: false,
         rrule: new RRule({
           freq: RRule.WEEKLY,
-          dtstart: new Date(newEventStartDate),
+          dtstart: new Date(
+            moment(newEventStartDate).second(59).minute(59).hour(23).valueOf()
+          ),
           until: new Date(newEventEndDate),
           byweekday: repeatArr.flat(),
         }).toString(),
