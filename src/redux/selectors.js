@@ -16,8 +16,7 @@ export const getActiveEventIds = (store) => {
   eventIds.forEach((id) => {
     const rruleObj = rrulestr(events[id].rrule);
     if (
-      moment(rruleObj.options.until).utc() < today ||
-      rruleObj.all().length === 0
+      moment(rruleObj.options.until).utc() < today
     ) {
       return;
     }
