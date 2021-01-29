@@ -13,14 +13,18 @@ export default class ServerTile extends Component {
     super(props);
     const { channelId, ip, port } = this.props;
     this.state = {
-      channelId,
-      ip,
-      port,
       latency: 0,
       averageTenLatencies: [],
       intervalHandler: null,
       server: new PingServer(channelId, ip, port, this.forceRender),
     };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.ip !== this.props.ip) {
+      const { channelId, ip, port } = this.props;
+      this.state.server.updateServerDomains(channelId, ip, port);
+    }
   }
 
   componentDidMount() {
@@ -48,8 +52,8 @@ export default class ServerTile extends Component {
   };
 
   render() {
-    const { channelId, averageTenLatencies, latency } = this.state;
-    const { showAverage, latencyThreshold } = this.props;
+    const { averageTenLatencies, latency } = this.state;
+    const { channelId, showAverage, latencyThreshold } = this.props;
 
     const displayLatency = latency ? `Latency: ${latency}ms` : "Waiting...";
     const averageLatency = averageTenLatencies.length

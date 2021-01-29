@@ -25,6 +25,15 @@ export default class PingServer {
     this.callback(this.latency, averageTenLatencies);
   }
 
+  updateServerDomains(id, ip, port) {
+    this.id = id;
+    this.ip = ip;
+    this.port = port;
+    this.latency = 0;
+    this.averageTenLatencies = [];
+    this.pingChannel();
+  }
+
   unmount() {
     clearTimeout(this.timer);
   }

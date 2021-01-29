@@ -1,15 +1,15 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 import { TextField } from "@material-ui/core";
-
+import ToggleButton from "@material-ui/lab/ToggleButton";
+import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import Title from "../components/common/Title";
 import Header from "../components/common/Header";
-import Button from "../components/common/DefaultButton";
+import DefaultButton from "../components/common/DefaultButton";
 
 import ServerTile from "../components/ServerTile";
-import RebootPng from "../icons/reboot.png";
 
-import ServerDetails from "../serverUtils/ServerDetails";
+import { Worlds, WorldIds } from "../serverUtils/ServerDetails";
 
 export default class ServerStatus extends Component {
   constructor() {
@@ -18,6 +18,7 @@ export default class ServerStatus extends Component {
       showAverage: true,
       latencyThreshold: 1200,
       timer: null,
+      selectedWorld: WorldIds[1], // default reboot xd
     };
   }
 
@@ -33,7 +34,7 @@ export default class ServerStatus extends Component {
       isNaN(parseInt(latencyThreshold)) ||
       latencyThreshold < 700
     ) {
-      alert("Values should be more than 700ms");
+      alert("Value should be more than 700ms.");
       return;
     }
     this.setState({
@@ -60,8 +61,18 @@ export default class ServerStatus extends Component {
     });
   };
 
+  handleWorldChange = (_, newWorld) => {
+    if (!newWorld) {
+      return;
+    }
+    this.setState({
+      ...this.state,
+      selectedWorld: newWorld,
+    });
+  };
+
   render() {
-    const { latencyThreshold, showAverage } = this.state;
+    const { latencyThreshold, showAverage, selectedWorld } = this.state;
     return (
       <>
         <Header src={process.env.PUBLIC_URL + "/serverstatusbanner.jpg"}>
@@ -72,10 +83,22 @@ export default class ServerStatus extends Component {
         </Header>
         <Container>
           <StatusContainer>
+            <StyledToggleButtonGroup
+              value={selectedWorld}
+              exclusive
+              onChange={this.handleWorldChange}
+            >
+              {WorldIds.map((id) => (
+                <StyledToggleButton value={Worlds[id].name}>
+                  <WorldImg src={Worlds[id].img} />
+                  <h3>{Worlds[id].name}</h3>
+                </StyledToggleButton>
+              ))}
+            </StyledToggleButtonGroup>
             <HeaderContainer>
               <ServerName>
-                <Icon src={RebootPng} />
-                <IconLabel>Reboot</IconLabel>
+                <Icon src={Worlds[selectedWorld].img} />
+                <IconLabel>{Worlds[selectedWorld].name}</IconLabel>
               </ServerName>
               <ControlsContainer>
                 <TextField
@@ -95,12 +118,12 @@ export default class ServerStatus extends Component {
               </ControlsContainer>
             </HeaderContainer>
             <ServerContainer>
-              {ServerDetails.map((server, i) => (
+              {Worlds[selectedWorld].serverDetails.map((server, i) => (
                 <ServerTile
+                  key={i}
                   channelId={server.channelId}
                   ip={server.ip}
                   port={server.port}
-                  key={i}
                   latencyThreshold={latencyThreshold}
                   showAverage={showAverage}
                 />
@@ -118,7 +141,7 @@ const Container = styled.div`
 `;
 
 const StatusContainer = styled.div`
-  margin: 40px 8px 0;
+  margin: 24px 8px 0;
 `;
 
 const HeaderContainer = styled.div`
@@ -144,14 +167,18 @@ const ControlsContainer = styled.div`
 
 const IconLabel = styled.h2`
   margin: 0 16px;
+  text-transform: capitalize;
 `;
 
-const StyledButton = styled(Button)`
+const StyledButton = styled(DefaultButton)`
   margin: 0;
   width: 230px;
 `;
 
-const Icon = styled.img``;
+const Icon = styled.img`
+  width: 79px;
+  height: 88px;
+`;
 
 const ServerContainer = styled.div`
   display: flex;
@@ -159,5 +186,24 @@ const ServerContainer = styled.div`
   justify-content: flex-start;
   flex-wrap: wrap;
   width: 900px;
-  margin: 32px auto;
+  margin: 24px auto;
+`;
+
+const StyledToggleButtonGroup = styled(ToggleButtonGroup)`
+  width: 900px;
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 24px 56px;
+`;
+
+const WorldImg = styled.img`
+  width: 18px;
+  height: 20px;
+  padding: 0 4px;
+`;
+
+const StyledToggleButton = styled(ToggleButton)`
+  flex: 1 0 150px;
 `;
