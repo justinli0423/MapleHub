@@ -40,7 +40,6 @@ class DailyTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      calendarEvents: [],
       selected: [],
       page: 0,
       rowsPerPage: 5,
@@ -55,6 +54,7 @@ class DailyTable extends Component {
       this.setTimer();
     }, 1000);
     this.setState({
+      ...this.state,
       timerHandler,
     });
   }
@@ -216,7 +216,7 @@ class DailyTable extends Component {
   }
 
   render() {
-    const { page, rowsPerPage, selected, serverTime } = this.state;
+    const { page, rowsPerPage, selected } = this.state;
     const { calendarEvents, eventIds } = this.props;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, eventIds.length - page * rowsPerPage);
@@ -232,8 +232,7 @@ class DailyTable extends Component {
               </Typography>
             ) : (
               <Typography variant='h6' id='tableTitle' component='div'>
-                The Daily Grind -{" "}
-                {moment(serverTime).utc().format("ddd MMM Do, h:mm:ss a")}
+                The Daily Grind
               </Typography>
             )}
 

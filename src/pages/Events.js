@@ -266,7 +266,14 @@ class Events extends Component {
           dtstart: new Date(
             moment(newEventStartDate).second(0).minute(0).hour(0).valueOf()
           ),
-          until: new Date(newEventEndDate),
+          until: new Date(
+            moment(newEventEndDate)
+              .utc()
+              .second(59)
+              .minute(59)
+              .hour(23)
+              .valueOf()
+          ),
         }).toString(),
       });
     } else {
@@ -278,9 +285,16 @@ class Events extends Component {
         rrule: new RRule({
           freq: RRule.WEEKLY,
           dtstart: new Date(
-            moment(newEventStartDate).second(59).minute(59).hour(23).valueOf()
+            moment(newEventStartDate).second(0).minute(0).hour(0).valueOf()
           ),
-          until: new Date(newEventEndDate),
+          until: new Date(
+            moment(newEventEndDate)
+              .utc()
+              .second(59)
+              .minute(59)
+              .hour(23)
+              .valueOf()
+          ),
           byweekday: repeatArr.flat(),
         }).toString(),
       });

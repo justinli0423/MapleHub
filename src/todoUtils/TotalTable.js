@@ -98,7 +98,6 @@ class TotalTable extends Component {
     });
   };
 
-  // TODO: use rrule.toText()??
   handleEventReoccurenceText = (calEvent) => {
     const rruleObj = rrulestr(calEvent.rrule);
     return rruleObj.toText();

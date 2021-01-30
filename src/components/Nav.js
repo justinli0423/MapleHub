@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -6,73 +6,110 @@ import {
   NavLink,
 } from "react-router-dom";
 import styled from "styled-components";
+import moment from "moment";
 
 import Home from "../pages/Home";
 import ServerStatus from "../pages/ServerStatus";
 import Legion from "../pages/Legion";
 import Events from "../pages/Events";
 
-export default function Nav() {
-  return (
-    <Router>
-      <Container>
-        <LogoContainer>
-          <LogoBar />
-          <h1>MapleHub</h1>
-          <Icon />
-        </LogoContainer>
-        <OptionsContainer>
-          <StyledLink exact to=''>
-            <Item>
-              <ActiveBar />
-              Updates
-            </Item>
-          </StyledLink>
-          <StyledLink to='/status'>
-            <Item>
-              <ActiveBar />
-              Status
-            </Item>
-          </StyledLink>
-          {/* <StyledLink exact to='/legion'>
-            <Item>
-              <ActiveBar />
-              Legion Board
-            </Item>
-          </StyledLink> */}
-          <StyledLink exact to='/reminders'>
-            <Item>
-              <ActiveBar />
-              Reminders
-            </Item>
-          </StyledLink>
-          {/* <Item>
-            <ActiveBar />
-            Maple.gg
-          </Item> */}
-        </OptionsContainer>
-      </Container>
+export default class Nav extends Component {
+  constructor() {
+    super();
+    this.state = {
+      intervalHandler: null,
+      currTime: new Date(),
+    };
+  }
 
-      {/* A <Switch> looks through its children <Route>s and
-            renders the first one that matches the current URL. */}
-      <MainContainer>
-        <Switch>
-          <Route path='/legion'>
-            <Legion />
-          </Route>
-          <Route path='/status'>
-            <ServerStatus />
-          </Route>
-          <Route path='/reminders'>
-            <Events />
-          </Route>
-          <Route path='/'>
-            <Home />
-          </Route>
-        </Switch>
-      </MainContainer>
-    </Router>
-  );
+  componentDidMount() {
+    const timerHandler = setInterval(() => {
+      this.setTimer();
+    }, 1000);
+    this.setState({
+      ...this.state,
+      timerHandler,
+    });
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.timerHandler);
+  }
+
+  setTimer = () => {
+    this.setState({
+      ...this.state,
+      serverTime: new Date(),
+    });
+  };
+
+  render() {
+    return (
+      <Router>
+        <Container>
+          <LogoContainer>
+            <LogoBar />
+            <h1>MapleHub</h1>
+            <Icon />
+            <TimerContainer>
+              {moment(this.state.serverTime)
+                .utc()
+                .format("ddd MMM Do, h:mm:ss a")}
+            </TimerContainer>
+          </LogoContainer>
+          <OptionsContainer>
+            <StyledLink exact to=''>
+              <Item>
+                <ActiveBar />
+                Updates
+              </Item>
+            </StyledLink>
+            <StyledLink to='/status'>
+              <Item>
+                <ActiveBar />
+                Status
+              </Item>
+            </StyledLink>
+            {/* <StyledLink exact to='/legion'>
+              <Item>
+                <ActiveBar />
+                Legion Board
+              </Item>
+            </StyledLink> */}
+            <StyledLink exact to='/reminders'>
+              <Item>
+                <ActiveBar />
+                Reminders
+              </Item>
+            </StyledLink>
+            {/* <Item>
+              <ActiveBar />
+              Maple.gg
+            </Item> */}
+          </OptionsContainer>
+        </Container>
+
+        {/* A <Switch> looks through its children <Route>s and
+              renders the first one that matches the current URL. */}
+        <MainContainer>
+          <Switch>
+            <Route path='/legion'>
+              <Legion />
+            </Route>
+            <Route path='/status'>
+              <ServerStatus />
+            </Route>
+            <Route path='/reminders'>
+              <Events />
+            </Route>
+            <Route path='/'>
+              <Home />
+            </Route>
+          </Switch>
+        </MainContainer>
+      </Router>
+    );
+  }
 }
 
 const Container = styled.div`
@@ -165,4 +202,9 @@ const MainContainer = styled.div`
   flex-direction: column;
   align-items: center;
   /* border: 1px solid grey; */
+`;
+
+const TimerContainer = styled.div`
+  width: 200px;
+  margin-left: 16px;
 `;
