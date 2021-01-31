@@ -205,6 +205,6 @@ const MainContainer = styled.div`
 `;
 
 const TimerContainer = styled.div`
-  width: 200px;
+  width: 250px;
   margin-left: 16px;
 `;
