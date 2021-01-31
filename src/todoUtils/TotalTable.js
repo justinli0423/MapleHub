@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-
+import moment from "moment";
 import { rrulestr } from "rrule";
 
 import Table from "@material-ui/core/Table";
@@ -179,6 +179,11 @@ class TotalTable extends Component {
                     const isItemSelected = selected.indexOf(eventId) !== -1;
                     const labelId = `enhanced-table-checkbox-${eventId}`;
                     const rruleObj = rrulestr(calendarEvents[eventId].rrule);
+                    const endOfDayUntil = moment(rruleObj.options.until)
+                      .utc()
+                      .second(59)
+                      .minute(59)
+                      .hour(23);
                     return (
                       <TableRow
                         hover
@@ -202,11 +207,11 @@ class TotalTable extends Component {
                           align='left'
                           style={{
                             color:
-                              rruleObj.options.until.valueOf() < Date.now()
+                              endOfDayUntil.valueOf() < Date.now()
                                 ? Colors.BackgroundGrey
                                 : undefined,
                             textDecoration:
-                              rruleObj.options.until.valueOf() < Date.now()
+                              endOfDayUntil.valueOf() < Date.now()
                                 ? "line-through"
                                 : undefined,
                           }}
@@ -214,7 +219,7 @@ class TotalTable extends Component {
                           {calendarEvents[eventId].subject}
                         </TableCell>
                         <TableCell align='left'>
-                          {rruleObj.options.until.toDateString()}
+                          {new Date(endOfDayUntil).toDateString()}
                         </TableCell>
                         <TableCell
                           align='left'
