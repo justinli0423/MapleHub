@@ -178,6 +178,7 @@ const Item = styled.span`
   height: 100%;
   padding: 20px 0;
   margin: 0 48px;
+  font-size: 12px;
 
   ${ActiveBar} {
     opacity: 0;

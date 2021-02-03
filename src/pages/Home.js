@@ -40,8 +40,8 @@ const HTMLQuickValidate = (str) => {
   return Array.from(doc.body.childNodes).some((node) => node.nodeType === 1);
 };
 
-const findYearForEvent = (eventTimeStamp, patchNodesTimeStamp) => {
-  const patchNotesDate = new Date(patchNodesTimeStamp);
+const findYearForEvent = (eventTimeStamp, patchNotesTimeStamp) => {
+  const patchNotesDate = new Date(patchNotesTimeStamp);
   // all event dates are assumed to be in current year
   const threeMonthsBeforePatch = patchNotesDate.setMonth(
     patchNotesDate.getMonth() - 3
@@ -74,16 +74,17 @@ const findYearForEvent = (eventTimeStamp, patchNodesTimeStamp) => {
       eventTimeStamp < threeMonthsAfterPatch
     ) {
       // if event occurs during window and month < dec: assume this year
-      return yearThreeMonthsBeforePatch;
+      return patchNotesDate.getFullYear();
     }
     if (eventTimeStamp < threeMonthsBeforePatch) {
       // if event occurs after event duration: assume next year
       return yearThreeMonthsAfterPatch;
     }
   }
+  return patchNotesDate.getFullYear();
 };
 
-const cleanDateString = (dateString, patchNodesTimeStamp) => {
+const cleanDateString = (dateString, patchNotesTimeStamp) => {
   if (!dateString.length) {
     return;
   }
@@ -103,30 +104,30 @@ const cleanDateString = (dateString, patchNodesTimeStamp) => {
     return;
   }
   filteredDate = filteredDate
-    .concat(" " + new Date(patchNodesTimeStamp).getFullYear() + " ")
+    .concat(" " + new Date(patchNotesTimeStamp).getFullYear() + " ")
     .concat("UTC");
   const filteredDateObject = new Date(filteredDate);
   const timeStamp = Date.parse(filteredDate);
   const filteredDateWithYear = filteredDateObject.setYear(
-    findYearForEvent(timeStamp, patchNodesTimeStamp)
+    findYearForEvent(timeStamp, patchNotesTimeStamp)
   );
   return filteredDateWithYear;
 };
 
-const handleSingleEvent = (dateArray, patchNodesTimeStamp) => {
+const handleSingleEvent = (dateArray, patchNotesTimeStamp) => {
   const [startTime, endTime] = [
-    cleanDateString(dateArray[0], patchNodesTimeStamp),
-    cleanDateString(dateArray[1], patchNodesTimeStamp),
+    cleanDateString(dateArray[0], patchNotesTimeStamp),
+    cleanDateString(dateArray[1], patchNotesTimeStamp),
   ];
   return [startTime, endTime];
 };
 
-const handleMultipleEvents = (dateArray, patchNodesTimeStamp) => {
+const handleMultipleEvents = (dateArray, patchNotesTimeStamp) => {
   const splitDateArray = dateArray
     .map((dateString) => dateString.split("UTC:"))
     .flat();
   const splitCleanedDateArray = splitDateArray
-    .map((date) => cleanDateString(date, patchNodesTimeStamp))
+    .map((date) => cleanDateString(date, patchNotesTimeStamp))
     .filter((date) => date);
   const eventTimes = [];
   splitCleanedDateArray.forEach((event, i) => {
@@ -144,10 +145,10 @@ const handleMultipleEvents = (dateArray, patchNodesTimeStamp) => {
 /**
  *
  * @param {HTML} body
- * @param {Date} patchNodesTimeStamp
+ * @param {Date} patchNotesTimeStamp
  */
 
-const handleSubSectionNews = (body, patchNodesTimeStamp) => {
+const handleSubSectionNews = (body, patchNotesTimeStamp) => {
   const sectionDetails = [];
   const eventHeadersList = Array.from(body.querySelectorAll("h3"));
 
@@ -188,7 +189,7 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
               // no end date
               lastSectionDetail.eventType = EventTypes.UPDATE;
               lastSectionDetail.eventTimes = [
-                cleanDateString(unfilteredDate[0], patchNodesTimeStamp),
+                cleanDateString(unfilteredDate[0], patchNotesTimeStamp),
                 (lastSectionDetail.endDate = null),
               ];
               break;
@@ -197,7 +198,7 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
               lastSectionDetail.eventType = EventTypes.SINGLE_EVENT;
               lastSectionDetail.eventTimes = handleSingleEvent(
                 unfilteredDate,
-                patchNodesTimeStamp
+                patchNotesTimeStamp
               );
               break;
             default:
@@ -206,7 +207,7 @@ const handleSubSectionNews = (body, patchNodesTimeStamp) => {
                 lastSectionDetail.eventType = EventTypes.MULTIPLE_EVENTS;
                 lastSectionDetail.eventTimes = handleMultipleEvents(
                   unfilteredDate,
-                  patchNodesTimeStamp
+                  patchNotesTimeStamp
                 );
               } else {
                 isDetails = true;
@@ -257,8 +258,8 @@ export default class Home extends Component {
       newsDetails: {
         backupBanner: process.env.PUBLIC_URL + "/testbanner.jpg",
         bannerURL: DefaultBannerUrl ?? null,
-        patchNodesTimeStamp: DefaultTimeStamp ?? null,
-        sectionDetails: DefaultEventDetails ?? [],
+        patchNotesTimeStamp: DefaultTimeStamp ?? null,
+        sectionDetails: [],
       },
       filters: {
         [FilterTypes.MULTIPLE_EVENTS]: false,
@@ -323,17 +324,10 @@ export default class Home extends Component {
       localStorage.getItem(LOCAL_STORAGE_EVENT_NOTES)
     );
     // if user updated patch notes manually, load that state instead
-    if (newsDetails) {
-      this.setState({
-        ...this.state,
-        newsDetails,
-      });
-    } else {
-      window.localStorage.setItem(
-        LOCAL_STORAGE_EVENT_NOTES,
-        JSON.stringify(this.state.newsDetails)
-      );
-    }
+    this.setState({
+      ...this.state,
+      newsDetails: newsDetails ?? DefaultEventDetails,
+    });
   }
 
   handleFilterToggle(filterType) {
@@ -395,22 +389,29 @@ export default class Home extends Component {
     ));
   }
 
-  // TODO: find count of subsections (count of h3s) and render placeholders?
   getNews(patchNotesSrc = "") {
     const doc = new DOMParser().parseFromString(patchNotesSrc, "text/html");
     const body = doc.querySelector("div.article-content");
     const banner = body.querySelector("img#__mcenew");
-    const patchNodesTimeStamp = Date.parse(
-      doc.querySelector(".timestamp").innerText
-    );
-    const sectionDetails = handleSubSectionNews(body, patchNodesTimeStamp);
+    const patchNotesTime = doc.querySelector(".timestamp").innerText;
+    let patchNotesTimeStamp = Date.parse(patchNotesTime);
+
+    if (patchNotesTime.indexOf("hours ago") > -1) {
+      patchNotesTimeStamp = Date.now();
+    }
+
+    if (patchNotesTime.indexOf("days ago") > -1) {
+      patchNotesTimeStamp = Date.now() - parseInt(patchNotesTime) * 86400000;
+    }
+
+    const sectionDetails = handleSubSectionNews(body, patchNotesTimeStamp);
     this.setState(
       {
         newsDetails: {
           ...this.state.newsDetails,
           bannerURL: banner.attributes.src.textContent,
           sectionDetails,
-          patchNodesTimeStamp,
+          patchNotesTimeStamp,
         },
       },
       () => {
@@ -472,14 +473,14 @@ export default class Home extends Component {
   }
 
   render() {
-    const { patchNodesTimeStamp, sectionDetails } = this.state.newsDetails;
+    const { patchNotesTimeStamp, sectionDetails } = this.state.newsDetails;
     return (
       <>
         {this.renderHeader()}
         <NewsContainer>
           <LastUpdatedHeader>
             <b>Patch Notes Last Updated On: </b>
-            {new Date(patchNodesTimeStamp).toDateString()}
+            {new Date(patchNotesTimeStamp).toDateString()}
           </LastUpdatedHeader>
           <SearchBar
             searchObject={sectionDetails}

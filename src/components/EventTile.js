@@ -312,7 +312,6 @@ export default class EventTile extends Component {
                   )
                 : "None"}
             </EventDetails>
-            {/* TODO: set Rewards */}
             <DetailsContainer isDetailsExpanded={isDetailsExpanded}>
               <DetailsHeader>Details: </DetailsHeader>
               <Details
@@ -391,6 +390,7 @@ const EventHeader = styled.h2`
 
 const EventDetails = styled.p`
   display: inline-block;
+  max-width: 900px;
   margin-left: 4px;
   line-height: 25px;
 `;

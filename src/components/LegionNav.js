@@ -3,7 +3,6 @@ import styled from "styled-components";
 
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import { StylesProvider } from "@material-ui/core/styles";
 
 import Colors from "../common/colors";
 
@@ -65,16 +64,14 @@ export default class LegionNav extends React.Component {
           )}
           onChange={this.handleAutocompleteInputChange.bind(this)}
           renderInput={(params) => (
-            <StylesProvider injectFirst>
-              <TextField
-                style={{
-                  width: "420px",
-                }}
-                label='Legion Rank'
-                variant='outlined'
-                {...params}
-              />
-            </StylesProvider>
+            <TextField
+              style={{
+                width: "420px",
+              }}
+              label='Legion Rank'
+              variant='outlined'
+              {...params}
+            />
           )}
         />
         <LegionPillContainer>{this.renderLegionPills()}</LegionPillContainer>
