@@ -326,7 +326,12 @@ export default class Home extends Component {
     // if user updated patch notes manually, load that state instead
     this.setState({
       ...this.state,
-      newsDetails: newsDetails ?? DefaultEventDetails,
+      newsDetails: newsDetails ?? {
+        ...this.state.newsDetails,
+        bannerURL: DefaultBannerUrl ?? null,
+        patchNotesTimeStamp: DefaultTimeStamp ?? null,
+        sectionDetails: DefaultEventDetails ?? [],
+      },
     });
   }
 
