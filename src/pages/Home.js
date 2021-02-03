@@ -333,6 +333,18 @@ export default class Home extends Component {
         sectionDetails: DefaultEventDetails ?? [],
       },
     });
+
+    if (!newsDetails) {
+      window.localStorage.setItem(
+        LOCAL_STORAGE_EVENT_NOTES,
+        JSON.stringify({
+          ...this.state.newsDetails,
+          bannerURL: DefaultBannerUrl ?? null,
+          patchNotesTimeStamp: DefaultTimeStamp ?? null,
+          sectionDetails: DefaultEventDetails ?? [],
+        })
+      );
+    }
   }
 
   handleFilterToggle(filterType) {
