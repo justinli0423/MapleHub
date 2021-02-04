@@ -320,31 +320,15 @@ export default class Home extends Component {
   }
 
   componentDidMount() {
-    const newsDetails = JSON.parse(
-      localStorage.getItem(LOCAL_STORAGE_EVENT_NOTES)
-    );
-    // if user updated patch notes manually, load that state instead
     this.setState({
       ...this.state,
-      newsDetails: newsDetails ?? {
+      newsDetails: {
         ...this.state.newsDetails,
         bannerURL: DefaultBannerUrl ?? null,
         patchNotesTimeStamp: DefaultTimeStamp ?? null,
         sectionDetails: DefaultEventDetails ?? [],
       },
     });
-
-    if (!newsDetails) {
-      window.localStorage.setItem(
-        LOCAL_STORAGE_EVENT_NOTES,
-        JSON.stringify({
-          ...this.state.newsDetails,
-          bannerURL: DefaultBannerUrl ?? null,
-          patchNotesTimeStamp: DefaultTimeStamp ?? null,
-          sectionDetails: DefaultEventDetails ?? [],
-        })
-      );
-    }
   }
 
   handleFilterToggle(filterType) {
@@ -366,7 +350,6 @@ export default class Home extends Component {
     this.setState({ isModalActive: false });
   }
 
-  // TODO: think about loading state?
   handleModalInputChange(ev) {
     if (HTMLQuickValidate(ev.target.value)) {
       this.getNews(ev.target.value);
@@ -386,14 +369,6 @@ export default class Home extends Component {
     const { sectionDetails } = this.state.newsDetails ?? [];
     const filterKeys = Object.keys(filters);
     const isFilterActive = !!filterKeys.filter((key) => filters[key]).length;
-
-    if (!sectionDetails || !sectionDetails.length) {
-      return (
-        <EventEmptyIntro>
-          No Events found, click <b>UPDATE NEWS HUB</b> above to get started!
-        </EventEmptyIntro>
-      );
-    }
 
     return sectionDetails.map((section, i) => (
       <EventTile
@@ -447,9 +422,10 @@ export default class Home extends Component {
       <Header src={src}>
         <Title
           title='All-In-One News Hub'
-          caption='Click the button below if the News Hub is not updated!'
+          caption='A short and simple version of the current patch notes.'
         />
-        <Button label='Update News Hub' callback={this.openModal.bind(this)} />
+        {/* button should be enabled only to update the patch */}
+        {/* <Button label='Update News Hub' callback={this.openModal.bind(this)} /> */}
         <Modal
           open={this.state.isModalActive}
           onClose={this.closeModal.bind(this)}

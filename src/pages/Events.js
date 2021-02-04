@@ -24,7 +24,12 @@ import {
   LOCAL_STORAGE_EVENT_NOTES,
   LOCAL_STORAGE_EVENT_DETAILS,
 } from "../common/consts";
-// import ics from "../common/ics";
+
+import {
+  DefaultEventDetails,
+  DefaultBannerUrl,
+  DefaultTimeStamp,
+} from "../homeUtils/defaultEventDetails";
 
 import Title from "../components/common/Title";
 import Header from "../components/common/Header";
@@ -47,7 +52,6 @@ import DailyTable from "../todoUtils/DailyTable";
 import TotalTable from "../todoUtils/TotalTable";
 
 const filter = createFilterOptions();
-// const cal = ics();
 
 class Events extends Component {
   constructor(props) {
@@ -64,9 +68,6 @@ class Events extends Component {
   }
 
   componentDidMount() {
-    const updateEvents = JSON.parse(
-      window.localStorage.getItem(LOCAL_STORAGE_EVENT_NOTES)
-    );
     const calendarEvents =
       JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_EVENT_DETAILS)) ??
       {};
@@ -75,10 +76,9 @@ class Events extends Component {
 
     this.setState({
       ...this.state,
-      events: (updateEvents && updateEvents.sectionDetails.length
-        ? updateEvents.sectionDetails
-        : []
-      ).filter((event) => event.eventTimes.length && event.eventTimes[1]),
+      events: DefaultEventDetails.filter(
+        (event) => event.eventTimes.length && event.eventTimes[1]
+      ),
     });
   }
 

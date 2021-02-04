@@ -139,9 +139,9 @@ const findRemainingDuration = (eventTimes) => {
     timeToConvert = eventTimes[1] - eventTimes[0];
   } else {
     timeToConvert = eventTimes[1] - currentTime;
-    if (timeToConvert < 0) {
-      return -1;
-    }
+  }
+  if (timeToConvert < 0) {
+    return -1;
   }
   const diffDays = Math.ceil(timeToConvert / (1000 * 60 * 60 * 24));
   return diffDays;
