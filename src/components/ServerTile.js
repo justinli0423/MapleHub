@@ -4,7 +4,7 @@ import styled from "styled-components";
 import PingServer from "../serverUtils/PingServer";
 
 import Colors from "./../common/colors";
-import { isMobile } from "./../common/MediaQueries";
+import { isMobile, isTablet } from "./../common/MediaQueries";
 
 const statusWidth = 150;
 const statusHeight = 16;
@@ -90,6 +90,10 @@ const Container = styled.div`
   color: ${Colors.White};
   background: ${Colors.Black};
   border-radius: 10px;
+
+  ${isTablet} {
+    flex: 1 0 calc(25% - 8px);
+  }
 
   ${isMobile} {
     flex: 1 0 calc(50% - 8px);

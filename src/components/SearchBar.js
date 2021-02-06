@@ -6,7 +6,7 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import { StylesProvider } from "@material-ui/core/styles";
 
 import Colors from "../common/colors";
-import { isMobile, isTabletOrBelow } from "../common/MediaQueries";
+import { isMobile, isTablet, isTabletOrBelow } from "../common/MediaQueries";
 
 export default class SearchBar extends React.Component {
   handleAutocompleteInputChange(ev, val) {
@@ -64,6 +64,10 @@ const Container = styled.div`
     width: 100%;
     padding: 0 16px;
     flex-wrap: wrap;
+  }
+  
+  ${isTablet} {
+    width: calc(768px - 32px);
   }
 `;
 
