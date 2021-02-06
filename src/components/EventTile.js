@@ -171,12 +171,12 @@ export default class EventTile extends Component {
     });
   }
 
-  handleDetailsToggle() {
+  handleDetailsToggle = () => {
     this.setState({
       ...this.state,
       isDetailsExpanded: !this.state.isDetailsExpanded,
     });
-  }
+  };
 
   handleRenderDuration() {
     const { eventDuration } = this.state;
@@ -282,13 +282,14 @@ export default class EventTile extends Component {
     return (
       <>
         <OverlayContainer
-          onClick={this.handleDetailsToggle.bind(this)}
+          onClick={this.handleDetailsToggle}
           isDetailsExpanded={isDetailsExpanded}
         />
         <Container
           isDetailsExpanded={isDetailsExpanded}
           isEventActive={isEventActive}
           isFiltered={this.handleFilteredState()}
+          isLargeMobileBox={eventDetails.requirements.length > 150}
         >
           <EventHeader isDetailsExpanded={isDetailsExpanded}>
             <EventIconContainer
@@ -384,8 +385,8 @@ const Container = styled.div`
   ${isMobile} {
     flex: unset;
     width: calc(100% - 32px);
-    height: ${({ isDetailsExpanded }) =>
-      isDetailsExpanded ? "500px" : "200px"};
+    height: ${({ isDetailsExpanded, isLargeMobileBox }) =>
+      isDetailsExpanded ? (isLargeMobileBox ? "800px" : "500px") : "200px"};
   }
 `;
 
@@ -394,12 +395,17 @@ const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  height: calc(100% - 62px - 45px);
+  height: calc(100% - 62px - 45px + 16px);
   margin-left: 8px;
   line-height: 30px;
+
+  ${isMobile} {
+    height: calc(100% - 54px - 40px + 16px);
+  }
 `;
 
 const EventHeader = styled.h2`
+  overflow-x: hidden;
   width: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "900px" : "410px")};
   height: 30px;
   margin: 16px 0;
@@ -503,10 +509,13 @@ const DetailsContainer = styled.div`
   width: ${({ isDetailsExpanded }) =>
     isDetailsExpanded ? "calc(100% - 32px)" : 0};
   height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "auto" : 0)};
+  margin-top: 8px;
   padding: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "8px" : 0)};
   opacity: ${({ isDetailsExpanded }) => (isDetailsExpanded ? 1 : 0)};
   visibility: ${({ isDetailsExpanded }) =>
     isDetailsExpanded ? "visible" : "hidden"};
+  border: 1px solid ${Colors.BackgroundGrey};
+  border-bottom: none;
 
   ${isMobile} {
     width: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "100%" : 0)};
