@@ -42,7 +42,6 @@ const HTMLQuickValidate = (str) => {
   return Array.from(doc.body.childNodes).some((node) => node.nodeType === 1);
 };
 
-
 // TOOO: why not just split into 2 cases: [0] < [1] and [0] > [1]
 // this way,we can set both time stamps with the same year and modify it inside the conditions
 const findYearForEvent = (eventTimeStamp, patchNotesTimeStamp) => {
@@ -344,7 +343,7 @@ export default class Home extends Component {
         [filterType]: !this.state.filters[filterType],
       },
     });
-    this.handleEventTileRender();
+
   }
 
   openModal() {
@@ -548,6 +547,10 @@ const NewsContainer = styled.div`
   ${isMobile} {
     width: 100%;
     margin: 24px auto;
+  }
+
+  ${isTablet} {
+    width: 768px;
   }
 `;
 

@@ -24,6 +24,10 @@ const HeaderContainer = styled.div`
   width: 1024px;
   margin: 0 auto;
 
+  ${isTablet} {
+    width: 100%;
+  }
+
   ${isMobile} {
     width: 100%;
   }

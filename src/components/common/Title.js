@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 import Colors from "../../common/colors";
-import { isMobile, isTablet } from "../../common/MediaQueries";
+import { isMobile } from "../../common/MediaQueries";
 
 const Header = styled.h1`
   padding: 72px 0 24px 0;

@@ -4,7 +4,12 @@ import styled, { keyframes, css } from "styled-components";
 import { EventTypes, FilterTypes } from "../common/consts";
 import Colors from "../common/colors";
 
-import { isMobile, isTablet, MediaQueries } from "../common/MediaQueries";
+import {
+  isMobile,
+  isTablet,
+  isTabletOrBelow,
+  MediaQueries,
+} from "../common/MediaQueries";
 
 import ArrowDownIcon from "../icons/chevron-down-solid.svg";
 import ArrowUpIcon from "../icons/chevron-up-solid.svg";
@@ -195,7 +200,7 @@ export default class EventTile extends Component {
   handleRenderStartPeriodHeader() {
     const { eventDetails } = this.state;
 
-    if (mediaQueries.isMobile) {
+    if (mediaQueries.isTabletOrBelow) {
       return "Starting:";
     }
 
@@ -301,6 +306,8 @@ export default class EventTile extends Component {
             />
             {mediaQueries.isMobile
               ? handleTruncateText(eventDetails.eventName, false, 24)
+              : mediaQueries.isTablet
+              ? handleTruncateText(eventDetails.eventName, false, 24)
               : eventDetails.eventName}
           </EventHeader>
           <ContentContainer>
@@ -318,7 +325,7 @@ export default class EventTile extends Component {
                 ? handleTruncateText(
                     eventDetails.requirements,
                     isDetailsExpanded,
-                    mediaQueries.isMobile ? 30 : 80
+                    mediaQueries.isTabletOrBelow ? 30 : 80
                   )
                 : "None"}
             </EventDetails>
@@ -386,6 +393,11 @@ const Container = styled.div`
   background: ${({ isEventActive }) => (isEventActive ? "#ffffff" : "#e6e6e6")};
   box-shadow: 4px 5px 3px rgba(0, 0, 0, 0.25);
 
+  ${isTablet} {
+    height: ${({ isDetailsExpanded }) =>
+      isDetailsExpanded ? "500px" : "200px"};
+  }
+
   ${isMobile} {
     flex: unset;
     width: calc(100% - 32px);
@@ -402,6 +414,10 @@ const ContentContainer = styled.div`
   height: calc(100% - 62px - 45px + 16px);
   margin-left: 8px;
   line-height: 30px;
+
+  ${isTablet} {
+    height: calc(100% - 54px - 40px);
+  }
 
   ${isMobile} {
     height: calc(100% - 54px - 40px + 16px);
@@ -423,6 +439,11 @@ const EventHeader = styled.h2`
     margin: 16px 0 8px;
     font-size: 20px;
   }
+
+  ${isTablet} {
+    width: 100%;
+    font-size: 20px;
+  }
 `;
 
 const EventDetails = styled.p`
@@ -431,10 +452,15 @@ const EventDetails = styled.p`
   margin: 4px;
   line-height: 25px;
 
-  ${isMobile} {
-    max-width: 300px;
+  ${isTabletOrBelow} {
+    max-width: 700px;
     font-size: 14px;
     margin: 0 4px;
+  }
+
+  ${isMobile} {
+    max-width: 300px;
+
   }
 `;
 

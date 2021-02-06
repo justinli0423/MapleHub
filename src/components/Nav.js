@@ -22,8 +22,13 @@ import ServerStatus from "../pages/ServerStatus";
 import Legion from "../pages/Legion";
 import Events from "../pages/Events";
 
-import { isMobile, isTablet } from "../common/MediaQueries";
+import {
+  isTablet,
+  isTabletOrBelow,
+  MediaQueries,
+} from "../common/MediaQueries";
 
+const mediaQueries = new MediaQueries();
 export default class Nav extends Component {
   constructor() {
     super();
@@ -132,6 +137,13 @@ export default class Nav extends Component {
                 <MenuIcon />
               </IconButton>
               <Typography variant='h6'>MapleHub</Typography> <Icon />
+              {mediaQueries.isTablet ? (
+                <TimerContainer>
+                  {moment(this.state.serverTime)
+                    .utc()
+                    .format("ddd MMM Do, h:mm:ss a")}
+                </TimerContainer>
+              ) : null}
               <Menu
                 id='simple-menu'
                 anchorEl={menuAnchor}
@@ -186,7 +198,7 @@ const Container = styled.div`
   background: #f6f6f6;
   border-bottom: 3px solid #e5e5e5;
 
-  ${isMobile} {
+  ${isTabletOrBelow} {
     display: none;
   }
 `;
@@ -194,7 +206,7 @@ const Container = styled.div`
 const MobileContainer = styled.div`
   display: none;
 
-  ${isMobile} {
+  ${isTabletOrBelow} {
     display: block;
   }
 `;
@@ -282,4 +294,11 @@ const MainContainer = styled.div`
 const TimerContainer = styled.div`
   width: 250px;
   margin-left: 16px;
+
+  ${isTablet} {
+    position: absolute;
+    right: 0;
+    width: unset;
+    margin-right: 24px;
+  }
 `;

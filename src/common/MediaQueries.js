@@ -24,8 +24,13 @@ export class MediaQueries {
   get isTablet() {
     return this.width >= 768 && this.width < 1024;
   }
+
+  get isTabletOrBelow() {
+    return this.width < 1024;
+  }
 }
 
 export const isMobile = "@media screen and (max-width: 767px)";
 export const isTablet =
   "@media screen and (min-width: 768px) and (max-width: 1023px)";
+export const isTabletOrBelow = "@media screen and (max-width: 1023px)";
