@@ -20,16 +20,9 @@ import {
 
 import DateFnsUtils from "@date-io/date-fns";
 
-import {
-  LOCAL_STORAGE_EVENT_NOTES,
-  LOCAL_STORAGE_EVENT_DETAILS,
-} from "../common/consts";
+import { LOCAL_STORAGE_EVENT_DETAILS } from "../common/consts";
 
-import {
-  DefaultEventDetails,
-  DefaultBannerUrl,
-  DefaultTimeStamp,
-} from "../homeUtils/defaultEventDetails";
+import { DefaultEventDetails } from "../homeUtils/defaultEventDetails";
 
 import Title from "../components/common/Title";
 import Header from "../components/common/Header";

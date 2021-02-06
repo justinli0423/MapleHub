@@ -5,11 +5,13 @@ import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import Title from "../components/common/Title";
 import Header from "../components/common/Header";
+import { isMobile, MediaQueries } from "../common/MediaQueries";
 import DefaultButton from "../components/common/DefaultButton";
-
 import ServerTile from "../components/ServerTile";
 
 import { Worlds, WorldIds } from "../serverUtils/ServerDetails";
+
+const mediaQueries = new MediaQueries();
 
 export default class ServerStatus extends Component {
   constructor() {
@@ -73,13 +75,14 @@ export default class ServerStatus extends Component {
 
   render() {
     const { latencyThreshold, showAverage, selectedWorld } = this.state;
+
+    const caption = mediaQueries.isMobile
+      ? "Find how good (or bad) your channel latency is."
+      : "The response times below will show both the average of the last 10 pings as well as the last ping. Pings will trigger itself every 10 seconds against each channel asynchronously.";
     return (
       <>
         <Header src={process.env.PUBLIC_URL + "/serverstatusbanner.jpg"}>
-          <Title
-            title='Server Status'
-            caption='The response times below will show both the average of the last 10 pings as well as the last ping. Pings will trigger itself every 10 seconds against each channel asynchronously.'
-          />
+          <Title title='Server Status' caption={caption} />
         </Header>
         <Container>
           <StatusContainer>
@@ -138,10 +141,18 @@ export default class ServerStatus extends Component {
 
 const Container = styled.div`
   width: 1024px;
+
+  ${isMobile} {
+    width: 100%;
+  }
 `;
 
 const StatusContainer = styled.div`
   margin: 24px 8px 0;
+
+  ${isMobile} {
+    margin-top: 8px;
+  }
 `;
 
 const HeaderContainer = styled.div`
@@ -150,6 +161,10 @@ const HeaderContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   margin: 0 54px;
+
+  ${isMobile} {
+    margin: 0 8px;
+  }
 `;
 
 const ServerName = styled.div`
@@ -163,6 +178,10 @@ const ControlsContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+
+  ${isMobile} {
+    display: none;
+  }
 `;
 
 const IconLabel = styled.h2`
@@ -178,6 +197,11 @@ const StyledButton = styled(DefaultButton)`
 const Icon = styled.img`
   width: 79px;
   height: 88px;
+
+  ${isMobile} {
+    width: 30px;
+    height: 34px;
+  }
 `;
 
 const ServerContainer = styled.div`
@@ -187,6 +211,10 @@ const ServerContainer = styled.div`
   flex-wrap: wrap;
   width: 900px;
   margin: 24px auto;
+
+  ${isMobile} {
+    width: 100%;
+  }
 `;
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)`
@@ -196,6 +224,11 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)`
   flex-direction: row;
   align-items: center;
   margin: 24px 56px;
+
+  ${isMobile} {
+    margin: 24px 0;
+    width: 100%;
+  }
 `;
 
 const WorldImg = styled.img`
@@ -205,5 +238,11 @@ const WorldImg = styled.img`
 `;
 
 const StyledToggleButton = styled(ToggleButton)`
-  flex: 1 0 150px;
+  flex: 1 0 16%;
+
+  ${isMobile} {
+    h3 {
+      display: none;
+    }
+  }
 `;

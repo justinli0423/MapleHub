@@ -4,6 +4,7 @@ import styled from "styled-components";
 import PingServer from "../serverUtils/PingServer";
 
 import Colors from "./../common/colors";
+import { isMobile } from "./../common/MediaQueries";
 
 const statusWidth = 150;
 const statusHeight = 16;
@@ -82,12 +83,18 @@ export default class ServerTile extends Component {
 }
 
 const Container = styled.div`
+  position: relative;
   width: 172px;
   height: 80px;
   margin: 4px;
   color: ${Colors.White};
   background: ${Colors.Black};
   border-radius: 10px;
+
+  ${isMobile} {
+    flex: 1 0 calc(50% - 8px);
+    width: unset;
+  }
 `;
 
 const ActiveStatus = styled.div`
@@ -121,6 +128,10 @@ const StatusBar = styled.div`
   );
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
+
+  ${isMobile} {
+    width: calc(100% - 24px);
+  }
 `;
 
 const ServerName = styled.h2`

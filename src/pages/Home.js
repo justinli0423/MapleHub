@@ -13,7 +13,6 @@ import {
 import Colors from "../common/colors";
 import { isMobile, isTablet, MediaQueries } from "../common/MediaQueries";
 
-import Button from "../components/common/DefaultButton";
 import Title from "../components/common/Title";
 import Header from "../components/common/Header";
 import EventTile from "../components/EventTile";
