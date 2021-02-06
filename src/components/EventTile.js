@@ -339,7 +339,11 @@ export default class EventTile extends Component {
             </DetailsContainer>
           </ContentContainer>
           <Footer onClick={this.handleDetailsToggle.bind(this)}>
-            <span>Show Details</span>
+            {isDetailsExpanded ? (
+              <span>Hide Details</span>
+            ) : (
+              <span>Show Details</span>
+            )}
             <div>
               <ArrowDownIconContainer
                 isDetailsExpanded={isDetailsExpanded}

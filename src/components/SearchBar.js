@@ -117,12 +117,13 @@ const Tooltip = styled.div`
   align-items: center;
   justify-content: center;
   position: absolute;
-  top: -45px;
+  top: -55px;
   left: 50%;
   transform: translateX(-50%);
-  width: max-content;
-  height: 30px;
+  width: 150px;
+  height: 45px;
   padding: 4px;
+  text-align: center;
   border-radius: 5px;
   background: ${Colors.White};
   border: 1px solid ${Colors.Black};
@@ -142,6 +143,13 @@ const Tooltip = styled.div`
     border-bottom: inherit;
     border-right: inherit;
     box-shadow: inherit;
+  }
+
+  ${isMobile} {
+    top: -45px;
+    width: 90px;
+    height: 35px;
+    font-size: 12px;
   }
 `;
 
