@@ -511,7 +511,7 @@ const DetailsContainer = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   width: ${({ isDetailsExpanded }) =>
-    isDetailsExpanded ? "calc(100% - 32px)" : 0};
+    isDetailsExpanded ? "calc(100% - 16px)" : 0};
   height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "auto" : 0)};
   margin-top: 8px;
   padding: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "8px" : 0)};
@@ -522,7 +522,8 @@ const DetailsContainer = styled.div`
   border-bottom: none;
 
   ${isMobile} {
-    width: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "100%" : 0)};
+    width: ${({ isDetailsExpanded }) =>
+      isDetailsExpanded ? "calc(100% - 8px)" : 0};
   }
 `;
 
