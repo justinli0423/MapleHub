@@ -4,6 +4,8 @@ import styled, { keyframes, css } from "styled-components";
 import { EventTypes, FilterTypes } from "../common/consts";
 import Colors from "../common/colors";
 
+import { isMobile, isTablet, MediaQueries } from "../common/MediaQueries";
+
 import ArrowDownIcon from "../icons/chevron-down-solid.svg";
 import ArrowUpIcon from "../icons/chevron-up-solid.svg";
 
@@ -12,6 +14,8 @@ import ActiveEventIcon from "../icons/hourglass-start-solid.svg";
 import FutureEventIcon from "../icons/fast-forward-solid.svg";
 import PastEventIcon from "../icons/history-solid.svg";
 import PermanentEventIcon from "../icons/infinity-solid.svg";
+
+const mediaQueries = new MediaQueries();
 
 const handleTruncateText = (text, isExpanded, length) => {
   if (text.length <= length || isExpanded) {
@@ -190,6 +194,11 @@ export default class EventTile extends Component {
 
   handleRenderStartPeriodHeader() {
     const { eventDetails } = this.state;
+
+    if (mediaQueries.isMobile) {
+      return "Starting:";
+    }
+
     if (eventDetails.eventType === EventTypes.MULTIPLE_EVENTS) {
       return "Next Period Starting:";
     }
@@ -289,26 +298,26 @@ export default class EventTile extends Component {
               }
               src={`${eventIcon}`}
             />
-            {eventDetails.eventName}
+            {mediaQueries.isMobile
+              ? handleTruncateText(eventDetails.eventName, false, 24)
+              : eventDetails.eventName}
           </EventHeader>
           <ContentContainer>
             <EventDetails>
               <Bold>{this.handleRenderStartPeriodHeader()}</Bold>
               {startDate}
             </EventDetails>
-            <br />
             <EventDetails>
               <Bold>Duration Remaining:</Bold>
               {this.handleRenderDuration()}
             </EventDetails>
-            <br />
             <EventDetails>
               <Bold>Requirements:</Bold>
               {eventDetails.requirements.length
                 ? handleTruncateText(
                     eventDetails.requirements,
                     isDetailsExpanded,
-                    80
+                    mediaQueries.isMobile ? 30 : 80
                   )
                 : "None"}
             </EventDetails>
@@ -367,35 +376,58 @@ const Container = styled.div`
     isDetailsExpanded ? "0 0 calc(100% - 32px)" : "0 0 calc(50% - 32px)"};
   height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "500px" : "250px")};
   margin: 16px;
-  padding: 16px;
+  padding: 0 16px 16px;
   border-radius: 5px;
   background: ${({ isEventActive }) => (isEventActive ? "#ffffff" : "#e6e6e6")};
   box-shadow: 4px 5px 3px rgba(0, 0, 0, 0.25);
+
+  ${isMobile} {
+    flex: unset;
+    width: calc(100% - 32px);
+    height: ${({ isDetailsExpanded }) =>
+      isDetailsExpanded ? "500px" : "200px"};
+  }
 `;
 
 const ContentContainer = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: calc(100% - 62px - 45px);
   margin-left: 8px;
   line-height: 30px;
 `;
 
 const EventHeader = styled.h2`
-  overflow: hidden;
+  width: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "900px" : "410px")};
+  height: 30px;
+  margin: 16px 0;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-bottom: 16px;
   font-weight: bold;
   font-size: 24px;
-  width: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "900px" : "410px")};
+  white-space: nowrap;
+
+  ${isMobile} {
+    width: 100%;
+    margin: 16px 0 8px;
+    font-size: 20px;
+  }
 `;
 
 const EventDetails = styled.p`
   display: inline-block;
   max-width: 900px;
-  margin-left: 4px;
+  margin: 4px;
   line-height: 25px;
+
+  ${isMobile} {
+    max-width: 300px;
+    font-size: 14px;
+    margin: 0 4px;
+  }
 `;
 
-// TODO: shrink footer when out of focus (clicking outside the box)
 const Footer = styled.div`
   position: absolute;
   left: 0;
@@ -418,6 +450,11 @@ const Footer = styled.div`
       filter: drop-shadow(2px 2px 1px ${Colors.BackgroundGrey});
     }
   }
+
+  ${isMobile} {
+    height: 40px;
+    font-size: 16px;
+  }
 `;
 
 const Bold = styled.b`
@@ -430,6 +467,11 @@ const ArrowIcon = styled.img`
   padding: 3px;
   border-radius: 50%;
   transition: 0.1s linear all;
+
+  ${isMobile} {
+    width: 20px;
+    height: 20px;
+  }
 `;
 
 const ArrowUpIconContainer = styled(ArrowIcon)`
@@ -453,29 +495,43 @@ const EventIconContainer = styled.img`
       : "none"};
 `;
 
-// TODO: Animation on show/hide?
 const DetailsContainer = styled.div`
   overflow-y: auto;
-  max-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   width: ${({ isDetailsExpanded }) =>
     isDetailsExpanded ? "calc(100% - 32px)" : 0};
   height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "auto" : 0)};
-  padding: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "16px 8px" : 0)};
+  padding: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "8px" : 0)};
   opacity: ${({ isDetailsExpanded }) => (isDetailsExpanded ? 1 : 0)};
   visibility: ${({ isDetailsExpanded }) =>
     isDetailsExpanded ? "visible" : "hidden"};
+
+  ${isMobile} {
+    width: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "100%" : 0)};
+  }
 `;
 
 const Details = styled.ul`
   list-style-position: outside;
+
+  ${isMobile} {
+    margin-top: 4px;
+    padding-inline-start: 24px;
+  }
+
   & > li {
     font-size: 14px;
     font-weight: normal;
 
-    & ul {
+    ul {
       font-size: 12px;
       font-weight: normal;
-      text-indent: 16px;
+
+      ${isMobile} {
+        padding-inline-start: 24px;
+      }
     }
   }
 
@@ -500,6 +556,10 @@ const Details = styled.ul`
 
 const RewardImage = styled.img`
   max-width: 800px;
+
+  ${isMobile} {
+    max-width: 280px;
+  }
 `;
 
 const Rewards = styled.div`
@@ -508,9 +568,25 @@ const Rewards = styled.div`
 
 const DetailsHeader = styled.h2`
   margin: 8px 4px;
+
+  ${isMobile} {
+    margin: 0 4px;
+    font-size: 16px;
+  }
 `;
 
-const RewardDetails = styled.ul``;
+const RewardDetails = styled.ul`
+  font-size: 12px;
+  font-weight: normal;
+
+  ${isMobile} {
+    padding-inline-start: 24px;
+
+    li > ul {
+      padding-inline-start: 24px;
+    }
+  }
+`;
 
 const OverlayContainer = styled.div`
   z-index: 10;

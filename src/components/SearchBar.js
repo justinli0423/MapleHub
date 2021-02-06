@@ -6,6 +6,7 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import { StylesProvider } from "@material-ui/core/styles";
 
 import Colors from "../common/colors";
+import { isMobile, isTablet } from "../common/MediaQueries";
 
 export default class SearchBar extends React.Component {
   handleAutocompleteInputChange(ev, val) {
@@ -15,15 +16,12 @@ export default class SearchBar extends React.Component {
   render() {
     return (
       <Container>
-        <Autocomplete
+        <StyledAutocomplete
           options={this.props.searchObject.map((event) => event.eventName)}
           onChange={this.handleAutocompleteInputChange.bind(this)}
           renderInput={(params) => (
             <StylesProvider injectFirst>
-              <TextField
-                style={{
-                  width: "300px",
-                }}
+              <StyledTextField
                 label='Event Name'
                 variant='outlined'
                 {...params}
@@ -61,6 +59,12 @@ const Container = styled.div`
   width: calc(1024px - 32px);
   height: auto;
   margin: 16px auto 0;
+
+  ${isMobile} {
+    width: 100%;
+    padding: 0 16px;
+    flex-wrap: wrap;
+  }
 `;
 
 const FilterPillsContainer = styled.div`
@@ -69,6 +73,10 @@ const FilterPillsContainer = styled.div`
   justify-content: space-evenly;
   align-items: center;
   flex: 1 0 50%;
+
+  ${isMobile} {
+    margin-top: 8px;
+  }
 `;
 
 const FilterPill = styled.img`
@@ -81,9 +89,28 @@ const FilterPill = styled.img`
     isActive
       ? `2px solid ${Colors.Black}`
       : `2px solid ${Colors.BackgroundGrey}`};
+
+  ${isMobile} {
+    padding: 4px 16px;
+  }
+`;
+
+const StyledAutocomplete = styled(Autocomplete)`
+  ${isMobile} {
+    width: 100%;
+  }
+`;
+
+const StyledTextField = styled(TextField)`
+  width: 300px;
+
+  ${isMobile} {
+    width: 100%;
+  }
 `;
 
 const Tooltip = styled.div`
+  z-index: 10;
   opacity: 0;
   visibility: hidden;
   display: flex;
@@ -129,5 +156,10 @@ const PillContainer = styled.div`
   &:hover ${Tooltip} {
     opacity: 1;
     visibility: visible;
+  }
+
+  ${isMobile} {
+    flex: 1 0 20%;
+    padding: 4px 0;
   }
 `;

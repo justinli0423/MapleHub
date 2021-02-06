@@ -13,6 +13,8 @@ import ServerStatus from "../pages/ServerStatus";
 import Legion from "../pages/Legion";
 import Events from "../pages/Events";
 
+import { isMobile, isTablet } from "../common/MediaQueries";
+
 export default class Nav extends Component {
   constructor() {
     super();
@@ -123,6 +125,10 @@ const Container = styled.div`
   justify-content: space-between;
   background: #f6f6f6;
   border-bottom: 3px solid #e5e5e5;
+
+  ${isMobile} {
+    display: none;
+  }
 `;
 
 const OptionsContainer = styled.div`

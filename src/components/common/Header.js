@@ -1,6 +1,7 @@
 import styled from "styled-components";
-
 import * as React from "react";
+
+import { isMobile, isTablet } from "../../common/MediaQueries";
 
 const Header = ({ src, children }) => {
   return (
@@ -22,6 +23,10 @@ const HeaderContainer = styled.div`
   height: 250px;
   width: 1024px;
   margin: 0 auto;
+
+  ${isMobile} {
+    width: 100%;
+  }
 `;
 
 const Banner = styled.img`

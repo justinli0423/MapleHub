@@ -11,6 +11,7 @@ import {
   LOCAL_STORAGE_EVENT_NOTES,
 } from "../common/consts";
 import Colors from "../common/colors";
+import { isMobile, isTablet, MediaQueries } from "../common/MediaQueries";
 
 import Button from "../components/common/DefaultButton";
 import Title from "../components/common/Title";
@@ -35,11 +36,16 @@ import FutureEventUnselectedIcon from "../icons/fast-forward-grey.svg";
 import PastEventUnselectedIcon from "../icons/history-grey.svg";
 import PermanentEventUnselectedIcon from "../icons/infinity-grey.svg";
 
+const mediaQueries = new MediaQueries();
+
 const HTMLQuickValidate = (str) => {
   const doc = new DOMParser().parseFromString(str, "text/html");
   return Array.from(doc.body.childNodes).some((node) => node.nodeType === 1);
 };
 
+
+// TOOO: why not just split into 2 cases: [0] < [1] and [0] > [1]
+// this way,we can set both time stamps with the same year and modify it inside the conditions
 const findYearForEvent = (eventTimeStamp, patchNotesTimeStamp) => {
   const patchNotesDate = new Date(patchNotesTimeStamp);
   // all event dates are assumed to be in current year
@@ -472,7 +478,11 @@ export default class Home extends Component {
         {this.renderHeader()}
         <NewsContainer>
           <LastUpdatedHeader>
-            <b>Patch Notes Last Updated On: </b>
+            <b>
+              {mediaQueries.isMobile
+                ? "Updated On: "
+                : "Patch Notes Last Updated On: "}
+            </b>
             {new Date(patchNotesTimeStamp).toDateString()}
           </LastUpdatedHeader>
           <SearchBar
@@ -519,6 +529,12 @@ const ModalTextArea = styled.textarea`
 const LastUpdatedHeader = styled.h2`
   font-size: 18px;
   font-weight: normal;
+
+  ${isMobile} {
+    padding: 0 16px;
+    align-self: start;
+    font-size: 16px;
+  }
 `;
 
 const NewsContainer = styled.div`
@@ -529,6 +545,11 @@ const NewsContainer = styled.div`
   align-items: center;
   margin: 32px auto;
   width: 1024px;
+
+  ${isMobile} {
+    width: 100%;
+    margin: 24px auto;
+  }
 `;
 
 const TileContainer = styled.div`
@@ -538,8 +559,8 @@ const TileContainer = styled.div`
   flex-wrap: wrap;
   margin: 0 auto;
   width: 100%;
-`;
 
-const EventEmptyIntro = styled.p`
-  margin: 32px 16px;
+  ${isMobile} {
+    flex-direction: column;
+  }
 `;
