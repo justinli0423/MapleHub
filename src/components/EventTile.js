@@ -460,7 +460,6 @@ const EventDetails = styled.p`
 
   ${isMobile} {
     max-width: 300px;
-
   }
 `;
 
@@ -533,23 +532,18 @@ const EventIconContainer = styled.img`
 
 const DetailsContainer = styled.div`
   overflow-y: auto;
-  display: flex;
+  display: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "flex" : "none")};
   flex-direction: column;
   justify-content: flex-start;
-  width: ${({ isDetailsExpanded }) =>
-    isDetailsExpanded ? "calc(100% - 16px)" : 0};
-  height: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "auto" : 0)};
+  width: calc(100% - 16px);
+  height: auto;
   margin-top: 8px;
-  padding: ${({ isDetailsExpanded }) => (isDetailsExpanded ? "8px" : 0)};
-  opacity: ${({ isDetailsExpanded }) => (isDetailsExpanded ? 1 : 0)};
-  visibility: ${({ isDetailsExpanded }) =>
-    isDetailsExpanded ? "visible" : "hidden"};
+  padding: 8px;
   border: 1px solid ${Colors.BackgroundGrey};
   border-bottom: none;
 
   ${isMobile} {
-    width: ${({ isDetailsExpanded }) =>
-      isDetailsExpanded ? "calc(100% - 8px)" : 0};
+    width: calc(100% - 8px);
   }
 `;
 
@@ -596,6 +590,10 @@ const Details = styled.ul`
 
 const RewardImage = styled.img`
   max-width: 800px;
+
+  ${isTablet} {
+    max-width: 650px;
+  }
 
   ${isMobile} {
     max-width: 280px;
