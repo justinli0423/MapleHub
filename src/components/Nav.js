@@ -5,6 +5,15 @@ import {
   Route,
   NavLink,
 } from "react-router-dom";
+
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import IconButton from "@material-ui/core/IconButton";
+import MenuIcon from "@material-ui/icons/Menu";
+
 import styled from "styled-components";
 import moment from "moment";
 
@@ -21,6 +30,7 @@ export default class Nav extends Component {
     this.state = {
       intervalHandler: null,
       currTime: new Date(),
+      menuAnchor: null,
     };
   }
 
@@ -45,7 +55,26 @@ export default class Nav extends Component {
     });
   };
 
+  mobileMenuClick = (event) => {
+    if (!event.currentTarget) {
+      return;
+    }
+
+    this.setState({
+      ...this.state,
+      menuAnchor: event.currentTarget,
+    });
+  };
+
+  mobileMenuClose = () => {
+    this.setState({
+      ...this.state,
+      menuAnchor: null,
+    });
+  };
+
   render() {
+    const { menuAnchor } = this.state;
     return (
       <Router>
         <Container>
@@ -78,7 +107,7 @@ export default class Nav extends Component {
                 Legion Board
               </Item>
             </StyledLink> */}
-            <StyledLink exact to='/reminders'>
+            <StyledLink to='/reminders'>
               <Item>
                 <ActiveBar />
                 Reminders
@@ -91,8 +120,39 @@ export default class Nav extends Component {
           </OptionsContainer>
         </Container>
 
-        {/* A <Switch> looks through its children <Route>s and
-              renders the first one that matches the current URL. */}
+        <MobileContainer>
+          <AppBar position='sticky' color='default'>
+            <Toolbar>
+              <IconButton
+                edge='start'
+                color='inherit'
+                aria-label='menu'
+                onClick={this.mobileMenuClick}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography variant='h6'>MapleHub</Typography> <Icon />
+              <Menu
+                id='simple-menu'
+                anchorEl={menuAnchor}
+                keepMounted
+                open={Boolean(menuAnchor)}
+                onClose={this.mobileMenuClose}
+              >
+                <MenuItem onClick={this.mobileMenuClose}>
+                  <StyledLink exact to=''>
+                    Updates
+                  </StyledLink>
+                </MenuItem>
+                <MenuItem onClick={this.mobileMenuClose}>
+                  <StyledLink to='/status'>Status</StyledLink>
+                </MenuItem>
+                {/* <MenuItem onClick={this.mobileMenuClose}>Legion Board</MenuItem> */}
+              </Menu>
+            </Toolbar>
+          </AppBar>
+        </MobileContainer>
+
         <MainContainer>
           <Switch>
             <Route path='/legion'>
@@ -128,6 +188,14 @@ const Container = styled.div`
 
   ${isMobile} {
     display: none;
+  }
+`;
+
+const MobileContainer = styled.div`
+  display: none;
+
+  ${isMobile} {
+    display: block;
   }
 `;
 
