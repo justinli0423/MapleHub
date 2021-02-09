@@ -69,9 +69,11 @@ export default class ServerStatus extends Component {
   };
 
   handleWorldChange = (_, newWorld) => {
-    if (!newWorld) {
+    if (!newWorld || newWorld === this.state.selectedWorld) {
       return;
     }
+    // only way to cancel all pending requests
+    window.stop();
     this.setState({
       ...this.state,
       selectedWorld: newWorld,

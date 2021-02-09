@@ -30,7 +30,6 @@ export default class PingServer {
     this.port = port;
     this.latency = null;
     this.averageTenLatencies = [];
-    window.stop();
     this.callback(0, 0);
     this.pingChannel();
   }
