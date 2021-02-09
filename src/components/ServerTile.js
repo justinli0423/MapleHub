@@ -40,7 +40,6 @@ export default class ServerTile extends Component {
   }
 
   componentWillUnmount() {
-    this.state.server.unmount();
     clearInterval(this.state.intervalHandler);
   }
 
@@ -63,7 +62,9 @@ export default class ServerTile extends Component {
             averageTenLatencies.length
         )
       : latency;
-    const displayAverageLatency = `Average: ${averageLatency}ms`;
+    const displayAverageLatency = averageLatency
+      ? `Average: ${averageLatency}ms`
+      : "Waiting...";
 
     return (
       <Container>

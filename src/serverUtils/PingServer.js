@@ -2,7 +2,6 @@ export default class PingServer {
   averageTenLatencies = [];
   latency = null;
   startTime = null;
-  timer = null;
 
   constructor(id, ip, port, callback) {
     this.id = id;
@@ -29,36 +28,28 @@ export default class PingServer {
     this.id = id;
     this.ip = ip;
     this.port = port;
-    this.latency = 0;
+    this.latency = null;
     this.averageTenLatencies = [];
+    window.stop();
+    this.callback(0, 0);
     this.pingChannel();
-  }
-
-  unmount() {
-    clearTimeout(this.timer);
   }
 
   pingChannel() {
     const { ip, port } = this;
     const stubImage = new Image();
 
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
-
+    this.startTime = Date.now();
     stubImage.onload = () => {
       this.updateResponseTime();
-      clearTimeout(this.timer);
     };
     stubImage.onerror = () => {
       this.updateResponseTime();
       // the image will always throw cross origin error
       // hacky way to remove it
       console.clear();
-      clearTimeout(this.timer);
     };
 
-    this.startTime = Date.now();
     stubImage.src = `http://${ip}:${port}/?cachebreaker=${Date.now()}`;
   }
 }
