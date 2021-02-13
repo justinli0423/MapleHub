@@ -1,7 +1,10 @@
+import {
+  numTilesHorizontal,
+  numTilesVertical,
+  LegionTileState,
+} from "./LegionDetails";
+
 class LegionStore {
-  tileSize = 25;
-  numTilesWidth = 22;
-  numTilesHeight = 20;
   isMouseDown = false;
   legionRank = null;
   grid = [];
@@ -14,10 +17,10 @@ class LegionStore {
   updateLegionGrid = (legionRank = null) => {
     const grid = [];
     if (!legionRank || !legionRank.gridCoords) {
-      for (let i = 0; i < this.numTilesHeight; i++) {
+      for (let i = 0; i < numTilesVertical; i++) {
         grid.push([]);
-        for (let j = 0; j < this.numTilesWidth; j++) {
-          grid[i].push(0);
+        for (let j = 0; j < numTilesHorizontal; j++) {
+          grid[i].push(LegionTileState.AVAILABLE);
         }
       }
     } else {
@@ -25,7 +28,9 @@ class LegionStore {
       const activeGridCoords = [];
       const activeLegionTiles = {};
       for (let i = 0; i < gridCoords.length; i++) {
-        const newArray = Array(gridCoords[i][1] - gridCoords[i][0] + 1).fill(0);
+        const newArray = Array(gridCoords[i][1] - gridCoords[i][0] + 1).fill(
+          LegionTileState.AVAILABLE
+        );
         const startIndex = gridCoords[i][0];
         activeGridCoords.push(...newArray.map((_, i) => i + startIndex));
       }
@@ -34,11 +39,15 @@ class LegionStore {
           [coords]: coords,
         });
       });
-      for (let i = 0; i < this.numTilesHeight; i++) {
+      for (let i = 0; i < numTilesVertical; i++) {
         grid.push([]);
-        for (let j = 0; j < this.numTilesWidth; j++) {
+        for (let j = 0; j < numTilesHorizontal; j++) {
           const index = i * 22 + j;
-          grid[i].push(activeLegionTiles[index] ? 0 : -1);
+          grid[i].push(
+            activeLegionTiles[index]
+              ? LegionTileState.AVAILABLE
+              : LegionTileState.DISABLED
+          );
         }
       }
     }

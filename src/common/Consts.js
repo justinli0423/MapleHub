@@ -50,6 +50,7 @@ const LegionRanks = {
 
 const LOCAL_STORAGE_EVENT_DETAILS = "mapleHubEventDetails";
 const LOCAL_STORAGE_EVENT_NOTES = "mapleHubEventNotes";
+const LOCAL_STORAGE_LEGION_STATS = "mapleHubLegionStats";
 
 Object.freeze(NodeNames);
 Object.freeze(Keywords);
@@ -67,4 +68,5 @@ export {
   LegionRanks,
   LOCAL_STORAGE_EVENT_DETAILS,
   LOCAL_STORAGE_EVENT_NOTES,
+  LOCAL_STORAGE_LEGION_STATS,
 };

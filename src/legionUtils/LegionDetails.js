@@ -163,6 +163,7 @@ const LegionDetails = [
 
 const LegionClasses = [
   {
+    id: 'allClasses60',
     rank: LegionRanks.B,
     levelReq: 60,
     classes: [Classes.ALL],
@@ -173,6 +174,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'allClasses100',
     rank: LegionRanks.A,
     levelReq: 100,
     classes: [Classes.ALL],
@@ -183,6 +185,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'mageBowThiefXenon140',
     rank: LegionRanks.S,
     levelReq: 140,
     classes: [Classes.MAGICIAN, Classes.BOWMAN, Classes.THIEF, Classes.XENON],
@@ -193,6 +196,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'warriorPirate140',
     rank: LegionRanks.S,
     levelReq: 140,
     classes: [Classes.WARRIOR, Classes.PIRATE],
@@ -203,6 +207,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'warrior200',
     rank: LegionRanks.SS,
     levelReq: 200,
     classes: [Classes.WARRIOR],
@@ -213,6 +218,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'mage200',
     rank: LegionRanks.SS,
     levelReq: 200,
     classes: [Classes.MAGICIAN],
@@ -223,6 +229,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'bowman200',
     rank: LegionRanks.SS,
     levelReq: 200,
     classes: [Classes.BOWMAN],
@@ -233,6 +240,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'thiefXenon200',
     rank: LegionRanks.SS,
     levelReq: 200,
     classes: [Classes.THIEF, Classes.XENON],
@@ -243,6 +251,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'pirate200',
     rank: LegionRanks.SS,
     levelReq: 200,
     classes: [Classes.PIRATE],
@@ -253,6 +262,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'warrior250',
     rank: LegionRanks.SSS,
     levelReq: 250,
     classes: [Classes.WARRIOR],
@@ -263,6 +273,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'mage250',
     rank: LegionRanks.SSS,
     levelReq: 250,
     classes: [Classes.MAGICIAN],
@@ -273,6 +284,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'bowman250',
     rank: LegionRanks.SSS,
     levelReq: 250,
     classes: [Classes.BOWMAN],
@@ -283,6 +295,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'thief250',
     rank: LegionRanks.SSS,
     levelReq: 250,
     classes: [Classes.THIEF],
@@ -293,6 +306,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'pirate250',
     rank: LegionRanks.SSS,
     levelReq: 250,
     classes: [Classes.PIRATE],
@@ -303,6 +317,7 @@ const LegionClasses = [
     ],
   },
   {
+    id: 'xenon250',
     rank: LegionRanks.SSS,
     levelReq: 250,
     classes: [Classes.XENON],
@@ -314,4 +329,23 @@ const LegionClasses = [
   },
 ];
 
-export { LegionDetails, LegionClasses };
+const tileSize = 25;
+const numTilesHorizontal = 22;
+const numTilesVertical = 20;
+
+const LegionTileState = {
+  DISABLED: -1,
+  AVAILABLE: 0,
+  HOVERED: 1,
+  OCCUPIED: 2,
+  OVERLAPPED: 3,
+};
+
+export {
+  LegionDetails,
+  LegionClasses,
+  tileSize,
+  numTilesHorizontal,
+  numTilesVertical,
+  LegionTileState,
+};

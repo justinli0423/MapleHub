@@ -4,10 +4,9 @@ import styled from "styled-components";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 
-import Colors from "../common/colors";
+import LegionClassTile from "./LegionClassTile";
 
 import { LegionDetails, LegionClasses } from "../legionUtils/LegionDetails";
-import { Classes } from "../common/consts";
 
 export default class LegionNav extends React.Component {
   handleAutocompleteInputChange(_, val) {
@@ -27,21 +26,12 @@ export default class LegionNav extends React.Component {
           )}
           [Lv: {legion.levelReq}]:
         </Details>
-        <LegionTable>
-          <tbody>
-            {legion.grid.map((row) => (
-              <LegionPill>
-                {row.map((cell) => (
-                  <LegionTile isActive={!!cell} classes={legion.classes} />
-                ))}
-              </LegionPill>
-            ))}
-          </tbody>
-        </LegionTable>
-        <TextField
+        <LegionClassTile legion={legion} />
+        {/* <TextField
           label='Number'
           type='number'
           margin='dense'
+          disabled
           defaultValue={0}
           InputLabelProps={{
             shrink: true,
@@ -50,7 +40,7 @@ export default class LegionNav extends React.Component {
             width: "60px",
             padding: 0,
           }}
-        />
+        /> */}
       </LegionSection>
     ));
   }
@@ -116,25 +106,4 @@ const Details = styled.div`
   overflow: hidden;
   white-space: break-spaces;
   overflow-wrap: anywhere;
-`;
-
-const LegionTable = styled.table`
-  border-collapse: collapse;
-  margin: 8px 8px -20px 4px;
-`;
-
-const LegionPill = styled.tr`
-  border-collapse: collapse;
-`;
-
-const LegionTile = styled.td`
-  height: 5px;
-  width: 5px;
-  border: ${({ isActive }) => (isActive ? "1px solid black" : "none")};
-  background: ${({ isActive, classes }) =>
-    isActive
-      ? classes.length > 1
-        ? Colors.Legion[Classes.ALL]
-        : Colors.Legion[classes[0]]
-      : "transparent"};
 `;
