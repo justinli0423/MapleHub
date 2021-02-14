@@ -74,6 +74,7 @@ export default class Legion extends Component {
   }
 
   render() {
+    const { legionStore } = this.state;
     return (
       <DndProvider backend={HTML5Backend}>
         <Header src={process.env.PUBLIC_URL + "/legionbanner.jpg"}>
@@ -88,7 +89,10 @@ export default class Legion extends Component {
             {this.renderTextOverlays()}
             <PaddingContainer>
               <GridContainer>
-                <LegionGrid grid={this.state.legionStore.grid} />
+                <LegionGrid
+                  grid={legionStore.grid}
+                  handleDroppedLegionTile={legionStore.handleDroppedLegionTile}
+                />
               </GridContainer>
             </PaddingContainer>
           </LegionContainer>

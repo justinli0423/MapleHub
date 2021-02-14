@@ -14,6 +14,7 @@ import {
 
 const LegionGrid = ({
   grid,
+  handleDroppedLegionTile,
   connectDropTarget,
   isOver,
   canDrop,
@@ -22,21 +23,28 @@ const LegionGrid = ({
   offset,
 }) => {
   let count = 0;
-  // console.log(offset);
   const [, dropRef] = useDrop({
     accept: ItemTypes.LEGION,
-    hover: (item, monitor, component) => {
-      console.log(component);
+    drop: (item, monitor) => {
+      const { x, y } = monitor.getDifferenceFromInitialOffset();
+      const el = document.getElementById(droppedTile.id);
+      if (el) {
+        const tileOffset = el.getBoundingClientRect();
+        const tileLeftOffset = tileOffset.left;
+        const tileTopOffset = tileOffset.top;
+        const viewportOffsetLeft = x + tileLeftOffset;
+        const viewportOffsetTop = y + tileTopOffset;
+        const elAtPosition = document.elementFromPoint(
+          viewportOffsetLeft,
+          viewportOffsetTop
+        );
+        if (!elAtPosition) {
+          return;
+        }
+        handleDroppedLegionTile(droppedTile, elAtPosition);
+      }
     },
   });
-  if (droppedTile) {
-    const el = document.getElementById(droppedTile.id);
-    const viewportOffset = el.getBoundingClientRect();
-    // console.log(viewportOffset.left);
-    if (didDrop) {
-      // console.log(droppedTile);
-    }
-  }
   return connectDropTarget(
     <tbody ref={dropRef}>
       {grid.map((row, i) => (
@@ -59,37 +67,23 @@ const LegionGrid = ({
   );
 };
 
-export default DropTarget(
-  ItemTypes.LEGION,
-  {
-    hover: (...props) => {
-      // const { node } = component;
-      // if (!node) return;
-
-      // const bounds = node.getBoundingClientRect();
-      // const position = monitor.getClientOffset();
-
-      // console.log(props);
-    },
-  },
-  (connect, monitor) => ({
-    connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver(),
-    canDrop: monitor.canDrop(),
-    droppedTile: monitor.getItem(),
-    didDrop: monitor.didDrop(),
-  })
-)(LegionGrid);
+export default DropTarget(ItemTypes.LEGION, {}, (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver(),
+  canDrop: monitor.canDrop(),
+  droppedTile: monitor.getItem(),
+  didDrop: monitor.didDrop(),
+}))(LegionGrid);
 
 const GridCell = styled.td`
   padding: ${tileSize / 2}px;
   font-size: 8px;
   color: white;
   background: ${({ tileState }) => {
-    if (tileState === LegionTileState.AVAILABLE) {
+    if (tileState.state === LegionTileState.AVAILABLE) {
       return "transparent";
     }
-    if (tileState === LegionTileState.DISABLED) {
+    if (tileState.state === LegionTileState.DISABLED) {
       return Colors.Legion.Disabled;
     }
     return Colors.Legion.Hover;

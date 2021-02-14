@@ -168,8 +168,8 @@ const LegionClasses = [
     levelReq: 60,
     classes: [Classes.ALL],
     grid: [
-      [0, 0, 0, 0, 0],
       [1, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0],
     ],
   },
@@ -179,8 +179,8 @@ const LegionClasses = [
     levelReq: 100,
     classes: [Classes.ALL],
     grid: [
-      [0, 0, 0, 0, 0],
       [1, 1, 0, 0, 0],
+      [0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0],
     ],
   },
@@ -190,8 +190,8 @@ const LegionClasses = [
     levelReq: 140,
     classes: [Classes.MAGICIAN, Classes.BOWMAN, Classes.THIEF, Classes.XENON],
     grid: [
-      [0, 0, 0, 0, 0],
       [1, 1, 1, 0, 0],
+      [0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0],
     ],
   },
@@ -234,8 +234,8 @@ const LegionClasses = [
     levelReq: 200,
     classes: [Classes.BOWMAN],
     grid: [
-      [0, 0, 0, 0, 0],
       [1, 1, 1, 1, 0],
+      [0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0],
     ],
   },
@@ -289,8 +289,8 @@ const LegionClasses = [
     levelReq: 250,
     classes: [Classes.BOWMAN],
     grid: [
-      [0, 0, 0, 0, 0],
       [1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0],
     ],
   },
@@ -336,9 +336,8 @@ const numTilesVertical = 20;
 const LegionTileState = {
   DISABLED: -1,
   AVAILABLE: 0,
-  HOVERED: 1,
-  OCCUPIED: 2,
-  OVERLAPPED: 3,
+  OCCUPIED: 1,
+  OVERLAPPED: 2,
 };
 
 export {

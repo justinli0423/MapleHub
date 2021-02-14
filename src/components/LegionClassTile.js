@@ -8,7 +8,11 @@ import ItemTypes from "../common/ItemTypes";
 import { Classes } from "../common/consts";
 import { tileSize } from "../legionUtils/LegionDetails";
 
-const LegionClassTile = ({ legion, isDragging, connectDragSource }) => {
+const LegionClassTile = ({
+  legion,
+  isDragging,
+  connectDragSource,
+}) => {
   return (
     <LegionTable
       id={legion.id}
