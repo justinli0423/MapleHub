@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { findDOMNode } from "react-dom";
 import { DragSource } from "react-dnd";
 
@@ -10,6 +10,7 @@ import { tileSize } from "../legionUtils/LegionDetails";
 
 const LegionClassTile = ({
   legion,
+  isMapped,
   isDragging,
   connectDragSource,
 }) => {
@@ -27,6 +28,7 @@ const LegionClassTile = ({
                 isDragging={isDragging}
                 isActive={!!cell}
                 classes={legion.classes}
+                isMapped={isMapped}
               />
             ))}
           </LegionPill>
@@ -40,8 +42,8 @@ export default DragSource(
   ItemTypes.LEGION,
   {
     beginDrag: (props) => ({
-      classType: props.legion.classes,
-      filledCells: props.legion.grid,
+      classes: props.legion.classes,
+      grid: props.legion.grid,
       id: props.legion.id,
     }),
     endDrag: (props, monitor) => {
@@ -69,6 +71,7 @@ const LegionPill = styled.tr`
 const LegionTile = styled.td`
   height: ${tileSize / 2}px;
   width: ${tileSize / 2}px;
+
   border: ${({ isActive }) => (isActive ? "1px solid black" : "none")};
   opacity: ${({ isDragging }) => (isDragging ? 0.5 : 1)};
   background: ${({ isActive, classes }) =>
@@ -77,4 +80,13 @@ const LegionTile = styled.td`
         ? Colors.Legion[Classes.ALL]
         : Colors.Legion[classes[0]]
       : "transparent"};
+
+  ${({ isMapped }) =>
+    !isMapped
+      ? undefined
+      : css`
+          position: absolute;
+          height: ${tileSize}px;
+          width: ${tileSize}px;
+        `};
 `;

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled, { css } from "styled-components";
 import { DropTarget, useDrop } from "react-dnd";
+import { findDOMNode } from "react-dom";
 
 import Colors from "../common/colors";
 import ItemTypes from "../common/ItemTypes";
@@ -12,17 +13,17 @@ import {
   LegionTileState,
 } from "../legionUtils/LegionDetails";
 
+import LegionClassTile from "./LegionClassTile";
+
 const LegionGrid = ({
   grid,
   handleDroppedLegionTile,
   connectDropTarget,
-  isOver,
-  canDrop,
   droppedTile,
-  didDrop,
-  offset,
 }) => {
-  let count = 0;
+  let tileIndexCount = 0;
+  const [overlayTiles, setOverlayTiles] = useState({});
+  const [overlayTileIds, setOverlayTileIds] = useState([]);
   const [, dropRef] = useDrop({
     accept: ItemTypes.LEGION,
     drop: (item, monitor) => {
@@ -41,29 +42,51 @@ const LegionGrid = ({
         if (!elAtPosition) {
           return;
         }
-        handleDroppedLegionTile(droppedTile, elAtPosition);
+
+        addNewOverlayTile({ ...item });
+
+        // remove this ... not useful.
+        // handleDroppedLegionTile(droppedTile, elAtPosition);
       }
     },
   });
-  return connectDropTarget(
-    <tbody ref={dropRef}>
-      {grid.map((row, i) => (
-        <tr key={i}>
-          {row.map((tileState, j) => {
-            const cell = (
-              <GridCell
-                key={count}
-                index={count}
-                id={count}
-                tileState={tileState}
-              />
-            );
-            count++;
-            return cell;
-          })}
-        </tr>
-      ))}
-    </tbody>
+
+  const addNewOverlayTile = (legion) => {
+    setOverlayTiles({
+      ...overlayTiles,
+      [overlayTileIds.length]: <LegionClassTile legion={legion} isMapped />,
+    });
+    setOverlayTileIds([...overlayTileIds, overlayTileIds.length]);
+  };
+
+  const generateOverlayTiles = () => {
+    return overlayTileIds.map((ids) => overlayTiles[ids]);
+  };
+
+  return (
+    <Container>
+      {generateOverlayTiles()}
+      <tbody
+        ref={(instance) => connectDropTarget(dropRef(findDOMNode(instance)))}
+      >
+        {grid.map((row, i) => (
+          <tr key={i}>
+            {row.map((tileState, j) => {
+              const cell = (
+                <GridCell
+                  key={tileIndexCount}
+                  index={tileIndexCount}
+                  id={tileIndexCount}
+                  tileState={tileState}
+                />
+              );
+              tileIndexCount++;
+              return cell;
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </Container>
   );
 };
 
@@ -74,6 +97,10 @@ export default DropTarget(ItemTypes.LEGION, {}, (connect, monitor) => ({
   droppedTile: monitor.getItem(),
   didDrop: monitor.didDrop(),
 }))(LegionGrid);
+
+const Container = styled.div`
+  display: relative;
+`;
 
 const GridCell = styled.td`
   padding: ${tileSize / 2}px;
