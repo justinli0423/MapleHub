@@ -116,10 +116,9 @@ const LegionContainer = styled.div`
 `;
 
 const GridContainer = styled.table`
+  position: relative;
   border-collapse: collapse;
   border-spacing: 0px;
-  width: ${tileSize * numTilesHorizontal + 8}px;
-  height: ${tileSize * numTilesVertical + 8}px;
   margin: 0 auto;
 `;
 

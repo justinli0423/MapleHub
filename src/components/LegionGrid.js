@@ -39,11 +39,18 @@ const LegionGrid = ({
           viewportOffsetLeft,
           viewportOffsetTop
         );
-        if (!elAtPosition) {
+        if (!elAtPosition || !elAtPosition.offsetParent) {
           return;
         }
 
-        addNewOverlayTile({ ...item });
+        const offsetParent = elAtPosition.offsetParent;
+        addNewOverlayTile(
+          { ...item },
+          {
+            x: offsetParent.offsetLeft,
+            y: offsetParent.offsetTop,
+          }
+        );
 
         // remove this ... not useful.
         // handleDroppedLegionTile(droppedTile, elAtPosition);
@@ -51,10 +58,14 @@ const LegionGrid = ({
     },
   });
 
-  const addNewOverlayTile = (legion) => {
+  const addNewOverlayTile = (legion, position) => {
     setOverlayTiles({
       ...overlayTiles,
-      [overlayTileIds.length]: <LegionClassTile legion={legion} isMapped />,
+      [overlayTileIds.length]: (
+        <Container x={position.x} y={position.y}>
+          <LegionClassTile legion={legion} isMapped />
+        </Container>
+      ),
     });
     setOverlayTileIds([...overlayTileIds, overlayTileIds.length]);
   };
@@ -64,21 +75,23 @@ const LegionGrid = ({
   };
 
   return (
-    <Container>
+    <>
       {generateOverlayTiles()}
       <tbody
         ref={(instance) => connectDropTarget(dropRef(findDOMNode(instance)))}
       >
         {grid.map((row, i) => (
           <tr key={i}>
-            {row.map((tileState, j) => {
+            {row.map((tileState) => {
               const cell = (
                 <GridCell
                   key={tileIndexCount}
                   index={tileIndexCount}
                   id={tileIndexCount}
                   tileState={tileState}
-                />
+                >
+                  <CellSpacing />
+                </GridCell>
               );
               tileIndexCount++;
               return cell;
@@ -86,7 +99,7 @@ const LegionGrid = ({
           </tr>
         ))}
       </tbody>
-    </Container>
+    </>
   );
 };
 
@@ -99,13 +112,25 @@ export default DropTarget(ItemTypes.LEGION, {}, (connect, monitor) => ({
 }))(LegionGrid);
 
 const Container = styled.div`
-  display: relative;
+  position: absolute;
+  ${({ x, y }) =>
+    x >= 0 && y >= 0
+      ? css`
+          left: ${x}px;
+          top: ${y}px;
+        `
+      : undefined};
+`;
+
+const CellSpacing = styled.div`
+  width: 24px;
+  height: 24px;
+  background: transparent;
 `;
 
 const GridCell = styled.td`
-  padding: ${tileSize / 2}px;
-  font-size: 8px;
-  color: white;
+  margin: 0;
+  padding: 0;
   background: ${({ tileState }) => {
     if (tileState.state === LegionTileState.AVAILABLE) {
       return "transparent";
