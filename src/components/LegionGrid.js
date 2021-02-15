@@ -7,13 +7,11 @@ import Colors from "../common/colors";
 import ItemTypes from "../common/ItemTypes";
 
 import {
-  tileSize,
   numTilesHorizontal,
-  numTilesVertical,
   LegionTileState,
 } from "../legionUtils/LegionDetails";
 
-import LegionClassTile from "./LegionClassTile";
+import DroppableLegionClassTile from "./DroppableLegionClassTile";
 
 const renewTileCache = (tileId) => {
   if (tileId.indexOf("#") === -1) {
@@ -26,20 +24,24 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
   let tileIndexCount = 0;
   const [overlayTiles, setOverlayTiles] = useState({});
   const [overlayTileIds, setOverlayTileIds] = useState([]);
+
   const updateLegionTilePosition = (legion, tileId, droppedPosition) => {
     const tileElement = overlayTiles[tileId];
     if (!tileElement || !droppedPosition) {
       return;
     }
-
-    const prevOffsetTop = tileElement.props.y;
-    const prevOffsetLeft = tileElement.props.x;
+    const prevOffsetTop = tileElement.props.position.y;
+    const prevOffsetLeft = tileElement.props.position.x;
     const { offsetTop, offsetLeft } = droppedPosition;
     const x = prevOffsetLeft + offsetLeft;
     const y = prevOffsetTop + offsetTop;
     const legionGridContainer = document
       .querySelector("table#legionTableContainer")
       .getBoundingClientRect();
+    removeOverlayTile(tileId);
+    // determine the offset from (tile) -> (grid) and then
+    // (grid) -> (document) and then we target the element
+    // that is at that position and hope it is a tablecell
     const elAtPosition = document.elementFromPoint(
       legionGridContainer.x + x,
       legionGridContainer.y + y
@@ -52,13 +54,25 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
       return;
     }
 
-    overlayTiles[tileId] = (
-      <Container
-        x={elAtPosition.offsetParent.offsetLeft}
-        y={elAtPosition.offsetParent.offsetTop}
-      >
-        <LegionClassTile legion={legion} isMapped />
-      </Container>
+    if (
+      overlayTileIds.includes(
+        elAtPosition.offsetParent.offsetParent.getAttribute("id")
+      )
+    ) {
+      // position is reading from the overlaying tiles, need to read from grid tiles
+      // instead
+      console.log("here");
+      // const overlayTile = elAtPosition.offsetParent;
+      return;
+    }
+
+    addNewOverlayTile(
+      legion,
+      {
+        x: elAtPosition.offsetParent.offsetLeft,
+        y: elAtPosition.offsetParent.offsetTop,
+      },
+      tileId
     );
   };
 
@@ -97,8 +111,6 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
               y: offsetParent.offsetTop,
             }
           );
-          // remove this ... not useful.
-          // handleDroppedLegionTile(droppedTile, elAtPosition);
         } else {
           // reusing a tile - need different coords calculation
           updateLegionTilePosition({ ...item }, droppedTile.id, {
@@ -111,17 +123,35 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
   });
 
   const addNewOverlayTile = (legion, position, tileId = null) => {
-    // tileId used for tiles that are already assigned
-
+    let filteredIds = overlayTileIds;
+    if (tileId) {
+      // tileId used for tiles that are already assigned
+      filteredIds = removeOverlayTile(tileId);
+    }
     setOverlayTiles({
       ...overlayTiles,
-      [legion.id]: (
-        <Container x={position.x} y={position.y}>
-          <LegionClassTile legion={legion} isMapped />
-        </Container>
+      [tileId ?? legion.id]: (
+        <DroppableLegionClassTile
+          position={position}
+          legion={legion}
+          isMapped
+        />
       ),
     });
-    setOverlayTileIds([...overlayTileIds, legion.id]);
+    setOverlayTileIds([...filteredIds, tileId ?? legion.id]);
+  };
+
+  const removeOverlayTile = (tileId) => {
+    const index = overlayTileIds.indexOf(tileId);
+    if (index === -1) {
+      return;
+    }
+    const newOverlayTiles = { ...overlayTiles };
+    const newOverlayTilesIds = overlayTileIds.filter((id) => id !== tileId);
+    delete newOverlayTiles[tileId];
+    setOverlayTiles(newOverlayTiles);
+    setOverlayTileIds(newOverlayTilesIds);
+    return newOverlayTilesIds;
   };
 
   const generateOverlayTiles = () => {

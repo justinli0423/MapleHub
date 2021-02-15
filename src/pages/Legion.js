@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { DndProvider } from "react-dnd";
 
@@ -11,12 +11,6 @@ import Title from "../components/common/Title";
 import Header from "../components/common/Header";
 import LegionNav from "../components/LegionNav";
 import LegionGrid from "../components/LegionGrid";
-
-import {
-  tileSize,
-  numTilesHorizontal,
-  numTilesVertical,
-} from "../legionUtils/LegionDetails";
 
 export default class Legion extends Component {
   constructor() {
@@ -79,19 +73,17 @@ export default class Legion extends Component {
       <DndProvider backend={HTML5Backend}>
         <Header src={process.env.PUBLIC_URL + "/legionbanner.jpg"}>
           <Title
-            title='Legion Board Solver'
+            title='Legion Board Presets'
             caption='Save you legion presets here to easily switch in game.'
           />
         </Header>
         <Container>
           <LegionNav callback={this.setLegionRank} />
           <LegionContainer>
-            {this.renderTextOverlays()}
+            {/* {this.renderTextOverlays()} */}
             <PaddingContainer>
               <GridContainer id='legionTableContainer'>
-                <LegionGrid
-                  grid={legionStore.grid}
-                />
+                <LegionGrid grid={legionStore.grid} />
               </GridContainer>
             </PaddingContainer>
           </LegionContainer>

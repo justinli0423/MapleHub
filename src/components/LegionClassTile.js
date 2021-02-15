@@ -1,5 +1,5 @@
 import React from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { findDOMNode } from "react-dom";
 import { DragSource } from "react-dnd";
 
@@ -8,32 +8,23 @@ import ItemTypes from "../common/ItemTypes";
 import { Classes } from "../common/consts";
 import { tileSize } from "../legionUtils/LegionDetails";
 
-const currTime = Date.now();
-
-const LegionClassTile = ({
-  legion,
-  isMapped,
-  isDragging,
-  connectDragSource,
-}) => {
+const LegionClassTile = ({ legion, isDragging, connectDragSource }) => {
   return (
     <LegionTable
       id={legion.id}
       ref={(instance) => connectDragSource(findDOMNode(instance))}
-      isMapped={isMapped}
     >
       <tbody>
-        {legion.grid.map((row) => (
-          <LegionPill>
+        {legion.grid.map((row, j) => (
+          <LegionPill key={j}>
             {row.map((cell, i) => (
               <LegionTile
                 key={i}
                 isDragging={isDragging}
                 isActive={!!cell}
                 classes={legion.classes}
-                isMapped={isMapped}
               >
-                <CellSpacing isMapped={isMapped} />
+                <CellSpacing />
               </LegionTile>
             ))}
           </LegionPill>
@@ -50,7 +41,6 @@ export default DragSource(
       classes: props.legion.classes,
       grid: props.legion.grid,
       id: props.legion.id,
-      isMapped: props.isMapped,
     }),
     endDrag: (props, monitor) => {
       if (!monitor.didDrop()) {
@@ -69,15 +59,6 @@ const LegionTable = styled.table`
   border-collapse: collapse;
   border-spacing: 0;
   margin: 8px 8px 0 16px;
-
-  ${({ isMapped }) =>
-    isMapped
-      ? css`
-          width: 100%;
-          height: 100%;
-          margin: 0;
-        `
-      : undefined}
 `;
 
 const LegionPill = styled.tr``;
@@ -86,14 +67,6 @@ const CellSpacing = styled.div`
   height: ${tileSize / 2}px;
   width: ${tileSize / 2}px;
   background: transparent;
-
-  ${({ isMapped }) =>
-    !isMapped
-      ? undefined
-      : css`
-          height: ${24}px;
-          width: ${24}px;
-        `};
 `;
 
 const LegionTile = styled.td`

@@ -22,9 +22,13 @@ export default class LegionNav extends React.Component {
       <LegionSection key={i}>
         <Details>
           {legion.classes.map((legionClass, i, arr) =>
-            i === arr.length - 1 ? <>{legionClass} </> : <>{legionClass}/</>
+            i === arr.length - 1 ? (
+              <span key={i}>{legionClass} </span>
+            ) : (
+              <span key={i}>{legionClass}/</span>
+            )
           )}
-          [Lv: {legion.levelReq}]:
+          <span>[Lv: {legion.levelReq}]:</span>
         </Details>
         <LegionClassTile legion={legion} />
         {/* <TextField

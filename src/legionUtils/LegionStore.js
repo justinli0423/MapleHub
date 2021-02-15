@@ -1,4 +1,3 @@
-import ReactDOM from "react-dom";
 import {
   numTilesHorizontal,
   numTilesVertical,
@@ -83,7 +82,7 @@ class LegionStore {
 
   handleDroppedLegionTile = (legionTile, droppedTilePosition) => {
     console.log(legionTile, droppedTilePosition);
-    const { classType, filledCells, id } = legionTile;
+    const { filledCells } = legionTile;
     let tileIndex = parseInt(droppedTilePosition.getAttribute("id"));
 
     if (isNaN(tileIndex)) {
