@@ -15,15 +15,53 @@ import {
 
 import LegionClassTile from "./LegionClassTile";
 
-const LegionGrid = ({
-  grid,
-  handleDroppedLegionTile,
-  connectDropTarget,
-  droppedTile,
-}) => {
+const renewTileCache = (tileId) => {
+  if (tileId.indexOf("#") === -1) {
+    return tileId + "#" + Date.now();
+  }
+  return tileId.split("#")[0] + "#" + Date.now();
+};
+
+const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
   let tileIndexCount = 0;
   const [overlayTiles, setOverlayTiles] = useState({});
   const [overlayTileIds, setOverlayTileIds] = useState([]);
+  const updateLegionTilePosition = (legion, tileId, droppedPosition) => {
+    const tileElement = overlayTiles[tileId];
+    if (!tileElement || !droppedPosition) {
+      return;
+    }
+
+    const prevOffsetTop = tileElement.props.y;
+    const prevOffsetLeft = tileElement.props.x;
+    const { offsetTop, offsetLeft } = droppedPosition;
+    const x = prevOffsetLeft + offsetLeft;
+    const y = prevOffsetTop + offsetTop;
+    const legionGridContainer = document
+      .querySelector("table#legionTableContainer")
+      .getBoundingClientRect();
+    const elAtPosition = document.elementFromPoint(
+      legionGridContainer.x + x,
+      legionGridContainer.y + y
+    );
+    if (
+      !elAtPosition ||
+      !elAtPosition.offsetParent ||
+      elAtPosition.offsetParent.nodeName !== "TD"
+    ) {
+      return;
+    }
+
+    overlayTiles[tileId] = (
+      <Container
+        x={elAtPosition.offsetParent.offsetLeft}
+        y={elAtPosition.offsetParent.offsetTop}
+      >
+        <LegionClassTile legion={legion} isMapped />
+      </Container>
+    );
+  };
+
   const [, dropRef] = useDrop({
     accept: ItemTypes.LEGION,
     drop: (item, monitor) => {
@@ -39,35 +77,51 @@ const LegionGrid = ({
           viewportOffsetLeft,
           viewportOffsetTop
         );
-        if (!elAtPosition || !elAtPosition.offsetParent) {
+        if (
+          !elAtPosition ||
+          !elAtPosition.offsetParent ||
+          elAtPosition.offsetParent.nodeName === "TABLE"
+        ) {
           return;
         }
 
-        const offsetParent = elAtPosition.offsetParent;
-        addNewOverlayTile(
-          { ...item },
-          {
-            x: offsetParent.offsetLeft,
-            y: offsetParent.offsetTop,
-          }
-        );
-
-        // remove this ... not useful.
-        // handleDroppedLegionTile(droppedTile, elAtPosition);
+        if (!item.isMapped) {
+          // this is for dragging from the menu to the grid
+          // i.e. first time using a tile
+          const offsetParent = elAtPosition.offsetParent;
+          item.id = renewTileCache(item.id);
+          addNewOverlayTile(
+            { ...item },
+            {
+              x: offsetParent.offsetLeft,
+              y: offsetParent.offsetTop,
+            }
+          );
+          // remove this ... not useful.
+          // handleDroppedLegionTile(droppedTile, elAtPosition);
+        } else {
+          // reusing a tile - need different coords calculation
+          updateLegionTilePosition({ ...item }, droppedTile.id, {
+            offsetTop: y,
+            offsetLeft: x,
+          });
+        }
       }
     },
   });
 
-  const addNewOverlayTile = (legion, position) => {
+  const addNewOverlayTile = (legion, position, tileId = null) => {
+    // tileId used for tiles that are already assigned
+
     setOverlayTiles({
       ...overlayTiles,
-      [overlayTileIds.length]: (
+      [legion.id]: (
         <Container x={position.x} y={position.y}>
           <LegionClassTile legion={legion} isMapped />
         </Container>
       ),
     });
-    setOverlayTileIds([...overlayTileIds, overlayTileIds.length]);
+    setOverlayTileIds([...overlayTileIds, legion.id]);
   };
 
   const generateOverlayTiles = () => {
@@ -111,7 +165,7 @@ export default DropTarget(ItemTypes.LEGION, {}, (connect, monitor) => ({
   didDrop: monitor.didDrop(),
 }))(LegionGrid);
 
-const Container = styled.div`
+const Container = styled.tbody`
   position: absolute;
   ${({ x, y }) =>
     x >= 0 && y >= 0

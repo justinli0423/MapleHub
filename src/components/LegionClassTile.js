@@ -8,6 +8,8 @@ import ItemTypes from "../common/ItemTypes";
 import { Classes } from "../common/consts";
 import { tileSize } from "../legionUtils/LegionDetails";
 
+const currTime = Date.now();
+
 const LegionClassTile = ({
   legion,
   isMapped,
@@ -48,6 +50,7 @@ export default DragSource(
       classes: props.legion.classes,
       grid: props.legion.grid,
       id: props.legion.id,
+      isMapped: props.isMapped,
     }),
     endDrag: (props, monitor) => {
       if (!monitor.didDrop()) {

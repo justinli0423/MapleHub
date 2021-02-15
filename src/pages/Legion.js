@@ -88,10 +88,9 @@ export default class Legion extends Component {
           <LegionContainer>
             {this.renderTextOverlays()}
             <PaddingContainer>
-              <GridContainer>
+              <GridContainer id='legionTableContainer'>
                 <LegionGrid
                   grid={legionStore.grid}
-                  handleDroppedLegionTile={legionStore.handleDroppedLegionTile}
                 />
               </GridContainer>
             </PaddingContainer>
