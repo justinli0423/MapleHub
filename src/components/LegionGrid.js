@@ -37,8 +37,8 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
     if (!tileElement || !droppedPosition) {
       return;
     }
-    const prevOffsetTop = tileElement.props.position.y;
-    const prevOffsetLeft = tileElement.props.position.x;
+    const prevOffsetTop = tileElement.position.y;
+    const prevOffsetLeft = tileElement.position.x;
     const { offsetTop, offsetLeft } = droppedPosition;
     // round to the closest tile position, but shift left by 1 because of borders
     const x = Math.round((prevOffsetLeft + offsetLeft) / 25) * 25 - 1;
@@ -89,16 +89,18 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
     },
   });
 
+  // tileId is for moving existing tiles instead of creating new ones
   const addNewOverlayTile = (legion, position, tileId = null) => {
-    // remove the old data first
-    let filteredIds = removeOverlayTile(tileId);
+    // remove the old data first to prevent duplicate in id array
+    removeOverlayTile(tileId);
     setOverlayTiles({
       ...overlayTiles,
-      [tileId ?? legion.id]: (
-        <DroppableLegionClassTile position={position} legion={legion} />
-      ),
+      [tileId ?? legion.id]: {
+        position,
+        legion,
+      },
     });
-    setOverlayTileIds([...filteredIds, tileId ?? legion.id]);
+    setOverlayTileIds([...overlayTileIds, tileId ?? legion.id]);
   };
 
   const removeOverlayTile = (tileId) => {
@@ -109,13 +111,17 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
     const newOverlayTiles = { ...overlayTiles };
     const newOverlayTilesIds = overlayTileIds.filter((id) => id !== tileId);
     delete newOverlayTiles[tileId];
-    setOverlayTiles(newOverlayTiles);
     setOverlayTileIds(newOverlayTilesIds);
+    setOverlayTiles(newOverlayTiles);
     return newOverlayTilesIds;
   };
 
   const generateOverlayTiles = () => {
-    return overlayTileIds.map((ids) => overlayTiles[ids]);
+    return overlayTileIds.map((id) => {
+      console.log(overlayTiles, overlayTileIds);
+      const { position, legion } = overlayTiles[id];
+      return <DroppableLegionClassTile position={position} legion={legion} />;
+    });
   };
 
   return (
