@@ -1,87 +1,93 @@
-import React, { Component } from "react";
+import React from "react";
 import styled, { css } from "styled-components";
 import { findDOMNode } from "react-dom";
-import { DragSource, DropTarget } from "react-dnd";
+import { DragSource, DropTarget, useDrop } from "react-dnd";
 
 import Colors from "../common/colors";
 import ItemTypes from "../common/ItemTypes";
 import { Classes } from "../common/consts";
 import { tileSize } from "../legionUtils/LegionDetails";
 
-class DroppableLegionClassTile extends Component {
-  render() {
-    const {
-      position,
-      legion,
-      isDragging,
-      connectDragSource,
-      connectDropTarget,
-    } = this.props;
-
-    if (!position) {
-      return null;
-    }
-    return (
-      <Container
-        x={position.x}
-        y={position.y}
-        key={`${position.x}#${position.y}`}
-      >
-        <LegionTable
-          id={legion.id}
-          ref={(instance) =>
-            connectDropTarget(connectDragSource(findDOMNode(instance)))
-          }
-        >
-          <tbody>
-            {legion.grid.map((row, j) => (
-              <LegionPill key={j}>
-                {row.map((cell, i) => (
-                  <LegionTile
-                    key={i}
-                    isDragging={isDragging}
-                    isActive={!!cell}
-                    classes={legion.classes}
-                  >
-                    <CellSpacing />
-                  </LegionTile>
-                ))}
-              </LegionPill>
-            ))}
-          </tbody>
-        </LegionTable>
-      </Container>
-    );
-  }
-}
-
-DroppableLegionClassTile = DragSource(
-  ItemTypes.LEGION,
-  {
-    beginDrag: (props) => ({
-      classes: props.legion.classes,
-      grid: props.legion.grid,
-      id: props.legion.id,
-      isMapped: true,
-    }),
-    endDrag: (props, monitor) => {
-      if (!monitor.didDrop()) {
+const DroppableLegionClassTile = ({
+  position,
+  legion,
+  isDragging,
+  droppedTile,
+  connectDragSource,
+  connectDropTarget,
+}) => {
+  const [, dropRef] = useDrop({
+    accept: ItemTypes.LEGION,
+    drop: (item, monitor) => {
+      // TODO: deal with dropping tiles here
+      if (!droppedTile) {
         return;
       }
-      // TODO: increment count of tiles here
+      console.log(item);
+      console.log(position);
+      const el = document.getElementById(droppedTile.id);
+
     },
-  },
-  (connect, monitor) => ({
-    connectDragSource: connect.dragSource(),
-    isDragging: monitor.isDragging(),
-  })
-)(DroppableLegionClassTile);
+  });
 
-DroppableLegionClassTile = DropTarget(ItemTypes.LEGION, {}, (connect) => ({
+  if (!position) {
+    return null;
+  }
+
+  return (
+    <Container
+      x={position.x}
+      y={position.y}
+      key={`${position.x}#${position.y}`}
+    >
+      <LegionTable
+        id={legion.id}
+        ref={(instance) =>
+          connectDropTarget(dropRef(connectDragSource(findDOMNode(instance))))
+        }
+      >
+        <tbody>
+          {legion.grid.map((row, j) => (
+            <LegionPill key={j}>
+              {row.map((cell, i) => (
+                <LegionTile
+                  key={i}
+                  isDragging={isDragging}
+                  isActive={!!cell}
+                  classes={legion.classes}
+                >
+                  <CellSpacing />
+                </LegionTile>
+              ))}
+            </LegionPill>
+          ))}
+        </tbody>
+      </LegionTable>
+    </Container>
+  );
+};
+
+// This component will need to be drop and draggable
+export default DropTarget(ItemTypes.LEGION, {}, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
-}))(DroppableLegionClassTile);
-
-export default DroppableLegionClassTile;
+  droppedTile: monitor.getItem(),
+}))(
+  DragSource(
+    ItemTypes.LEGION,
+    {
+      beginDrag: (props) => ({
+        classes: props.legion.classes,
+        grid: props.legion.grid,
+        id: props.legion.id,
+        isMapped: true,
+      }),
+    },
+    (connect, monitor) => ({
+      connectDragSource: connect.dragSource(),
+      isDragging: monitor.isDragging(),
+    })
+  )(DroppableLegionClassTile)
+);
 
 const Container = styled.tbody`
   position: absolute;
@@ -106,7 +112,7 @@ const LegionTable = styled.table`
 const LegionPill = styled.tr``;
 
 const CellSpacing = styled.div`
-/* subtract 1 for border */
+  /* subtract 1 for border */
   height: ${tileSize - 1}px;
   width: ${tileSize - 1}px;
   background: transparent;

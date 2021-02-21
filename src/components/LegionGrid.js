@@ -41,53 +41,11 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
     const prevOffsetLeft = tileElement.position.x;
     const { offsetTop, offsetLeft } = droppedPosition;
     // round to the closest tile position, but shift left by 1 because of borders
-    const x = Math.round((prevOffsetLeft + offsetLeft) / 25) * 25 - 1;
-    const y = Math.round((prevOffsetTop + offsetTop) / 25) * 25;
+    const x = Math.floor((prevOffsetLeft + offsetLeft) / 25) * 25 - 1;
+    const y = Math.floor((prevOffsetTop + offsetTop) / 25) * 25;
 
     addNewOverlayTile(legion, { x, y }, tileId);
   };
-
-  const [, dropRef] = useDrop({
-    accept: ItemTypes.LEGION,
-    drop: (item, monitor) => {
-      const { x, y } = monitor.getDifferenceFromInitialOffset();
-      const el = document.getElementById(droppedTile.id);
-      if (el) {
-        const tileOffset = el.getBoundingClientRect();
-        const gridContainer = document.querySelector(
-          "table#legionTableContainer"
-        );
-        const gridRect = gridContainer.getBoundingClientRect();
-        const tileLeftOffset = tileOffset.left;
-        const tileTopOffset = tileOffset.top;
-        // subtract 1 from the offset to account for borders
-        const viewportOffsetLeft =
-          Math.round((x + tileLeftOffset - gridRect.x) / 25) * 25 - 1;
-        const viewportOffsetTop =
-          Math.round((y + tileTopOffset - gridRect.y) / 25) * 25;
-
-        if (!item.isMapped) {
-          // this is for dragging from the menu to the grid
-          // i.e. first time using a tile
-          // const offsetParent = elAtPosition.offsetParent;
-          item.id = createNewTileId(item.id);
-          addNewOverlayTile(
-            { ...item },
-            {
-              x: viewportOffsetLeft,
-              y: viewportOffsetTop,
-            }
-          );
-        } else {
-          // reusing a tile - need different coords calculation
-          updateLegionTilePosition({ ...item }, droppedTile.id, {
-            offsetTop: y,
-            offsetLeft: x,
-          });
-        }
-      }
-    },
-  });
 
   // tileId is for moving existing tiles instead of creating new ones
   const addNewOverlayTile = (legion, position, tileId = null) => {
@@ -118,11 +76,52 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
 
   const generateOverlayTiles = () => {
     return overlayTileIds.map((id) => {
-      console.log(overlayTiles, overlayTileIds);
       const { position, legion } = overlayTiles[id];
       return <DroppableLegionClassTile position={position} legion={legion} />;
     });
   };
+
+  const [, dropRef] = useDrop({
+    accept: ItemTypes.LEGION,
+    drop: (item, monitor) => {
+      const { x, y } = monitor.getDifferenceFromInitialOffset();
+      const el = document.getElementById(droppedTile.id);
+      if (el) {
+        const tileOffset = el.getBoundingClientRect();
+        const gridContainer = document.querySelector(
+          "table#legionTableContainer"
+        );
+        const gridRect = gridContainer.getBoundingClientRect();
+        const tileLeftOffset = tileOffset.left;
+        const tileTopOffset = tileOffset.top;
+        // subtract 1 from the offset to account for borders
+        const viewportOffsetLeft =
+          Math.floor((x + tileLeftOffset - gridRect.x) / 25) * 25 - 1;
+        const viewportOffsetTop =
+          Math.floor((y + tileTopOffset - gridRect.y) / 25) * 25;
+
+        if (!item.isMapped) {
+          // this is for dragging from the menu to the grid
+          // i.e. first time using a tile
+          // const offsetParent = elAtPosition.offsetParent;
+          item.id = createNewTileId(item.id);
+          addNewOverlayTile(
+            { ...item },
+            {
+              x: viewportOffsetLeft,
+              y: viewportOffsetTop,
+            }
+          );
+        } else {
+          // reusing a tile - need different coords calculation
+          updateLegionTilePosition({ ...item }, droppedTile.id, {
+            offsetTop: y,
+            offsetLeft: x,
+          });
+        }
+      }
+    },
+  });
 
   return (
     <>
@@ -155,10 +154,7 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
 
 export default DropTarget(ItemTypes.LEGION, {}, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  canDrop: monitor.canDrop(),
   droppedTile: monitor.getItem(),
-  didDrop: monitor.didDrop(),
 }))(LegionGrid);
 
 const CellSpacing = styled.div`
