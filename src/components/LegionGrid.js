@@ -33,7 +33,7 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
     const prevOffsetTop = tileElement.props.position.y;
     const prevOffsetLeft = tileElement.props.position.x;
     const { offsetTop, offsetLeft } = droppedPosition;
-    // round to the closest tile position, but append 1 so that it
+    // round to the closest tile position, but shift left by 1 because of borders
     const x = Math.round((prevOffsetLeft + offsetLeft) / 25) * 25 - 1;
     const y = Math.round((prevOffsetTop + offsetTop) / 25) * 25;
 
@@ -47,32 +47,28 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
       const el = document.getElementById(droppedTile.id);
       if (el) {
         const tileOffset = el.getBoundingClientRect();
+        const gridContainer = document.querySelector(
+          "table#legionTableContainer"
+        );
+        const gridRect = gridContainer.getBoundingClientRect();
         const tileLeftOffset = tileOffset.left;
         const tileTopOffset = tileOffset.top;
-        const viewportOffsetLeft = x + tileLeftOffset;
-        const viewportOffsetTop = y + tileTopOffset;
-        const elAtPosition = document.elementFromPoint(
-          viewportOffsetLeft,
-          viewportOffsetTop
-        );
-        if (
-          !elAtPosition ||
-          !elAtPosition.offsetParent ||
-          elAtPosition.offsetParent.nodeName === "TABLE"
-        ) {
-          return;
-        }
+        // subtract 1 from the offset to account for borders
+        const viewportOffsetLeft =
+          Math.round((x + tileLeftOffset - gridRect.x) / 25) * 25 - 1;
+        const viewportOffsetTop =
+          Math.round((y + tileTopOffset - gridRect.y) / 25) * 25;
 
         if (!item.isMapped) {
           // this is for dragging from the menu to the grid
           // i.e. first time using a tile
-          const offsetParent = elAtPosition.offsetParent;
+          // const offsetParent = elAtPosition.offsetParent;
           item.id = renewTileCache(item.id);
           addNewOverlayTile(
             { ...item },
             {
-              x: offsetParent.offsetLeft,
-              y: offsetParent.offsetTop,
+              x: viewportOffsetLeft,
+              y: viewportOffsetTop,
             }
           );
         } else {
