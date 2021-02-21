@@ -13,7 +13,6 @@ class DroppableLegionClassTile extends Component {
     const {
       position,
       legion,
-      isMapped,
       isDragging,
       connectDragSource,
       connectDropTarget,
@@ -33,7 +32,6 @@ class DroppableLegionClassTile extends Component {
           ref={(instance) =>
             connectDropTarget(connectDragSource(findDOMNode(instance)))
           }
-          isMapped={isMapped}
         >
           <tbody>
             {legion.grid.map((row, j) => (
@@ -44,9 +42,8 @@ class DroppableLegionClassTile extends Component {
                     isDragging={isDragging}
                     isActive={!!cell}
                     classes={legion.classes}
-                    isMapped={isMapped}
                   >
-                    <CellSpacing isMapped={isMapped} />
+                    <CellSpacing />
                   </LegionTile>
                 ))}
               </LegionPill>
@@ -65,7 +62,7 @@ DroppableLegionClassTile = DragSource(
       classes: props.legion.classes,
       grid: props.legion.grid,
       id: props.legion.id,
-      isMapped: props.isMapped,
+      isMapped: true,
     }),
     endDrag: (props, monitor) => {
       if (!monitor.didDrop()) {
@@ -101,31 +98,18 @@ const LegionTable = styled.table`
   border-collapse: collapse;
   border-spacing: 0;
   margin: 8px 8px 0 16px;
-
-  ${({ isMapped }) =>
-    isMapped
-      ? css`
-          width: 100%;
-          height: 100%;
-          margin: 0;
-        `
-      : undefined}
+  width: 100%;
+  height: 100%;
+  margin: 0;
 `;
 
 const LegionPill = styled.tr``;
 
 const CellSpacing = styled.div`
-  height: ${tileSize / 2}px;
-  width: ${tileSize / 2}px;
+/* subtract 1 for border */
+  height: ${tileSize - 1}px;
+  width: ${tileSize - 1}px;
   background: transparent;
-
-  ${({ isMapped }) =>
-    !isMapped
-      ? undefined
-      : css`
-          height: ${24}px;
-          width: ${24}px;
-        `};
 `;
 
 const LegionTile = styled.td`

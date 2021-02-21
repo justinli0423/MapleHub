@@ -13,7 +13,14 @@ import {
 
 import DroppableLegionClassTile from "./DroppableLegionClassTile";
 
-const renewTileCache = (tileId) => {
+/**
+ *
+ * @param {number} tileId
+ * takes in the legion tile ID, and create a "hash"
+ * so that you can have multiple of the same legion tiles
+ * in memory without colliding
+ */
+const createNewTileId = (tileId) => {
   if (tileId.indexOf("#") === -1) {
     return tileId + "#" + Date.now();
   }
@@ -63,7 +70,7 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
           // this is for dragging from the menu to the grid
           // i.e. first time using a tile
           // const offsetParent = elAtPosition.offsetParent;
-          item.id = renewTileCache(item.id);
+          item.id = createNewTileId(item.id);
           addNewOverlayTile(
             { ...item },
             {
@@ -83,19 +90,12 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
   });
 
   const addNewOverlayTile = (legion, position, tileId = null) => {
-    let filteredIds = overlayTileIds;
-    if (tileId) {
-      // tileId used for tiles that are already assigned
-      filteredIds = removeOverlayTile(tileId);
-    }
+    // remove the old data first
+    let filteredIds = removeOverlayTile(tileId);
     setOverlayTiles({
       ...overlayTiles,
       [tileId ?? legion.id]: (
-        <DroppableLegionClassTile
-          position={position}
-          legion={legion}
-          isMapped
-        />
+        <DroppableLegionClassTile position={position} legion={legion} />
       ),
     });
     setOverlayTileIds([...filteredIds, tileId ?? legion.id]);
@@ -104,7 +104,7 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
   const removeOverlayTile = (tileId) => {
     const index = overlayTileIds.indexOf(tileId);
     if (index === -1) {
-      return;
+      return overlayTileIds;
     }
     const newOverlayTiles = { ...overlayTiles };
     const newOverlayTilesIds = overlayTileIds.filter((id) => id !== tileId);
@@ -154,17 +154,6 @@ export default DropTarget(ItemTypes.LEGION, {}, (connect, monitor) => ({
   droppedTile: monitor.getItem(),
   didDrop: monitor.didDrop(),
 }))(LegionGrid);
-
-const Container = styled.tbody`
-  position: absolute;
-  ${({ x, y }) =>
-    x >= 0 && y >= 0
-      ? css`
-          left: ${x}px;
-          top: ${y}px;
-        `
-      : undefined};
-`;
 
 const CellSpacing = styled.div`
   width: 24px;
