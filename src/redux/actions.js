@@ -4,8 +4,11 @@ import {
   RESTORE_EVENTS,
   RESET_EVENTS,
   DELETE_EVENT,
+  ADD_TILE,
+  REMOVE_TILE,
 } from "./actionTypes";
 
+// ------- REMINDER ACTIONS -------
 export const restoreEvents = (calendarEvents, eventIds) => ({
   type: RESTORE_EVENTS,
   payload: {
@@ -32,5 +35,20 @@ export const deleteEvent = (id) => ({
 });
 
 export const resetEvents = () => ({
-  type: RESET_EVENTS
-})
+  type: RESET_EVENTS,
+});
+
+// ------- LEGION GRID ACTIONS -------
+export const addLegionTile = (id, position, legion) => ({
+  type: ADD_TILE,
+  payload: {
+    id,
+    position,
+    legion,
+  },
+});
+
+export const removeLegionTile = (id) => ({
+  type: REMOVE_TILE,
+  payload: { id },
+});
