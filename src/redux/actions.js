@@ -39,10 +39,9 @@ export const resetEvents = () => ({
 });
 
 // ------- LEGION GRID ACTIONS -------
-export const addLegionTile = (id, position, legion) => ({
+export const addLegionTile = (legion, position) => ({
   type: ADD_TILE,
   payload: {
-    id,
     position,
     legion,
   },

@@ -8,10 +8,11 @@ const initialState = {
 const events = (state = initialState, action) => {
   switch (action.type) {
     case ADD_TILE: {
-      const { id, position, legion } = action.payload;
+      const { position, legion } = action.payload;
+      const id = legion.id;
       const overlayTileIds = state.overlayTileIds.filter(
         (tileId) => tileId !== id
-      );
+      ).concat(id);
       return {
         ...state,
         overlayTileIds,

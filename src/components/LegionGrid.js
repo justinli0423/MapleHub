@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { connect } from "react-redux";
 import styled, { css } from "styled-components";
 import { DropTarget, useDrop } from "react-dnd";
 import { findDOMNode } from "react-dom";
@@ -6,12 +7,19 @@ import { findDOMNode } from "react-dom";
 import Colors from "../common/colors";
 import ItemTypes from "../common/ItemTypes";
 
+import { addLegionTile } from "../redux/actions";
+import {
+  getLegionStore,
+  getOverlayTileIds,
+  getOverlayTiles,
+} from "../redux/selectors";
+
+import DroppableLegionClassTile from "./DroppableLegionClassTile";
+
 import {
   numTilesHorizontal,
   LegionTileState,
 } from "../legionUtils/LegionDetails";
-
-import DroppableLegionClassTile from "./DroppableLegionClassTile";
 
 /**
  *
@@ -27,11 +35,15 @@ const createNewTileId = (tileId) => {
   return tileId.split("#")[0] + "#" + Date.now();
 };
 
-const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
+const LegionGrid = ({
+  grid,
+  connectDropTarget,
+  droppedTile,
+  addLegionTile,
+  overlayTiles,
+  overlayTileIds,
+}) => {
   let tileIndexCount = 0;
-  const [overlayTiles, setOverlayTiles] = useState({});
-  const [overlayTileIds, setOverlayTileIds] = useState([]);
-
   const updateLegionTilePosition = (legion, tileId, droppedPosition) => {
     const tileElement = overlayTiles[tileId];
     if (!tileElement || !droppedPosition) {
@@ -44,34 +56,7 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
     const x = Math.floor((prevOffsetLeft + offsetLeft) / 25) * 25 - 1;
     const y = Math.floor((prevOffsetTop + offsetTop) / 25) * 25;
 
-    addNewOverlayTile(legion, { x, y }, tileId);
-  };
-
-  // tileId is for moving existing tiles instead of creating new ones
-  const addNewOverlayTile = (legion, position, tileId = null) => {
-    // remove the old data first to prevent duplicate in id array
-    removeOverlayTile(tileId);
-    setOverlayTiles({
-      ...overlayTiles,
-      [tileId ?? legion.id]: {
-        position,
-        legion,
-      },
-    });
-    setOverlayTileIds([...overlayTileIds, tileId ?? legion.id]);
-  };
-
-  const removeOverlayTile = (tileId) => {
-    const index = overlayTileIds.indexOf(tileId);
-    if (index === -1) {
-      return overlayTileIds;
-    }
-    const newOverlayTiles = { ...overlayTiles };
-    const newOverlayTilesIds = overlayTileIds.filter((id) => id !== tileId);
-    delete newOverlayTiles[tileId];
-    setOverlayTileIds(newOverlayTilesIds);
-    setOverlayTiles(newOverlayTiles);
-    return newOverlayTilesIds;
+    addLegionTile(legion, {x, y})
   };
 
   const generateOverlayTiles = () => {
@@ -105,7 +90,7 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
           // i.e. first time using a tile
           // const offsetParent = elAtPosition.offsetParent;
           item.id = createNewTileId(item.id);
-          addNewOverlayTile(
+          addLegionTile(
             { ...item },
             {
               x: viewportOffsetLeft,
@@ -152,10 +137,24 @@ const LegionGrid = ({ grid, connectDropTarget, droppedTile }) => {
   );
 };
 
-export default DropTarget(ItemTypes.LEGION, {}, (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  droppedTile: monitor.getItem(),
-}))(LegionGrid);
+const mapStateToProps = (state) => {
+  const legionStore = getLegionStore(state);
+  const overlayTiles = getOverlayTiles(legionStore);
+  const overlayTileIds = getOverlayTileIds(legionStore);
+  return {
+    overlayTiles,
+    overlayTileIds,
+  };
+};
+
+export default connect(mapStateToProps, {
+  addLegionTile,
+})(
+  DropTarget(ItemTypes.LEGION, {}, (connect, monitor) => ({
+    connectDropTarget: connect.dropTarget(),
+    droppedTile: monitor.getItem(),
+  }))(LegionGrid)
+);
 
 const CellSpacing = styled.div`
   width: 24px;
