@@ -21,19 +21,7 @@ import {
   LegionTileState,
 } from "../legionUtils/LegionDetails";
 
-/**
- *
- * @param {number} tileId
- * takes in the legion tile ID, and create a "hash"
- * so that you can have multiple of the same legion tiles
- * in memory without colliding
- */
-const createNewTileId = (tileId) => {
-  if (tileId.indexOf("#") === -1) {
-    return tileId + "#" + Date.now();
-  }
-  return tileId.split("#")[0] + "#" + Date.now();
-};
+
 
 const LegionGrid = ({
   grid,
@@ -88,8 +76,6 @@ const LegionGrid = ({
         if (!item.isMapped) {
           // this is for dragging from the menu to the grid
           // i.e. first time using a tile
-          // const offsetParent = elAtPosition.offsetParent;
-          item.id = createNewTileId(item.id);
           addLegionTile(
             { ...item },
             {
@@ -108,6 +94,8 @@ const LegionGrid = ({
     },
   });
 
+  // TODO: bring table wrapper into this component and 
+  // render overlays outside the table (wrap in div)
   return (
     <>
       {generateOverlayTiles()}

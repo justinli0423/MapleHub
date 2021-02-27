@@ -1,7 +1,10 @@
 import React from "react";
+import { connect } from "react-redux";
 import styled, { css } from "styled-components";
 import { findDOMNode } from "react-dom";
 import { DragSource, DropTarget, useDrop } from "react-dnd";
+
+import { addLegionTile } from "../redux/actions";
 
 import Colors from "../common/colors";
 import ItemTypes from "../common/ItemTypes";
@@ -9,6 +12,7 @@ import { Classes } from "../common/consts";
 import { tileSize } from "../legionUtils/LegionDetails";
 
 const DroppableLegionClassTile = ({
+  addLegionTile,
   position,
   legion,
   isDragging,
@@ -23,10 +27,23 @@ const DroppableLegionClassTile = ({
       if (!droppedTile) {
         return;
       }
-      console.log(item);
-      console.log(position);
-      const el = document.getElementById(droppedTile.id);
-
+      const originalX = item.position.x;
+      const originalY = item.position.y;
+      const x =
+        Math.floor(
+          (originalX + monitor.getDifferenceFromInitialOffset().x) / 25
+        ) * 25;
+      const y =
+        Math.floor(
+          (originalY + monitor.getDifferenceFromInitialOffset().y) / 25
+        ) * 25;
+      addLegionTile(
+        { ...item },
+        {
+          x,
+          y,
+        }
+      );
     },
   });
 
@@ -68,25 +85,30 @@ const DroppableLegionClassTile = ({
 };
 
 // This component will need to be drop and draggable
-export default DropTarget(ItemTypes.LEGION, {}, (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  droppedTile: monitor.getItem(),
-}))(
-  DragSource(
-    ItemTypes.LEGION,
-    {
-      beginDrag: (props) => ({
-        classes: props.legion.classes,
-        grid: props.legion.grid,
-        id: props.legion.id,
-        isMapped: true,
-      }),
-    },
-    (connect, monitor) => ({
-      connectDragSource: connect.dragSource(),
-      isDragging: monitor.isDragging(),
-    })
-  )(DroppableLegionClassTile)
+export default connect(null, {
+  addLegionTile,
+})(
+  DropTarget(ItemTypes.LEGION, {}, (connect, monitor) => ({
+    connectDropTarget: connect.dropTarget(),
+    droppedTile: monitor.getItem(),
+  }))(
+    DragSource(
+      ItemTypes.LEGION,
+      {
+        beginDrag: (props) => ({
+          classes: props.legion.classes,
+          position: props.position,
+          grid: props.legion.grid,
+          id: props.legion.id,
+          isMapped: true,
+        }),
+      },
+      (connect, monitor) => ({
+        connectDragSource: connect.dragSource(),
+        isDragging: monitor.isDragging(),
+      })
+    )(DroppableLegionClassTile)
+  )
 );
 
 const Container = styled.tbody`
