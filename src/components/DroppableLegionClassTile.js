@@ -29,10 +29,11 @@ const DroppableLegionClassTile = ({
       }
       const originalX = item.position.x;
       const originalY = item.position.y;
+      // requires - 1 for border offset
       const x =
         Math.floor(
           (originalX + monitor.getDifferenceFromInitialOffset().x) / 25
-        ) * 25;
+        ) * 25 - 1;
       const y =
         Math.floor(
           (originalY + monitor.getDifferenceFromInitialOffset().y) / 25
