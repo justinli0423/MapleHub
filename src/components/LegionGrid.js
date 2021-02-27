@@ -21,8 +21,6 @@ import {
   LegionTileState,
 } from "../legionUtils/LegionDetails";
 
-
-
 const LegionGrid = ({
   grid,
   connectDropTarget,
@@ -34,22 +32,23 @@ const LegionGrid = ({
   let tileIndexCount = 0;
   const updateLegionTilePosition = (legion, tileId, droppedPosition) => {
     const tileElement = overlayTiles[tileId];
-    if (!tileElement || !droppedPosition) {
-      return;
-    }
     const prevOffsetTop = tileElement.position.y;
     const prevOffsetLeft = tileElement.position.x;
     const { offsetTop, offsetLeft } = droppedPosition;
     // round to the closest tile position, but shift left by 1 because of borders
-    const x = Math.floor((prevOffsetLeft + offsetLeft) / 25) * 25 - 1;
-    const y = Math.floor((prevOffsetTop + offsetTop) / 25) * 25;
+    const x = Math.max(
+      Math.floor((prevOffsetLeft + offsetLeft) / 25) * 25 - 1,
+      -1
+    );
+    const y = Math.max(Math.floor((prevOffsetTop + offsetTop) / 25) * 25, 0);
 
-    addLegionTile(legion, {x, y})
+    addLegionTile(legion, { x, y });
   };
 
   const generateOverlayTiles = () => {
     return overlayTileIds.map((id) => {
       const { position, legion } = overlayTiles[id];
+      console.log(id, position);
       return <DroppableLegionClassTile position={position} legion={legion} />;
     });
   };
@@ -94,7 +93,7 @@ const LegionGrid = ({
     },
   });
 
-  // TODO: bring table wrapper into this component and 
+  // TODO: bring table wrapper into this component and
   // render overlays outside the table (wrap in div)
   return (
     <>

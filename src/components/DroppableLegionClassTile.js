@@ -33,7 +33,9 @@ const DroppableLegionClassTile = ({
       const x =
         Math.floor(
           (originalX + monitor.getDifferenceFromInitialOffset().x) / 25
-        ) * 25 - 1;
+        ) *
+          25 -
+        1;
       const y =
         Math.floor(
           (originalY + monitor.getDifferenceFromInitialOffset().y) / 25
@@ -115,12 +117,10 @@ export default connect(null, {
 const Container = styled.tbody`
   position: absolute;
   ${({ x, y }) =>
-    x >= 0 && y >= 0
-      ? css`
-          left: ${x}px;
-          top: ${y}px;
-        `
-      : undefined};
+    css`
+      left: ${x}px;
+      top: ${y}px;
+    `};
 `;
 
 const LegionTable = styled.table`

@@ -103,11 +103,11 @@ const LegionSection = styled.div`
 `;
 
 const Details = styled.div`
+  overflow: hidden;
   display: flex;
   align-items: flex-end;
-  height: 42px;
-  width: 190px;
-  overflow: hidden;
+  flex-wrap: wrap;
+  width: 180px;
   white-space: break-spaces;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
 `;
