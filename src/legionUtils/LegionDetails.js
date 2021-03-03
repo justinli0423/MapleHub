@@ -167,33 +167,21 @@ const LegionClasses = [
     rank: LegionRanks.B,
     levelReq: 60,
     classes: [Classes.ALL],
-    grid: [
-      [1, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0],
-    ],
+    grid: [[1]],
   },
   {
     id: "allClasses100",
     rank: LegionRanks.A,
     levelReq: 100,
     classes: [Classes.ALL],
-    grid: [
-      [1, 1, 0, 0, 0],
-      [0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0],
-    ],
+    grid: [[1, 1]],
   },
   {
     id: "mageBowThiefXenon140",
     rank: LegionRanks.S,
     levelReq: 140,
     classes: [Classes.MAGICIAN, Classes.BOWMAN, Classes.THIEF, Classes.XENON],
-    grid: [
-      [1, 1, 1, 0, 0],
-      [0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0],
-    ],
+    grid: [[1, 1, 1]],
   },
   {
     id: "warriorPirate140",
@@ -201,9 +189,8 @@ const LegionClasses = [
     levelReq: 140,
     classes: [Classes.WARRIOR, Classes.PIRATE],
     grid: [
-      [1, 1, 0, 0, 0],
-      [1, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0],
+      [1, 1],
+      [1, 0],
     ],
   },
   {
@@ -212,9 +199,8 @@ const LegionClasses = [
     levelReq: 200,
     classes: [Classes.WARRIOR],
     grid: [
-      [1, 1, 0, 0, 0],
-      [1, 1, 0, 0, 0],
-      [0, 0, 0, 0, 0],
+      [1, 1],
+      [1, 1],
     ],
   },
   {
@@ -223,9 +209,8 @@ const LegionClasses = [
     levelReq: 200,
     classes: [Classes.MAGICIAN],
     grid: [
-      [1, 1, 1, 0, 0],
-      [0, 1, 0, 0, 0],
-      [0, 0, 0, 0, 0],
+      [1, 1, 1],
+      [0, 1, 0],
     ],
   },
   {
@@ -233,11 +218,7 @@ const LegionClasses = [
     rank: LegionRanks.SS,
     levelReq: 200,
     classes: [Classes.BOWMAN],
-    grid: [
-      [1, 1, 1, 1, 0],
-      [0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0],
-    ],
+    grid: [[1, 1, 1, 1]],
   },
   {
     id: "thiefXenon200",
@@ -245,9 +226,8 @@ const LegionClasses = [
     levelReq: 200,
     classes: [Classes.THIEF, Classes.XENON],
     grid: [
-      [1, 1, 1, 0, 0],
-      [0, 0, 1, 0, 0],
-      [0, 0, 0, 0, 0],
+      [1, 1, 1],
+      [0, 0, 1],
     ],
   },
   {
@@ -256,9 +236,9 @@ const LegionClasses = [
     levelReq: 200,
     classes: [Classes.PIRATE],
     grid: [
-      [0, 1, 0, 0, 0],
-      [1, 1, 0, 0, 0],
-      [1, 0, 0, 0, 0],
+      [0, 1],
+      [1, 1],
+      [1, 0],
     ],
   },
   {
@@ -267,9 +247,9 @@ const LegionClasses = [
     levelReq: 250,
     classes: [Classes.WARRIOR],
     grid: [
-      [1, 1, 1, 0, 0],
-      [1, 1, 0, 0, 0],
-      [0, 0, 0, 0, 0],
+      [1, 1, 1],
+      [1, 1, 0],
+      [0, 0, 0],
     ],
   },
   {
@@ -278,9 +258,9 @@ const LegionClasses = [
     levelReq: 250,
     classes: [Classes.MAGICIAN],
     grid: [
-      [0, 1, 0, 0, 0],
-      [1, 1, 1, 0, 0],
-      [0, 1, 0, 0, 0],
+      [0, 1, 0],
+      [1, 1, 1],
+      [0, 1, 0],
     ],
   },
   {
@@ -288,11 +268,7 @@ const LegionClasses = [
     rank: LegionRanks.SSS,
     levelReq: 250,
     classes: [Classes.BOWMAN],
-    grid: [
-      [1, 1, 1, 1, 1],
-      [0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0],
-    ],
+    grid: [[1, 1, 1, 1, 1]],
   },
   {
     id: "thief250",
@@ -300,9 +276,9 @@ const LegionClasses = [
     levelReq: 250,
     classes: [Classes.THIEF],
     grid: [
-      [0, 0, 1, 0, 0],
-      [1, 1, 1, 0, 0],
-      [0, 0, 1, 0, 0],
+      [0, 0, 1],
+      [1, 1, 1],
+      [0, 0, 1],
     ],
   },
   {
@@ -313,7 +289,6 @@ const LegionClasses = [
     grid: [
       [1, 1, 0, 0, 0],
       [0, 1, 1, 1, 1],
-      [0, 0, 0, 0, 0],
     ],
   },
   {
@@ -322,9 +297,9 @@ const LegionClasses = [
     levelReq: 250,
     classes: [Classes.XENON],
     grid: [
-      [1, 0, 0, 0, 0],
-      [1, 1, 1, 0, 0],
-      [0, 0, 1, 0, 0],
+      [1, 0, 0],
+      [1, 1, 1],
+      [0, 0, 1],
     ],
   },
 ];
