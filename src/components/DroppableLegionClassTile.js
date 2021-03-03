@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import styled, { css } from "styled-components";
 import { findDOMNode } from "react-dom";
-import { DragSource, DropTarget, useDrop } from "react-dnd";
+import { DragSource, DropTarget, useDrop, DragPreviewImage } from "react-dnd";
 
 import { addLegionTile } from "../redux/actions";
 
@@ -19,6 +19,7 @@ const DroppableLegionClassTile = ({
   droppedTile,
   connectDragSource,
   connectDropTarget,
+  connectDragPreview,
 }) => {
   const [, dropRef] = useDrop({
     accept: ItemTypes.LEGION,
@@ -46,8 +47,6 @@ const DroppableLegionClassTile = ({
             Math.floor((x + tileLeftOffset - gridRect.x) / 25) * 25 - 1;
           const viewportOffsetTop =
             Math.floor((y + tileTopOffset - gridRect.y) / 25) * 25;
-
-          console.log(viewportOffsetLeft, viewportOffsetTop);
           addLegionTile(
             { ...item },
             {
@@ -91,13 +90,11 @@ const DroppableLegionClassTile = ({
       x={position.x}
       y={position.y}
       key={`${position.x}#${position.y}`}
+      ref={(instance) =>
+        connectDropTarget(dropRef(connectDragSource(findDOMNode(instance))))
+      }
     >
-      <LegionTable
-        id={legion.id}
-        ref={(instance) =>
-          connectDropTarget(dropRef(connectDragSource(findDOMNode(instance))))
-        }
-      >
+      <LegionTable id={legion.id}>
         <tbody>
           {legion.grid.map((row, j) => (
             <LegionPill key={j}>
@@ -135,11 +132,13 @@ export default connect(null, {
           position: props.position,
           grid: props.legion.grid,
           id: props.legion.id,
+          icon: props.legion.icon,
           isMapped: true,
         }),
       },
       (connect, monitor) => ({
         connectDragSource: connect.dragSource(),
+        connectDragPreview: connect.dragPreview(),
         isDragging: monitor.isDragging(),
       })
     )(DroppableLegionClassTile)
@@ -148,6 +147,7 @@ export default connect(null, {
 
 const Container = styled.tbody`
   position: absolute;
+  transform: translate(0, 0);
   ${({ x, y }) =>
     css`
       left: ${x}px;

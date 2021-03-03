@@ -41,6 +41,7 @@ export default DragSource(
       classes: props.legion.classes,
       grid: props.legion.grid,
       id: props.legion.id,
+      icon: props.legion.icon,
     }),
     endDrag: (props, monitor) => {
       if (!monitor.didDrop()) {
@@ -64,9 +65,6 @@ const LegionTable = styled.table`
 const LegionPill = styled.tr``;
 
 const CellSpacing = styled.div`
-  /*   height: ${tileSize - 1}px;
-      width: ${tileSize - 1}px;
-   */
   height: ${tileSize / 2}px;
   width: ${tileSize / 2}px;
   background: transparent;
