@@ -41,7 +41,6 @@ export default DragSource(
       classes: props.legion.classes,
       grid: props.legion.grid,
       id: props.legion.id,
-      icon: props.legion.icon,
     }),
     endDrag: (props, monitor) => {
       if (!monitor.didDrop()) {

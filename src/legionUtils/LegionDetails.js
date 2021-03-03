@@ -1,19 +1,4 @@
 import { Classes, LegionRanks } from "../common/consts";
-import allClasses60 from "./tileIcons/allClasses60.png";
-import allClasses100 from "./tileIcons/allClasses100.png";
-import bowman200 from "./tileIcons/bowman200.png";
-import bowman250 from "./tileIcons/bowman250.png";
-import mage200 from "./tileIcons/mage200.png";
-import mage250 from "./tileIcons/mage250.png";
-import mageBowThiefXenon140 from "./tileIcons/mageBowThiefXenon140.png";
-import pirate200 from "./tileIcons/pirate200.png";
-import pirate250 from "./tileIcons/pirate250.png";
-import thief250 from "./tileIcons/pirate200.png";
-import thiefXenon200 from "./tileIcons/thiefXenon200.png";
-import warrior200 from "./tileIcons/warrior200.png";
-import warrior250 from "./tileIcons/warrior250.png";
-import warriorPirate140 from "./tileIcons/warriorPirate140.png";
-import xenon250 from "./tileIcons/xenon250.png";
 
 const Coords = {
   first: [
@@ -180,7 +165,6 @@ const LegionClasses = [
   {
     id: "allClasses60",
     rank: LegionRanks.B,
-    icon: allClasses60,
     levelReq: 60,
     classes: [Classes.ALL],
     grid: [
@@ -192,7 +176,6 @@ const LegionClasses = [
   {
     id: "allClasses100",
     rank: LegionRanks.A,
-    icon: allClasses100,
     levelReq: 100,
     classes: [Classes.ALL],
     grid: [
@@ -204,7 +187,6 @@ const LegionClasses = [
   {
     id: "mageBowThiefXenon140",
     rank: LegionRanks.S,
-    icon: mageBowThiefXenon140,
     levelReq: 140,
     classes: [Classes.MAGICIAN, Classes.BOWMAN, Classes.THIEF, Classes.XENON],
     grid: [
@@ -216,7 +198,6 @@ const LegionClasses = [
   {
     id: "warriorPirate140",
     rank: LegionRanks.S,
-    icon: warriorPirate140,
     levelReq: 140,
     classes: [Classes.WARRIOR, Classes.PIRATE],
     grid: [
@@ -228,7 +209,6 @@ const LegionClasses = [
   {
     id: "warrior200",
     rank: LegionRanks.SS,
-    icon: warrior200,
     levelReq: 200,
     classes: [Classes.WARRIOR],
     grid: [
@@ -240,7 +220,6 @@ const LegionClasses = [
   {
     id: "mage200",
     rank: LegionRanks.SS,
-    icon: mage200,
     levelReq: 200,
     classes: [Classes.MAGICIAN],
     grid: [
@@ -252,7 +231,6 @@ const LegionClasses = [
   {
     id: "bowman200",
     rank: LegionRanks.SS,
-    icon: bowman200,
     levelReq: 200,
     classes: [Classes.BOWMAN],
     grid: [
@@ -264,7 +242,6 @@ const LegionClasses = [
   {
     id: "thiefXenon200",
     rank: LegionRanks.SS,
-    icon: thiefXenon200,
     levelReq: 200,
     classes: [Classes.THIEF, Classes.XENON],
     grid: [
@@ -276,7 +253,6 @@ const LegionClasses = [
   {
     id: "pirate200",
     rank: LegionRanks.SS,
-    icon: pirate200,
     levelReq: 200,
     classes: [Classes.PIRATE],
     grid: [
@@ -288,7 +264,6 @@ const LegionClasses = [
   {
     id: "warrior250",
     rank: LegionRanks.SSS,
-    icon: warrior250,
     levelReq: 250,
     classes: [Classes.WARRIOR],
     grid: [
@@ -300,7 +275,6 @@ const LegionClasses = [
   {
     id: "mage250",
     rank: LegionRanks.SSS,
-    icon: mage250,
     levelReq: 250,
     classes: [Classes.MAGICIAN],
     grid: [
@@ -312,7 +286,6 @@ const LegionClasses = [
   {
     id: "bowman250",
     rank: LegionRanks.SSS,
-    icon: bowman250,
     levelReq: 250,
     classes: [Classes.BOWMAN],
     grid: [
@@ -324,7 +297,6 @@ const LegionClasses = [
   {
     id: "thief250",
     rank: LegionRanks.SSS,
-    icon: thief250,
     levelReq: 250,
     classes: [Classes.THIEF],
     grid: [
@@ -336,7 +308,6 @@ const LegionClasses = [
   {
     id: "pirate250",
     rank: LegionRanks.SSS,
-    icon: pirate250,
     levelReq: 250,
     classes: [Classes.PIRATE],
     grid: [
@@ -348,7 +319,6 @@ const LegionClasses = [
   {
     id: "xenon250",
     rank: LegionRanks.SSS,
-    icon: xenon250,
     levelReq: 250,
     classes: [Classes.XENON],
     grid: [

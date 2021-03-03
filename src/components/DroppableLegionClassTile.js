@@ -132,7 +132,6 @@ export default connect(null, {
           position: props.position,
           grid: props.legion.grid,
           id: props.legion.id,
-          icon: props.legion.icon,
           isMapped: true,
         }),
       },
