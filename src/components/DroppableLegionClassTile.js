@@ -19,7 +19,6 @@ const DroppableLegionClassTile = ({
   droppedTile,
   connectDragSource,
   connectDropTarget,
-  connectDragPreview,
 }) => {
   const [, dropRef] = useDrop({
     accept: ItemTypes.LEGION,
@@ -146,6 +145,7 @@ export default connect(null, {
 
 const Container = styled.tbody`
   position: absolute;
+  /* need transform to remove background image - not sure why */
   transform: translate(0, 0);
   ${({ x, y }) =>
     css`
