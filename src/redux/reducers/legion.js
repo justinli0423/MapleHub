@@ -32,6 +32,8 @@ const isTileInGrid = (position, tile) => {
   // TODO: need to check for tile height as well
   const actualTileWidth =
     Math.max(...tile.map((row) => row.lastIndexOf(1))) + 1;
+  const actualTileHeight =
+    Math.max(...tile.map((row, i) => (row.includes(1) ? i : 0))) + 1;
   const gridContainer = document.querySelector("table#legionTableContainer");
   const gridRect = gridContainer.getBoundingClientRect();
 
@@ -40,7 +42,7 @@ const isTileInGrid = (position, tile) => {
     position.x >= -1 &&
     position.x <= gridRect.width - 25 * actualTileWidth &&
     position.y >= 0 &&
-    position.y <= gridRect.height
+    position.y <= gridRect.height - 25 * actualTileHeight
   );
 };
 

@@ -48,7 +48,6 @@ const LegionGrid = ({
   const generateOverlayTiles = () => {
     return overlayTileIds.map((id) => {
       const { position, legion } = overlayTiles[id];
-      console.log(id, position);
       return <DroppableLegionClassTile position={position} legion={legion} />;
     });
   };
