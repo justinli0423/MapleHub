@@ -27,6 +27,38 @@ const DroppableLegionClassTile = ({
       if (!droppedTile) {
         return;
       }
+
+      if (!item.isMapped) {
+        // new tile dropped onto another tile
+        // TODO: this is copied LegionGrid.js:59 - refactor into cleaner modules
+        const { x, y } = monitor.getDifferenceFromInitialOffset();
+        const el = document.getElementById(droppedTile.id);
+        if (el) {
+          const tileOffset = el.getBoundingClientRect();
+          const gridContainer = document.querySelector(
+            "table#legionTableContainer"
+          );
+          const gridRect = gridContainer.getBoundingClientRect();
+          const tileLeftOffset = tileOffset.left;
+          const tileTopOffset = tileOffset.top;
+          // subtract 1 from the offset to account for borders
+          const viewportOffsetLeft =
+            Math.floor((x + tileLeftOffset - gridRect.x) / 25) * 25 - 1;
+          const viewportOffsetTop =
+            Math.floor((y + tileTopOffset - gridRect.y) / 25) * 25;
+
+          console.log(viewportOffsetLeft, viewportOffsetTop);
+          addLegionTile(
+            { ...item },
+            {
+              x: viewportOffsetLeft,
+              y: viewportOffsetTop,
+            }
+          );
+        }
+        return;
+      }
+
       const originalX = item.position.x;
       const originalY = item.position.y;
       // requires - 1 for border offset

@@ -1,4 +1,5 @@
 import { ADD_TILE, REMOVE_TILE } from "../actionTypes";
+import { LOCAL_STORAGE_LEGION_STATS } from "../../common/consts";
 
 const initialState = {
   overlayTiles: {},
@@ -19,6 +20,10 @@ const createUniqueTileId = (tileId) => {
   return tileId;
 };
 
+const saveLegionGridToCache = (store) => {
+  window.localStorage.setItem(LOCAL_STORAGE_LEGION_STATS, store);
+};
+
 /**
  *
  * @param {x, y} position
@@ -29,7 +34,7 @@ const createUniqueTileId = (tileId) => {
  * We allow -1 on horizontal alignment for border overlap purposes
  */
 const isTileInGrid = (position, tile) => {
-  // TODO: need to check for tile height as well
+  // TODO: check for boundaries when legion rank changes
   const actualTileWidth =
     Math.max(...tile.map((row) => row.lastIndexOf(1))) + 1;
   const actualTileHeight =
@@ -37,7 +42,6 @@ const isTileInGrid = (position, tile) => {
   const gridContainer = document.querySelector("table#legionTableContainer");
   const gridRect = gridContainer.getBoundingClientRect();
 
-  console.log(actualTileWidth);
   return (
     position.x >= -1 &&
     position.x <= gridRect.width - 25 * actualTileWidth &&
@@ -49,7 +53,7 @@ const isTileInGrid = (position, tile) => {
 const events = (state = initialState, action) => {
   switch (action.type) {
     case ADD_TILE: {
-      // will also update if the legion ID exists
+      // will also update the tile if the legion ID exists already
       const { position, legion } = action.payload;
       if (!isTileInGrid(position, legion.grid)) {
         return state;
