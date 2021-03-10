@@ -94,25 +94,25 @@ export default class Nav extends Component {
             </TimerContainer>
           </LogoContainer>
           <OptionsContainer>
-            <StyledLink exact to=''>
+            <StyledLink exact to="">
               <Item>
                 <ActiveBar />
                 Updates
               </Item>
             </StyledLink>
-            <StyledLink to='/status'>
+            <StyledLink to="/status">
               <Item>
                 <ActiveBar />
                 Status
               </Item>
             </StyledLink>
-            <StyledLink exact to='/legion'>
+            {/* <StyledLink exact to='/legion'>
               <Item>
                 <ActiveBar />
                 Legion Board
               </Item>
-            </StyledLink>
-            <StyledLink to='/reminders'>
+            </StyledLink> */}
+            <StyledLink to="/reminders">
               <Item>
                 <ActiveBar />
                 Reminders
@@ -126,17 +126,17 @@ export default class Nav extends Component {
         </Container>
 
         <MobileContainer>
-          <AppBar position='sticky' color='default'>
+          <AppBar position="sticky" color="default">
             <Toolbar>
               <IconButton
-                edge='start'
-                color='inherit'
-                aria-label='menu'
+                edge="start"
+                color="inherit"
+                aria-label="menu"
                 onClick={this.mobileMenuClick}
               >
                 <MenuIcon />
               </IconButton>
-              <Typography variant='h6'>MapleHub</Typography> <Icon />
+              <Typography variant="h6">MapleHub</Typography> <Icon />
               {mediaQueries.isTablet ? (
                 <TimerContainer>
                   {moment(this.state.serverTime)
@@ -145,19 +145,19 @@ export default class Nav extends Component {
                 </TimerContainer>
               ) : null}
               <Menu
-                id='simple-menu'
+                id="simple-menu"
                 anchorEl={menuAnchor}
                 keepMounted
                 open={Boolean(menuAnchor)}
                 onClose={this.mobileMenuClose}
               >
                 <MenuItem onClick={this.mobileMenuClose}>
-                  <StyledLink exact to=''>
+                  <StyledLink exact to="">
                     Updates
                   </StyledLink>
                 </MenuItem>
                 <MenuItem onClick={this.mobileMenuClose}>
-                  <StyledLink to='/status'>Status</StyledLink>
+                  <StyledLink to="/status">Status</StyledLink>
                 </MenuItem>
                 {/* <MenuItem onClick={this.mobileMenuClose}>Legion Board</MenuItem> */}
               </Menu>
@@ -167,16 +167,16 @@ export default class Nav extends Component {
 
         <MainContainer>
           <Switch>
-            <Route path='/legion'>
+            <Route path="/legion">
               <Legion />
             </Route>
-            <Route path='/status'>
+            <Route path="/status">
               <ServerStatus />
             </Route>
-            <Route path='/reminders'>
+            <Route path="/reminders">
               <Events />
             </Route>
-            <Route path='/'>
+            <Route path="/">
               <Home />
             </Route>
           </Switch>
