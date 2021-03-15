@@ -106,12 +106,12 @@ export default class Nav extends Component {
                 Status
               </Item>
             </StyledLink>
-            {/* <StyledLink exact to='/legion'>
+            <StyledLink exact to="/legion">
               <Item>
                 <ActiveBar />
                 Legion Board
               </Item>
-            </StyledLink> */}
+            </StyledLink>
             <StyledLink to="/reminders">
               <Item>
                 <ActiveBar />

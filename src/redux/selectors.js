@@ -21,8 +21,3 @@ export const getActiveEventIds = (store) => {
 
   return activeEventIds;
 };
-
-// ------- LEGION GRID ACTIONS -------
-export const getLegionStore = (store) => store.legion;
-export const getOverlayTileIds = (store) => store.overlayTileIds;
-export const getOverlayTiles = (store) => store.overlayTiles;

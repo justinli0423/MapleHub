@@ -37,17 +37,3 @@ export const deleteEvent = (id) => ({
 export const resetEvents = () => ({
   type: RESET_EVENTS,
 });
-
-// ------- LEGION GRID ACTIONS -------
-export const addLegionTile = (legion, position) => ({
-  type: ADD_TILE,
-  payload: {
-    position,
-    legion,
-  },
-});
-
-export const removeLegionTile = (id) => ({
-  type: REMOVE_TILE,
-  payload: { id },
-});
