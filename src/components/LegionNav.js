@@ -9,14 +9,6 @@ import LegionClassTile from "./LegionClassTile";
 import { LegionDetails, LegionClasses } from "../legionUtils/LegionDetails";
 
 export default class LegionNav extends React.Component {
-  handleAutocompleteInputChange(_, val) {
-    this.props.callback(
-      ...LegionDetails.filter(
-        (details) => details.name.concat(` - [Lv: ${details.minLevel}]`) === val
-      )
-    );
-  }
-
   renderLegionPills() {
     return LegionClasses.map((legion, i) => (
       <LegionSection key={i}>
@@ -31,20 +23,6 @@ export default class LegionNav extends React.Component {
           <span>[Lv: {legion.levelReq}]:</span>
         </Details>
         <LegionClassTile legion={legion} />
-        {/* <TextField
-          label='Number'
-          type='number'
-          margin='dense'
-          disabled
-          defaultValue={0}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          style={{
-            width: "60px",
-            padding: 0,
-          }}
-        /> */}
       </LegionSection>
     ));
   }
@@ -56,14 +34,13 @@ export default class LegionNav extends React.Component {
           options={LegionDetails.map(
             (legion) => legion.name + ` - [Lv: ${legion.minLevel}]`
           )}
-          onChange={this.handleAutocompleteInputChange.bind(this)}
           renderInput={(params) => (
             <TextField
               style={{
                 width: "420px",
               }}
-              label='Legion Rank'
-              variant='outlined'
+              label="Legion Rank"
+              variant="outlined"
               {...params}
             />
           )}

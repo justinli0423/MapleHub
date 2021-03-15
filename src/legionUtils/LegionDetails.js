@@ -161,6 +161,7 @@ const LegionDetails = [
   { name: "Legendary Legion Rank V", minLevel: 10000, attackers: 40 },
 ];
 
+// TODO: should store the canvas points here
 const LegionClasses = [
   {
     id: "allClasses60",

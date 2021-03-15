@@ -16,7 +16,7 @@ export default class Legion extends Component {
           />
         </Header>
         <Container>
-          <LegionNav callback={this.setLegionRank} />
+          <LegionNav />
           <LegionContainer></LegionContainer>
         </Container>
       </>
