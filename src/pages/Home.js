@@ -17,6 +17,7 @@ import Title from "../components/common/Title";
 import Header from "../components/common/Header";
 import EventTile from "../components/EventTile";
 import SearchBar from "../components/SearchBar";
+// import Button from "../components/common/DefaultButton";
 
 import {
   DefaultEventDetails,
@@ -343,7 +344,7 @@ export default class Home extends Component {
         [filterType]: !this.state.filters[filterType],
       },
     });
-
+    
   }
 
   openModal() {
@@ -425,16 +426,16 @@ export default class Home extends Component {
     return (
       <Header src={src}>
         <Title
-          title='All-In-One News Hub'
-          caption='A short and simple version of the current patch notes.'
+          title="All-In-One News Hub"
+          caption="A short and simple version of the current patch notes."
         />
         {/* button should be enabled only to update the patch */}
-        {/* <Button label='Update News Hub' callback={this.openModal.bind(this)} /> */}
+        {/* <Button label="Update News Hub" callback={this.openModal.bind(this)} /> */}
         <Modal
           open={this.state.isModalActive}
           onClose={this.closeModal.bind(this)}
-          aria-labelledby='simple-modal-title'
-          aria-describedby='simple-modal-description'
+          aria-labelledby="simple-modal-title"
+          aria-describedby="simple-modal-description"
         >
           <ModalContainer>
             <div>
@@ -442,7 +443,7 @@ export default class Home extends Component {
               <ol>
                 <li>
                   Open patch notes from the{" "}
-                  <a href='https://maplestory.nexon.net/' target='_blank'>
+                  <a href="https://maplestory.nexon.net/" target="_blank">
                     Official Maplestory Website
                   </a>
                   .
